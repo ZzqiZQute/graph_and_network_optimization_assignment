@@ -10,6 +10,7 @@ public:
     ~Vertex();
     void addVertexParams(VertexParams *vp);
     void removeVertexParamsAt(int pos);
+
 private:
     QList<VertexParams*> *params;
 

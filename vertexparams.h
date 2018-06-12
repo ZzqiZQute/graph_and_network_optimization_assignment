@@ -6,18 +6,19 @@ class VertexParams
 {
 public:
     VertexParams();
-    VertexParams(int q,int d);
+    VertexParams(int p,int e);
 
+    int getP() const;
+    void setP(int value);
 
-    int getQ() const;
-    void setQ(int value);
+    int getE() const;
+    void setE(int value);
 
-    int getD() const;
-    void setD(int value);
 
 private:
-    int q;//前继节点
-    int d;//距离
+    int p;//前继节点
+    int e;//边长
+
 };
 
 #endif // VERTEXPARAMS_H

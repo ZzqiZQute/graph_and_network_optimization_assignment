@@ -25,17 +25,26 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp \
     vertex.cpp \
     graph.cpp \
-    vertexparams.cpp
+    vertexparams.cpp \
+    bellmanmark.cpp \
+    floydmark.cpp \
+    displayframe.cpp \
+    launchdialog.cpp \
+    shortestpathwindow.cpp
 
 HEADERS += \
-        mainwindow.h \
     vertex.h \
     graph.h \
     common.h \
-    vertexparams.h
+    vertexparams.h \
+    bellmanmark.h \
+    floydmark.h \
+    displayframe.h \
+    launchdialog.h \
+    shortestpathwindow.h
 
 FORMS += \
-        mainwindow.ui
+    launchdialog.ui \
+    shortestpathwindow.ui

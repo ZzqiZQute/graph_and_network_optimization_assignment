@@ -5,28 +5,31 @@ VertexParams::VertexParams()
 
 }
 
-VertexParams::VertexParams(int q, int d)
+VertexParams::VertexParams(int p, int e)
 {
-    this->q=q;
-    this->d=d;
+    this->p=p;
+    this->e=e;
 }
 
-int VertexParams::getQ() const
+int VertexParams::getP() const
 {
-    return q;
+    return p;
 }
 
-void VertexParams::setQ(int value)
+void VertexParams::setP(int value)
 {
-    q = value;
+    p = value;
 }
 
-int VertexParams::getD() const
+int VertexParams::getE() const
 {
-    return d;
+    return e;
 }
 
-void VertexParams::setD(int value)
+void VertexParams::setE(int value)
 {
-    d = value;
+    e = value;
 }
+
+
+

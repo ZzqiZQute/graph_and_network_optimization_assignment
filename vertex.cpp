@@ -21,3 +21,4 @@ void Vertex::addVertexParams(VertexParams* vp){
 void Vertex::removeVertexParamsAt(int pos){
     params->removeAt(pos);
 }
+
