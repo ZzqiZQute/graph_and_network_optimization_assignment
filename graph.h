@@ -21,6 +21,8 @@ public:
 
     FloydMark *getFloydMark() const;
 
+    int getLastX();
+    int getLastY();
 private:
     QList<Vertex*> *vertexs;
     BellmanMark *bellmanMark;

@@ -3,6 +3,7 @@
 Vertex::Vertex()
 {
     params=new QList<VertexParams*>();
+    selected=false;
 }
 
 QList<VertexParams*>* Vertex::getParams() const
@@ -21,4 +22,52 @@ void Vertex::addVertexParams(VertexParams* vp){
 void Vertex::removeVertexParamsAt(int pos){
     params->removeAt(pos);
 }
+
+int Vertex::getCenterY() const
+{
+    return centerY;
+}
+
+void Vertex::setCenterY(int value)
+{
+    centerY = value;
+}
+
+int Vertex::getCenterX() const
+{
+    return centerX;
+}
+
+void Vertex::setCenterX(int value)
+{
+    centerX = value;
+}
+
+bool Vertex::getSelected() const
+{
+    return selected;
+}
+
+void Vertex::setSelected(bool value)
+{
+    selected = value;
+}
+
+void Vertex::saveCenter()
+{
+    oriCenterX=centerX;
+    oriCenterY=centerY;
+}
+
+int Vertex::getOriCenterX() const
+{
+    return oriCenterX;
+}
+
+int Vertex::getOriCenterY() const
+{
+    return oriCenterY;
+}
+
+
 

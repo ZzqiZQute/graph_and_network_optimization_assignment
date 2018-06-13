@@ -144,8 +144,17 @@ FloydMark *Graph::getFloydMark() const
 void Graph::clearVertexs(){
     vertexs->clear();
     vertexs->push_back(new Vertex());
+    count=0;
 }
 
 Vertex* Graph::getVertexAt(int pos) const{
     return vertexs->at(pos);
+}
+int Graph::getLastX(){
+
+    return vertexs->at(count)->getCenterX();
+}
+int Graph::getLastY(){
+
+   return vertexs->at(count)->getCenterY();
 }
