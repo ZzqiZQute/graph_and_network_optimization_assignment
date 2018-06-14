@@ -65,6 +65,8 @@ private:
     QPoint mouseToReal(int x, int y);
     QPoint realToMouse(int x, int y);
     void init();
+    void drawStraightEdge(QPainter *painter, Vertex *v1, Vertex *v2);
+    void drawStraightMaybeEdge(QPainter *painter, Vertex *v1, QPoint p);
 };
 
 #endif // DISPLAYFRAME_H

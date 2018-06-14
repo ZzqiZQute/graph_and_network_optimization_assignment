@@ -41,6 +41,15 @@ void Graph::removeVertexAt(int pos){
                 }
             }
         }
+       for(int i=0;i<vertexs->size();i++){
+            QList<VertexParams*> *vp=vertexs->at(i)->getParams();
+            auto b=vp->begin(),e=vp->end();
+            while(b!=e){
+                if((*b)->getP()>pos)
+                    (*b)->setP((*b)->getP()-1);
+                b++;
+            }
+        }
         vertexs->removeAt(pos);
         count--;
     }
@@ -156,5 +165,5 @@ int Graph::getLastX(){
 }
 int Graph::getLastY(){
 
-   return vertexs->at(count)->getCenterY();
+    return vertexs->at(count)->getCenterY();
 }

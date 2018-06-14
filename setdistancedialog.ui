@@ -6,19 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>246</width>
+    <width>308</width>
     <height>98</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>246</width>
+    <width>308</width>
     <height>98</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>246</width>
+    <width>308</width>
     <height>98</height>
    </size>
   </property>
@@ -56,6 +56,19 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="minimumSize">
+        <size>
+         <width>51</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>(空则清除）</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="pushButton">

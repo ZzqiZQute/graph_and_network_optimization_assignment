@@ -19,6 +19,9 @@ public:
 
     bool getHasValue() const;
 
+    bool getOk() const;
+
+
 public slots:
     void onBtnOkClicked();
 protected:
@@ -26,8 +29,8 @@ protected:
 private:
     Ui::SetDistanceDialog *ui;
     int distance;
-    bool hasValue;
     void getDis();
+    bool ok;
 };
 
 #endif // SETDISTANCEDIALOG_H

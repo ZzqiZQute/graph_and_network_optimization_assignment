@@ -17,6 +17,12 @@ Vertex::~Vertex(){
 }
 
 void Vertex::addVertexParams(VertexParams* vp){
+    for(int i=0;i<params->count();i++){
+        if(params->at(i)->getP()==vp->getP()){
+            params->removeAt(i);
+            break;
+        }
+    }
     params->push_back(vp);
 }
 void Vertex::removeVertexParamsAt(int pos){
