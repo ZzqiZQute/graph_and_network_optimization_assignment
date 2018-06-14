@@ -43,9 +43,10 @@ private:
     bool readyMultiMove;
     bool createEdge;
     bool findEdgeTail;
+    bool moveEdgeLabel;
     int moveVertexPos;
-    int moveVertexMouseX;
-    int moveVertexMouseY;
+    int currentLMouseX;
+    int currentLMouseY;
     int moveVertexCenterX;
     int moveVertexCenterY;
     int maybeMultiSelectMouseX;
@@ -58,7 +59,7 @@ private:
     int createEdgeVertexTail;
     QWidget *mParent;
     void drawVertexs(QPainter *painter);
-    int checkLBtnDownVertex(QPoint pos);
+    int checkLBtnDownVertex();
     void drawTest(QPainter *painter);
     void drawSelects(QPainter *painter);
     void drawEdge(QPainter *painter);
@@ -67,6 +68,8 @@ private:
     void init();
     void drawStraightEdge(QPainter *painter, Vertex *v1, Vertex *v2);
     void drawStraightMaybeEdge(QPainter *painter, Vertex *v1, QPoint p);
+    QPoint calcEdgeCenter(Vertex *v1, Vertex *v2);
+    void drawCurveEdge(QPainter *painter, Vertex *v1, Vertex *v2);
 };
 
 #endif // DISPLAYFRAME_H

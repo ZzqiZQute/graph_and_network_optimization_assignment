@@ -1,6 +1,6 @@
 #include "common.h"
 #include <math.h>
-double calcdeg(int x1,int y1,int x2,int y2){
+double calcDeg(int x1,int y1,int x2,int y2){
     double ret=0;
     if(abs(x1-x2)<=1&&abs(y1-y2)>1) ret= y2>y1?-90:90;
     else if(abs(y1-y2)<=1&&abs(x1-x2)>1) ret= x2>x1?0:180;
@@ -14,8 +14,5 @@ double calcdeg(int x1,int y1,int x2,int y2){
     return ret;
 }
 QPoint calcTail(int x,int y,double deg,double len){
-    QPoint ret;
-    ret.setX(x+len*cos(deg*PI/180));
-    ret.setY(y-len*sin(deg*PI/180));
-    return ret;
+    return QPoint(x+len*cos(deg*PI/180),y-len*sin(deg*PI/180));
 }
