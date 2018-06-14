@@ -32,7 +32,9 @@ SOURCES += \
     floydmark.cpp \
     displayframe.cpp \
     launchdialog.cpp \
-    shortestpathwindow.cpp
+    shortestpathwindow.cpp \
+    common.cpp \
+    setdistancedialog.cpp
 
 HEADERS += \
     vertex.h \
@@ -43,8 +45,10 @@ HEADERS += \
     floydmark.h \
     displayframe.h \
     launchdialog.h \
-    shortestpathwindow.h
+    shortestpathwindow.h \
+    setdistancedialog.h
 
 FORMS += \
     launchdialog.ui \
-    shortestpathwindow.ui
+    shortestpathwindow.ui \
+    setdistancedialog.ui

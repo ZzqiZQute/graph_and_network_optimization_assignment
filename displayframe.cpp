@@ -1,10 +1,13 @@
 #include "displayframe.h"
 #include "common.h"
+#include "setdistancedialog.h"
 #include <math.h>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QMouseEvent>
 #include <QMessageBox>
+#include <iostream>
+using namespace std;
 DisplayFrame::DisplayFrame(QWidget *parent):QFrame(parent)
 {
     this->mParent=parent;
@@ -83,13 +86,44 @@ void DisplayFrame::drawEdge(QPainter* painter){
 
     if(createEdge){
         if(!findEdgeTail){
-        Vertex* v=graph->getVertexAt(createEdgeVertexHead);
-        QPoint realPoint=mouseToReal(createEdgeMouseX,createEdgeMouseY);
-        painter->drawLine(QLine(QPoint(v->getCenterX(),v->getCenterY()),realPoint));
-        }else{
+            Vertex* v=graph->getVertexAt(createEdgeVertexHead);
+            QPoint realPoint=mouseToReal(createEdgeMouseX,createEdgeMouseY);
+            QPoint vCenter=QPoint(v->getCenterX(),v->getCenterY());
+            QPoint startPoint;
+            int length=sqrt((realPoint.x()-vCenter.x())*(realPoint.x()-vCenter.x())+
+                            (realPoint.y()-vCenter.y())*(realPoint.y()-vCenter.y()));
+            int c=VERTEX_SIZE/2+1;
+            if(length>c){
+                startPoint.setX(c*(realPoint.x()-vCenter.x())/length+vCenter.x());
+                startPoint.setY(c*(realPoint.y()-vCenter.y())/length+vCenter.y());
+                painter->drawLine(startPoint,realPoint);
+                double deg=calcdeg(realPoint.x(),realPoint.y(),startPoint.x(),startPoint.y());
+                QPoint p1=calcTail(realPoint.x(),realPoint.y(),deg+30,VERTEX_SIZE/4);
+                QPoint p2=calcTail(realPoint.x(),realPoint.y(),deg-30,VERTEX_SIZE/4);
+                painter->drawLine(realPoint,p1);
+                painter->drawLine(realPoint,p2);
+            }
+        }
+        else{
             Vertex* v1=graph->getVertexAt(createEdgeVertexHead);
             Vertex* v2=graph->getVertexAt(createEdgeVertexTail);
-            painter->drawLine(QLine(QPoint(v1->getCenterX(),v1->getCenterY()),QPoint(v2->getCenterX(),v2->getCenterY())));
+            QPoint vCenter=QPoint(v1->getCenterX(),v1->getCenterY());
+            int deg=calcdeg(v2->getCenterX(),v2->getCenterY(),v1->getCenterX(),v1->getCenterY());
+            QPoint realPoint=calcTail(v2->getCenterX(),v2->getCenterY(),deg,VERTEX_SIZE/2);
+            QPoint startPoint;
+            int length=sqrt((realPoint.x()-vCenter.x())*(realPoint.x()-vCenter.x())+
+                            (realPoint.y()-vCenter.y())*(realPoint.y()-vCenter.y()));
+            int c=VERTEX_SIZE/2+1;
+            if(length>c){
+                startPoint.setX(c*(realPoint.x()-vCenter.x())/length+vCenter.x());
+                startPoint.setY(c*(realPoint.y()-vCenter.y())/length+vCenter.y());
+                painter->drawLine(startPoint,realPoint);
+                double deg=calcdeg(realPoint.x(),realPoint.y(),startPoint.x(),startPoint.y());
+                QPoint p1=calcTail(realPoint.x(),realPoint.y(),deg+30,VERTEX_SIZE/4);
+                QPoint p2=calcTail(realPoint.x(),realPoint.y(),deg-30,VERTEX_SIZE/4);
+                painter->drawLine(realPoint,p1);
+                painter->drawLine(realPoint,p2);
+            }
         }
     }
 }
@@ -116,7 +150,7 @@ void DisplayFrame::drawVertexs(QPainter* painter){
         painter->drawText(rect,QString::number(i),QTextOption(Qt::AlignCenter));
     }
 }
-int DisplayFrame::checkLBtnDownVertex(QPoint& pos){
+int DisplayFrame::checkLBtnDownVertex(QPoint pos){
 
     int ret=0;
     for(int i=graph->getCount();i>=1;i--){
@@ -272,9 +306,20 @@ void DisplayFrame::mouseReleaseEvent(QMouseEvent *event){
                 graph->getVertexAt(i)->setSelected(false);
             }
         }
+        if(createEdge){
+            if(findEdgeTail){
+                SetDistanceDialog dialog(this);
+                dialog.exec();
+                if(dialog.getHasValue()){
+                    QMessageBox::aboutQt(this);
+                }
+
+            }
+        }
         moveVertexPos=0;
         maybeMultiSelect=false;
         readyMultiMove=false;
+        createEdge=false;
         findEdgeTail=false;
 
     }else if(event->button()==Qt::RightButton){
@@ -296,7 +341,7 @@ void DisplayFrame::wheelEvent(QWheelEvent *event){
     int oriOffsetY=winOffsetY;
     double oriscale=winScale;
     if(delta.ry()<0){//向下滚动
-        if(winScale>0.05)
+        if(winScale>0.3)
             winScale-=0.05;
     }else{//向上
         if(winScale<4)
@@ -316,6 +361,11 @@ void DisplayFrame::keyPressEvent(QKeyEvent *event){
         multiSelect=false;
         maybeMultiSelect=false;
         readyMultiMove=false;
+        if(moveVertexPos!=0){
+            Vertex* v=graph->getVertexAt(moveVertexPos);
+            v->setSelected(false);
+            moveVertexPos=0;
+        }
         for(int i=1;i<=graph->getCount();i++){
             graph->getVertexAt(i)->setSelected(false);
         }

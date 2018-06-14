@@ -58,7 +58,7 @@ private:
     int createEdgeVertexTail;
     QWidget *mParent;
     void drawVertexs(QPainter *painter);
-    int checkLBtnDownVertex(QPoint &pos);
+    int checkLBtnDownVertex(QPoint pos);
     void drawTest(QPainter *painter);
     void drawSelects(QPainter *painter);
     void drawEdge(QPainter *painter);
