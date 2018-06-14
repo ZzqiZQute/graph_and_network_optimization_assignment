@@ -135,7 +135,7 @@ void DisplayFrame::drawCurveEdge(QPainter* painter,Vertex* v1,Vertex* v2)
         startPoint.setY(c*(realPoint.y()-vCenter.y())/length+vCenter.y());
 
         double deg=calcDeg(startPoint.x(),startPoint.y(),realPoint.x(),realPoint.y());
-        int degoffset=30;
+        int degoffset=45;
         deg-=degoffset;
         middlePoint=calcTail(startPoint.x(),startPoint.y(),deg,length/2/cos(degoffset*PI/180));
         QPainterPath path(QPointF(startPoint.x(),startPoint.y()));
@@ -447,7 +447,7 @@ void DisplayFrame::mouseReleaseEvent(QMouseEvent *event){
                         int dis=dialog.getDistance();
                         Vertex* v1=graph->getVertexAt(createEdgeVertexHead);
                         QPoint edgeCenter=calcEdgeCenter(v1,v);
-                        int deg=calcDeg(v1->getCenterX(),v1->getCenterY(),v->getCenterX(),v->getCenterY())+90;
+                        int deg=calcDeg(v1->getCenterX(),v1->getCenterY(),v->getCenterX(),v->getCenterY())-90;
                         QPoint disText=calcTail(edgeCenter.x(),edgeCenter.y(),deg,VERTEX_SIZE/2);
                         VertexParams* vp=new VertexParams(createEdgeVertexHead,dis);
                         for(int i=0;i<v1->getParams()->count();i++){
@@ -463,19 +463,26 @@ void DisplayFrame::mouseReleaseEvent(QMouseEvent *event){
                         v->addVertexParams(vp);
 
                     }else{
+                        bool b=false;
                         for(int i=0;i<v->getParams()->count();i++){
                             if(v->getParams()->at(i)->getP()==createEdgeVertexHead){
-                                for(int j=0;i<v->getParams()->count();j++){
-                                    if(v->getParams()->at(j)->getP()==createEdgeVertexTail){
-                                        v->getParams()->at(j)->setCurve(false);
-                                        break;
+                                for(int j=1;j<=graph->getCount();j++){
+                                    Vertex *v1=graph->getVertexAt(j);
+                                    for(int k=0;k<v1->getParams()->count();k++){
+                                        if(v1->getParams()->at(k)->getP()==createEdgeVertexTail){
+                                            v1->getParams()->at(k)->setCurve(false);
+                                            b=true;
+                                            break;
+                                        }
                                     }
-                                    v->getParams()->removeAt(i);
-                                    break;
+                                    if(b)break;
                                 }
+                                v->getParams()->removeAt(i);
+                                break;
                             }
                         }
                     }
+
                 }
                 keyCtrlDown=false;
             }
