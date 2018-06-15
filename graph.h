@@ -18,16 +18,17 @@ public:
     int bellman();
     void floyd();
     BellmanMark *getBellmanMark() const;
-
     FloydMark *getFloydMark() const;
-
     int getLastX();
     int getLastY();
+    QStringList getCalcResult() const;
+
 private:
     QList<Vertex*> *vertexs;
     BellmanMark *bellmanMark;
     FloydMark* floydMark;
     int count;
+    QStringList calcResult;
 };
 
 #endif // GRAPH_H

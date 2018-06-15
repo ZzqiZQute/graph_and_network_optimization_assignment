@@ -19,10 +19,11 @@ public slots:
     void onBtnAddVertexClicked();
     void onBtnRemoveAllVertexClicked();
     void onRadioBtnEditModeToggled(bool);
+    void onBtnCalcClicked();
 private:
     Ui::ShortestPathWindow *ui;
     void init();
-    DisplayFrame *display;
+    DisplayFrame *shortestpath;
 };
 
 #endif // SHORTESTPATHWINDOW_H

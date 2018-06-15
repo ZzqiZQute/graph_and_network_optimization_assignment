@@ -13,4 +13,5 @@ int main(int argc, char *argv[])
         LaunchDialog d;
         d.show();
         return a.exec();
+
 }

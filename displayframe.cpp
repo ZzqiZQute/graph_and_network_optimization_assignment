@@ -209,17 +209,17 @@ void DisplayFrame::drawVertexs(QPainter* painter){
         rect.setWidth(VERTEX_SIZE);
         rect.setHeight(VERTEX_SIZE);
         if(editable){
-        if(v->getSelected()){
-            painter->setBrush(QBrush(QColor(234,234,234)));
+            if(v->getSelected()){
+                painter->setBrush(QBrush(QColor(234,234,234)));
+            }else{
+                painter->setBrush(QBrush(QColor(Qt::white)));
+            }if(keyCtrlDown){
+                painter->setPen(QPen(Qt::black,2));
+            }else
+                painter->setPen(QPen());
         }else{
-            painter->setBrush(QBrush(QColor(Qt::white)));
-        }if(keyCtrlDown){
-            painter->setPen(QPen(Qt::black,2));
-        }else
+            painter->setBrush(QBrush(QColor(246,246,246)));
             painter->setPen(QPen());
-        }else{
-             painter->setBrush(QBrush(QColor(246,246,246)));
-             painter->setPen(QPen());
         }
         painter->drawEllipse(rect);
         painter->drawText(rect,QString::number(i),QTextOption(Qt::AlignCenter));
@@ -588,15 +588,16 @@ void DisplayFrame::mouseReleaseEvent(QMouseEvent *event){
                             bool b=false;
                             for(int i=0;i<v->getParams()->count();i++){
                                 if(v->getParams()->at(i)->getP()==createEdgeVertexHead){
-                                    for(int j=1;j<=graph->getCount();j++){
-                                        Vertex *v1=graph->getVertexAt(j);
-                                        for(int k=0;k<v1->getParams()->count();k++){
-                                            if(v1->getParams()->at(k)->getP()==createEdgeVertexTail){
-                                                v1->getParams()->at(k)->setCurve(false);
-                                                b=true;
-                                                break;
-                                            }
+                                    Vertex *v1=graph->getVertexAt(createEdgeVertexHead);
+                                    for(int j=0;j<v1->getParams()->count();j++){
+                                        VertexParams *vp1=v1->getParams()->at(j);
+                                        if(vp1->getP()==createEdgeVertexTail)
+                                        {
+                                            vp1->setCurve(false);
+                                            b=true;
+                                            break;
                                         }
+
                                         if(b)break;
                                     }
                                     v->getParams()->removeAt(i);

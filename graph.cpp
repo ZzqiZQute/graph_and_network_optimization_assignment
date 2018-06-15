@@ -1,9 +1,4 @@
 #include "common.h"
-#include "graph.h"
-#include "vertex.h"
-#include "vertexparams.h"
-#include "bellmanmark.h"
-#include "floydmark.h"
 #include <iostream>
 using namespace std;
 Graph::Graph()
@@ -14,6 +9,7 @@ Graph::Graph()
     floydMark=NULL;
     count=0;
 }
+
 
 Graph::~Graph()
 {
@@ -63,9 +59,11 @@ int Graph::getCount() const
 
 int Graph::bellman()
 {
+    calcResult.clear();
+    calcResult<<"当前算法:Bellman";
     if(bellmanMark!=NULL)
         delete bellmanMark;
-    int k=1;
+    int k=0;
     bool changed=false;
     bellmanMark=new BellmanMark(count);
     BellmanMark* m=bellmanMark;
@@ -77,20 +75,29 @@ int Graph::bellman()
     }
     while(k<count)
     {
+        calcResult<<"第"+QString::number(k+1)+"次计算开始";
         for(int j=1;j<=count;j++){
             Vertex* v=vertexs->at(j);
             QList<VertexParams*> *vp=v->getParams();
-            for(auto k=vp->begin();k!=vp->end();++k){
-                int p=(*k)->getP();
-                int e=(*k)->getE();
+            for(auto q=vp->begin();q!=vp->end();++q){
+                int p=(*q)->getP();
+                int e=(*q)->getE();
                 if(m->getD(p)+e<m->getD(j)){
-                    m->setD(j,m->getP(p)+e);
+                    m->setD(j,m->getD(p)+e);
                     m->setP(j,p);
                     changed=true;
                 }
             }
         }
+        for(int j=1;j<=m->getCount();j++){
+           int p=m->getP(j);
+           int d=m->getD(j);
+           QString s= "\t"+QString::number(j)+":d="+(d==POS_INFINITY?"∞":QString::number(d))+" p="+QString::number(p);
+           calcResult<<s;
+        }
+        calcResult<<"第"+QString::number(k+1)+"次计算结束";
         if(!changed){
+            calcResult<<"完成计算";
             return 0;
         }else{
             ++k;
@@ -99,6 +106,7 @@ int Graph::bellman()
     }
 
     if(k>=count){
+        calcResult<<"检测到负回路，计算终止";
         return 1;
     }
     return 2;
@@ -166,4 +174,9 @@ int Graph::getLastX(){
 int Graph::getLastY(){
 
     return vertexs->at(count)->getCenterY();
+}
+
+QStringList Graph::getCalcResult() const
+{
+    return calcResult;
 }
