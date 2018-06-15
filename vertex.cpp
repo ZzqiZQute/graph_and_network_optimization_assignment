@@ -1,5 +1,6 @@
 #include "vertex.h"
 #include "vertexparams.h"
+#include "common.h"
 Vertex::Vertex()
 {
     params=new QList<VertexParams*>();
@@ -57,6 +58,7 @@ bool Vertex::getSelected() const
 void Vertex::setSelected(bool value)
 {
     selected = value;
+
 }
 
 void Vertex::saveCenter()

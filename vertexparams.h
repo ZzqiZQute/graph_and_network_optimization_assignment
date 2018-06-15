@@ -39,11 +39,21 @@ public:
     bool getHover() const;
     void setHover(bool value);
 
+
+
+    double getDis() const;
+    void setDis(double value);
+
+    double getDeg() const;
+    void setDeg(double value);
+
 private:
     int p;//前继节点
     int e;//边长
     int x;
     int y;
+    double deg;
+    double dis;
     int orix;
     int oriy;
     bool moveFlag;

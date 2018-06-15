@@ -52,3 +52,4 @@ FORMS += \
     launchdialog.ui \
     shortestpathwindow.ui \
     setdistancedialog.ui
+

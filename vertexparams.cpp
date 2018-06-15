@@ -122,5 +122,26 @@ void VertexParams::setHover(bool value)
     hover = value;
 }
 
+double VertexParams::getDis() const
+{
+    return dis;
+}
+
+void VertexParams::setDis(double value)
+{
+    dis = value;
+}
+
+double VertexParams::getDeg() const
+{
+    return deg;
+}
+
+void VertexParams::setDeg(double value)
+{
+    deg = value;
+}
+
+
 
 

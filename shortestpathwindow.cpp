@@ -24,6 +24,7 @@ void ShortestPathWindow::init(){
     ui->cbMethod->addItems(methodList);
     connect(ui->btnAddVertex,SIGNAL(clicked()),this,SLOT(onBtnAddVertexClicked()));
     connect(ui->btnRemoveAllVertex,SIGNAL(clicked()),this,SLOT(onBtnRemoveAllVertexClicked()));
+    connect(ui->rbEditMode,SIGNAL(toggled(bool)),this,SLOT(onRadioBtnEditModeToggled(bool)));
 }
 void ShortestPathWindow::onBtnAddVertexClicked(){
 
@@ -60,4 +61,19 @@ void ShortestPathWindow::onBtnRemoveAllVertexClicked(){
         display->setFocus();
         display->update();
     }
+}
+void ShortestPathWindow::onRadioBtnEditModeToggled(bool b){
+    if(b){
+        display->setEditable(true);
+        ui->btnAddVertex->setEnabled(true);
+        ui->btnRemoveAllVertex->setEnabled(true);
+    }
+    else
+    {
+        display->setEditable(false);
+        ui->btnAddVertex->setEnabled(false);
+        ui->btnRemoveAllVertex->setEnabled(false);
+    }
+    display->setFocus();
+    display->update();
 }

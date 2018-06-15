@@ -16,6 +16,9 @@ public:
     int getWinOffsetX() const;
 
     void reset();
+    bool getEditable() const;
+    void setEditable(bool value);
+
 protected:
     void paintEvent(QPaintEvent *event);
     void mousePressEvent(QMouseEvent *event);
@@ -44,6 +47,7 @@ private:
     bool createEdge;
     bool findEdgeTail;
     bool moveEdgeLabel;
+    bool editable;
     int moveVertexPos;
     int currentLMouseX;
     int currentLMouseY;
