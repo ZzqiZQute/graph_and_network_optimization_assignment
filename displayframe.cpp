@@ -1,4 +1,4 @@
-#include "displayframe.h"
+﻿#include "displayframe.h"
 #include "common.h"
 #include "setdistancedialog.h"
 #include <math.h>
@@ -18,14 +18,7 @@ DisplayFrame::DisplayFrame(QWidget *parent):QFrame(parent)
 
 }
 void DisplayFrame::init(){
-    winStartMove=false;
-    keyCtrlDown=false;
-    maybeMultiSelect=false;
-    multiSelect=false;
-    readyMultiMove=false;
-    createEdge=false;
-    findEdgeTail=false;
-    moveEdgeLabel=false;
+    clearState();
     editable=true;
     winScale=1;
     winOffsetX=0;
@@ -39,6 +32,7 @@ void DisplayFrame::init(){
     createEdgeMouseY=0;
     createEdgeVertexHead=0;
     createEdgeVertexTail=0;
+
 }
 DisplayFrame::~DisplayFrame(){
     delete graph;
@@ -46,6 +40,7 @@ DisplayFrame::~DisplayFrame(){
 void DisplayFrame::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
+    painter.setFont(QFont("微软雅黑",15));
     painter.setRenderHint(QPainter::Antialiasing);
     QRect rect=painter.window();
     if(!refresh){
@@ -57,15 +52,27 @@ void DisplayFrame::paintEvent(QPaintEvent *event)
         winOriOffsetY=winOffsetY;
     }
     if(editable)
-        painter.fillRect(rect,Qt::white);//背景白色
+        painter.fillRect(rect,Qt::white);
     else
         painter.fillRect(rect,QBrush(QColor(248,248,248)));
+
     painter.translate(winOffsetX,winOffsetY);
     painter.scale(winScale,winScale);
     drawVertexs(&painter);
     drawEdge(&painter);
     drawSelects(&painter);
+    painter.scale(1/winScale,1/winScale);
+    painter.translate(-winOffsetX,-winOffsetY);
+
+    drawHint(&painter);
+
     event->accept();
+}
+void DisplayFrame::drawHint(QPainter* painter){
+    if(!editable){
+        painter->setPen(QColor(Qt::blue));
+        painter->drawText(QRect(50,50,painter->window().width()-50,painter->window().height()-50),strHint);
+    }
 }
 
 void DisplayFrame::drawSelects(QPainter* painter){
@@ -90,12 +97,45 @@ void DisplayFrame::drawEdge(QPainter* painter){
     painter->setPen(QPen());
     for(int i=1;i<=graph->getCount();i++){
         Vertex* v=graph->getVertexAt(i);
-        for(int i=0;i<v->getParams()->count();i++){
-            VertexParams* param=v->getParams()->at(i);
+        for(int j=0;j<v->getParams()->count();j++){
+            VertexParam* param=v->getParams()->at(j);
             Vertex* v1=graph->getVertexAt(param->getP());
             Vertex* v2=v;
-            if(param->getHover())
-                painter->setPen(QColor(Qt::red));
+            if(editable){
+                if(param->getHover())
+                    painter->setPen(QColor(Qt::red));
+            }else{
+                if(method==Bellman){
+                    BellmanMark *m=graph->getBellmanMark();
+                    if(m!=NULL)
+                    {
+                        bool b=false;
+                        for(int k=0;k<m->getVertex()->count()-1;k++){
+                            int t=m->getVertex()->at(k);
+                            int s=m->getVertex()->at(k+1);
+                            if(s==param->getP()&&t==i){
+                                b=true;
+                                break;
+                            }
+                            if(m->getNegaCircuit()&&s==i&&m->findVertex(param->getP()))
+                            {
+                                b=true;
+                                break;
+                            }
+                        }
+
+
+                        if(b){
+                            if(m->getNegaCircuit())
+                                painter->setPen(QPen(QColor(128,0,0),2));
+                            else
+                                painter->setPen(QPen(QColor(0,128,0),2));
+
+                        }
+
+                    }
+                }
+            }
             if(!param->getCurve()){
                 drawStraightEdge(painter,v1,v2);
             }else{
@@ -105,6 +145,8 @@ void DisplayFrame::drawEdge(QPainter* painter){
             painter->drawText(QRect(param->getX()-VERTEX_SIZE/2,param->getY()-VERTEX_SIZE/2,VERTEX_SIZE,VERTEX_SIZE)
                               ,QString::number(param->getE()),QTextOption(Qt::AlignCenter));
             painter->setPen(QPen());
+
+
         }
     }
     if(createEdge){
@@ -119,6 +161,8 @@ void DisplayFrame::drawEdge(QPainter* painter){
             drawStraightEdge(painter,v1,v2);
         }
     }
+
+
 }
 QPoint DisplayFrame::calcEdgeCenter(Vertex* v1,Vertex* v2){
     return  QPoint((v1->getCenterX()+v2->getCenterX())/2,(v1->getCenterY()+v2->getCenterY())/2);
@@ -199,8 +243,7 @@ void DisplayFrame::drawStraightMaybeEdge(QPainter* painter,Vertex* v1,QPoint p){
     }
 }
 void DisplayFrame::drawVertexs(QPainter* painter){
-    QFont font=painter->font();
-    painter->setFont(QFont(font.family(),15));
+    painter->setPen(QPen());
     for(int i=1;i<=graph->getCount();i++){
         Vertex* v=graph->getVertexAt(i);
         QRect rect;
@@ -218,8 +261,55 @@ void DisplayFrame::drawVertexs(QPainter* painter){
             }else
                 painter->setPen(QPen());
         }else{
-            painter->setBrush(QBrush(QColor(246,246,246)));
-            painter->setPen(QPen());
+            if(graph->getCount()>1)
+            {
+                if(method==Bellman){
+                    BellmanMark* m=graph->getBellmanMark();
+                    if(m!=NULL)
+                    {
+                        painter->setPen(QPen());
+                        if(m->findVertex(i)){
+                            if(m->getNegaCircuit()){
+                                painter->setBrush(QBrush(QColor(255,128,128)));
+                            }else{
+                                painter->setBrush(QBrush(QColor(128,255,128)));
+                            }
+                        }else{
+                            painter->setBrush(QBrush(QColor(246,246,246)));
+
+                        }
+                    }
+                }
+                if(method==Floyd){
+                    painter->setBrush(QBrush(QColor(246,246,246)));
+                    FloydMark* m=graph->getFloydMark();
+                    painter->setPen(QPen());
+                    if(m!=NULL)
+                    {
+                        if(m->getFloydStart()>0){
+                            if(m->findVertex(i)){
+                                if(m->getNegaCircuit()){
+                                    painter->setBrush(QBrush(QColor(255,128,128)));
+                                }else{
+                                    if(m->getD(m->getFloydStart(),i)==POS_INFINITY)
+                                        painter->setBrush(QBrush(QColor(255,255,128)));
+                                    else
+                                        painter->setBrush(QBrush(QColor(128,255,128)));
+                                }
+                            }else{
+                                painter->setBrush(QBrush(QColor(246,246,246)));
+
+                            }
+                        }
+
+                        if(m->getFloydStart()==i){
+                            painter->setBrush(QBrush(QColor(128,128,255)));
+                        }
+                    }
+                }
+
+            }
+
         }
         painter->drawEllipse(rect);
         painter->drawText(rect,QString::number(i),QTextOption(Qt::AlignCenter));
@@ -231,6 +321,21 @@ int DisplayFrame::checkLBtnDownVertex(){
     for(int i=graph->getCount();i>=1;i--){
         Vertex* v=graph->getVertexAt(i);
         double dis=sqrt((realX-v->getCenterX())*(realX-v->getCenterX())+(realY-v->getCenterY())*(realY-v->getCenterY()));
+        if(dis<VERTEX_SIZE/2){
+            ret=i;
+            break;
+        }
+    }
+    return ret;
+}
+int DisplayFrame::checkMouseMoveVertex(QPoint pos){
+
+    int ret=0;
+    QPoint realPoint=mouseToReal(pos.x(),pos.y());
+    for(int i=graph->getCount();i>=1;i--){
+        Vertex* v=graph->getVertexAt(i);
+        double dis=sqrt((realPoint.x()-v->getCenterX())*(realPoint.x()-v->getCenterX())
+                        +(realPoint.y()-v->getCenterY())*(realPoint.y()-v->getCenterY()));
         if(dis<VERTEX_SIZE/2){
             ret=i;
             break;
@@ -253,7 +358,7 @@ void DisplayFrame::mousePressEvent(QMouseEvent *event){
                         moveVertexCenterY=v->getCenterY();
                         v->setSelected(true);
                         for(int i=0;i<v->getParams()->count();i++){
-                            VertexParams* vp=v->getParams()->at(i);
+                            VertexParam* vp=v->getParams()->at(i);
                             Vertex* v1=graph->getVertexAt(vp->getP());
                             vp->setDeg(calcDeg(v1->getCenterX(),v1->getCenterY(),vp->getX(),vp->getY())
                                        -calcDeg(v1->getCenterX(),v1->getCenterY(),v->getCenterX(),v->getCenterY()));
@@ -263,7 +368,7 @@ void DisplayFrame::mousePressEvent(QMouseEvent *event){
                             Vertex* v2=graph->getVertexAt(i);
                             for(int j=0;j<v2->getParams()->count();j++)
                             {
-                                VertexParams *vp=v2->getParams()->at(j);
+                                VertexParam *vp=v2->getParams()->at(j);
                                 if(vp->getP()==pos)
                                 {
                                     vp->setDeg(calcDeg(v->getCenterX(),v->getCenterY(),vp->getX(),vp->getY())
@@ -285,7 +390,7 @@ void DisplayFrame::mousePressEvent(QMouseEvent *event){
                             moveVertexCenterY=v->getCenterY();
                             v->setSelected(true);
                             for(int i=0;i<v->getParams()->count();i++){
-                                VertexParams* vp=v->getParams()->at(i);
+                                VertexParam* vp=v->getParams()->at(i);
                                 Vertex* v1=graph->getVertexAt(vp->getP());
                                 vp->setDeg(calcDeg(v1->getCenterX(),v1->getCenterY(),vp->getX(),vp->getY())
                                            -calcDeg(v1->getCenterX(),v1->getCenterY(),v->getCenterX(),v->getCenterY()));
@@ -295,7 +400,7 @@ void DisplayFrame::mousePressEvent(QMouseEvent *event){
                                 Vertex* v2=graph->getVertexAt(i);
                                 for(int j=0;j<v2->getParams()->count();j++)
                                 {
-                                    VertexParams *vp=v2->getParams()->at(j);
+                                    VertexParam *vp=v2->getParams()->at(j);
                                     if(vp->getP()==pos)
                                     {
                                         vp->setDeg(calcDeg(v->getCenterX(),v->getCenterY(),vp->getX(),vp->getY())
@@ -324,7 +429,7 @@ void DisplayFrame::mousePressEvent(QMouseEvent *event){
                 for(int i=1;i<=graph->getCount();i++){
                     Vertex* v=graph->getVertexAt(i);
                     for(int i=0;i<v->getParams()->count();i++){
-                        VertexParams* param=v->getParams()->at(i);
+                        VertexParam* param=v->getParams()->at(i);
                         QPoint mouseReal=mouseToReal(x,y);
                         if(mouseReal.x()<param->getX()+VERTEX_SIZE/2&&
                                 mouseReal.x()>param->getX()-VERTEX_SIZE/2&&
@@ -355,8 +460,20 @@ void DisplayFrame::mousePressEvent(QMouseEvent *event){
             }
 
         }
-    }else
+
+    }
+    else
     {
+        if(event->button()==Qt::LeftButton&&method==DisplayFrame::Floyd){
+            int pos=checkMouseMoveVertex(event->pos());
+            if(pos>0){
+                FloydMark* mark=graph->getFloydMark();
+                if(mark!=NULL){
+                    mark->reset();
+                    mark->setFloydStart(pos);
+                }
+            }
+        }
     }
     if(event->button()==Qt::RightButton){
         winStartMove=true;
@@ -408,7 +525,6 @@ void DisplayFrame::mouseMoveEvent(QMouseEvent *event){
                             ){
                         Vertex* v=graph->getVertexAt(i);
                         v->setSelected(true);
-                        //
                         graph->getVertexAt(i)->saveCenter();
                         b=true;
                     }else graph->getVertexAt(i)->setSelected(false);
@@ -426,7 +542,7 @@ void DisplayFrame::mouseMoveEvent(QMouseEvent *event){
                     v->setCenterX(v->getOriCenterX()+(x-currentLMouseX)/winScale);
                     v->setCenterY(v->getOriCenterY()+(y-currentLMouseY)/winScale);
                     for(int j=0;j<v->getParams()->count();j++){
-                        VertexParams *vp=v->getParams()->at(j);
+                        VertexParam *vp=v->getParams()->at(j);
                         Vertex* v1=graph->getVertexAt(vp->getP());
 
                         QPoint p=calcTail(v1->getCenterX(),v1->getCenterY(),
@@ -439,7 +555,7 @@ void DisplayFrame::mouseMoveEvent(QMouseEvent *event){
                     for(int j=1;j<=graph->getCount();j++){
                         Vertex *v2=graph->getVertexAt(j);
                         for(int k=0;k<v2->getParams()->count();k++){
-                            VertexParams *vp2=v2->getParams()->at(k);
+                            VertexParam *vp2=v2->getParams()->at(k);
                             if(vp2->getP()==i)
                             {
                                 QPoint p=calcTail(v->getCenterX(),v->getCenterY(),
@@ -485,7 +601,7 @@ void DisplayFrame::mouseMoveEvent(QMouseEvent *event){
             for(int i=1;i<=graph->getCount();i++){
                 Vertex* v=graph->getVertexAt(i);
                 for(int i=0;i<v->getParams()->count();i++){
-                    VertexParams* param=v->getParams()->at(i);
+                    VertexParam* param=v->getParams()->at(i);
                     if(param->getMoveFlag()){
                         param->setX(param->getOrix()+(x-currentLMouseX)/winScale);
                         param->setY(param->getOriy()+(y-currentLMouseY)/winScale);
@@ -500,7 +616,7 @@ void DisplayFrame::mouseMoveEvent(QMouseEvent *event){
         for(int i=1;i<=graph->getCount();i++){
             Vertex* v=graph->getVertexAt(i);
             for(int j=0;j<v->getParams()->count();j++){
-                VertexParams* param=v->getParams()->at(j);
+                VertexParam* param=v->getParams()->at(j);
                 param->setHover(false);
                 QPoint mouseReal=mouseToReal(x,y);
                 if(mouseReal.x()<param->getX()+VERTEX_SIZE/2&&
@@ -513,7 +629,7 @@ void DisplayFrame::mouseMoveEvent(QMouseEvent *event){
             }
             if(v->getSelected()){
                 for(int j=0;j<v->getParams()->count();j++){
-                    VertexParams *vp=v->getParams()->at(j);
+                    VertexParam *vp=v->getParams()->at(j);
                     Vertex* v1=graph->getVertexAt(vp->getP());
 
                     QPoint p=calcTail(v1->getCenterX(),v1->getCenterY(),
@@ -526,7 +642,7 @@ void DisplayFrame::mouseMoveEvent(QMouseEvent *event){
                 for(int j=1;j<=graph->getCount();j++){
                     Vertex *v2=graph->getVertexAt(j);
                     for(int k=0;k<v2->getParams()->count();k++){
-                        VertexParams *vp2=v2->getParams()->at(k);
+                        VertexParam *vp2=v2->getParams()->at(k);
                         if(vp2->getP()==i)
                         {
                             QPoint p=calcTail(v->getCenterX(),v->getCenterY(),
@@ -541,8 +657,101 @@ void DisplayFrame::mouseMoveEvent(QMouseEvent *event){
             }
         }
     }else{
+        int pos=checkMouseMoveVertex(event->pos());
+        if(method==DisplayFrame::Bellman){
+            BellmanMark* mark=graph->getBellmanMark();
+            if(mark!=NULL)
+            {
+                if(pos>1){
+                    mark->reset();
+                    int p=mark->getP(pos);
+                    if(p!=0)
+                    {
+                        mark->addVertex(pos);
+                        mark->addVertex(p);
+                    }
+                    while(p!=1){
+                        p=mark->getP(p);
+                        if(mark->findVertex(p)){
+                            mark->setNega(p);
+                            mark->setNegaCircuit(true);
+                            break;
+                        }
+                        mark->addVertex(p);
+                    }
+                    if(!mark->getNegaCircuit()){
+                        strHint="使用Bellman方法计算得到\n1->"+QString::number(pos)+"的最短路径为:";
+                        for(int i=0;i<mark->getVertex()->count()-1;i++){
+                            strHint+=QString::number(mark->getVertex()->at(mark->getVertex()->count()-1-i))+"->";
 
+                        }
+                        strHint+=QString::number(pos);
+                        strHint+="\n总长度:"+QString::number(mark->getD(pos));
+                    }else{
+                        if(mark->getD(pos)==POS_INFINITY){
+                            strHint="使用Bellman方法计算得到\n此路不通";
+                        }
+                        else{
+                            strHint="使用Bellman方法计算得到\n由于节点";
+                            for(int i=mark->getVertex()->count()-1;i>=0;i--)
+                            {
+                                int v=mark->getVertex()->at(i);
+                                if(v!=mark->getNega()){
+                                    strHint+=QString::number(v)+",";
+                                }else{
+                                    strHint+=QString::number(v);
+                                    break;
+                                }
+                            }
+                            strHint+="构成了负权值回路\n因此无法计算最短路径";
+                        }
+
+                    }
+                }
+                else
+                {
+                    strHint="";
+                    mark->reset();
+                }
+            }
+
+
+
+        }else if(method==DisplayFrame::Floyd){
+            FloydMark* mark=graph->getFloydMark();
+            if(mark!=NULL)
+            {
+                if(pos>0){
+                    mark->reset();
+                    if(mark->getFloydStart()>0){
+                        int p=mark->getP(mark->getFloydStart(),pos);
+                        int d=mark->getD(mark->getFloydStart(),pos);
+                        if(p!=0)
+                        {
+                            mark->addVertex(pos);
+                            mark->addVertex(p);
+                            if(d==POS_INFINITY)
+                                goto END;
+                        }
+                        while(p!=mark->getFloydStart()){
+                            p=mark->getP(mark->getFloydStart(),p);
+
+                            if(mark->findVertex(p)){
+                                mark->setNega(p);
+                                mark->setNegaCircuit(true);
+                                break;
+                            }
+                            mark->addVertex(p);
+                        }
+                    }
+                }
+                else{
+                    mark->reset();
+                }
+            }
+        }
     }
+END:
     update();
     event->accept();
 }
@@ -568,9 +777,9 @@ void DisplayFrame::mouseReleaseEvent(QMouseEvent *event){
                             QPoint edgeCenter=calcEdgeCenter(v1,v);
                             int deg=calcDeg(v1->getCenterX(),v1->getCenterY(),v->getCenterX(),v->getCenterY())-90;
                             QPoint disText=calcTail(edgeCenter.x(),edgeCenter.y(),deg,VERTEX_SIZE/2);
-                            VertexParams* vp=new VertexParams(createEdgeVertexHead,dis);
+                            VertexParam* vp=new VertexParam(createEdgeVertexHead,dis);
                             for(int i=0;i<v1->getParams()->count();i++){
-                                VertexParams *vp1=v1->getParams()->at(i);
+                                VertexParam *vp1=v1->getParams()->at(i);
                                 if(vp1->getP()==createEdgeVertexTail){
                                     vp1->setCurve(true);
                                     vp->setCurve(true);
@@ -590,7 +799,7 @@ void DisplayFrame::mouseReleaseEvent(QMouseEvent *event){
                                 if(v->getParams()->at(i)->getP()==createEdgeVertexHead){
                                     Vertex *v1=graph->getVertexAt(createEdgeVertexHead);
                                     for(int j=0;j<v1->getParams()->count();j++){
-                                        VertexParams *vp1=v1->getParams()->at(j);
+                                        VertexParam *vp1=v1->getParams()->at(j);
                                         if(vp1->getP()==createEdgeVertexTail)
                                         {
                                             vp1->setCurve(false);
@@ -614,7 +823,7 @@ void DisplayFrame::mouseReleaseEvent(QMouseEvent *event){
             for(int i=1;i<=graph->getCount();i++){
                 Vertex* v=graph->getVertexAt(i);
                 for(int i=0;i<v->getParams()->count();i++){
-                    VertexParams* param=v->getParams()->at(i);
+                    VertexParam* param=v->getParams()->at(i);
                     param->setMoveFlag(false);
                 }
             }
@@ -623,9 +832,6 @@ void DisplayFrame::mouseReleaseEvent(QMouseEvent *event){
 
 
         }
-    }else{
-
-
     }
     if(event->button()==Qt::RightButton){
         winStartMove=false;
@@ -649,10 +855,10 @@ void DisplayFrame::wheelEvent(QWheelEvent *event){
     int oriOffsetX=winOffsetX;
     int oriOffsetY=winOffsetY;
     double oriscale=winScale;
-    if(delta.ry()<0){//向下滚动
+    if(delta.ry()<0){
         if(winScale>0.3)
             winScale-=0.05;
-    }else{//向上
+    }else{
         if(winScale<4)
             winScale+=0.05;
     }
@@ -707,6 +913,42 @@ void DisplayFrame::keyReleaseEvent(QKeyEvent *event){
     event->accept();
 }
 
+bool DisplayFrame::getMethod() const
+{
+    return method;
+}
+
+void DisplayFrame::setMethod(bool value)
+{
+    method = value;
+}
+
+void DisplayFrame::saveWinOffset()
+{
+    winOriOffsetX=winOffsetX;
+    winOriOffsetY=winOffsetY;
+}
+
+void DisplayFrame::setWinScale(double value)
+{
+    winScale = value;
+}
+
+void DisplayFrame::setWinOffsetY(int value)
+{
+    winOffsetY = value;
+}
+
+void DisplayFrame::setWinOffsetX(int value)
+{
+    winOffsetX = value;
+}
+
+int DisplayFrame::getWinOffsetY() const
+{
+    return winOffsetY;
+}
+
 bool DisplayFrame::getEditable() const
 {
     return editable;
@@ -715,6 +957,21 @@ bool DisplayFrame::getEditable() const
 void DisplayFrame::setEditable(bool value)
 {
     editable = value;
+    if(editable){
+        if(method==Bellman)
+        {
+            BellmanMark* m=graph->getBellmanMark();
+            if(m!=NULL)
+                m->reset();
+        }
+
+        else if(method==Floyd)
+        {
+            FloydMark* m=graph->getFloydMark();
+            if(m!=NULL)
+                m->reset();
+        }
+    }
 }
 
 int DisplayFrame::getWinOffsetX() const
@@ -738,4 +995,14 @@ Graph *DisplayFrame::getGraph() const
 {
     return graph;
 }
+void DisplayFrame::clearState(){
 
+    winStartMove=false;
+    keyCtrlDown=false;
+    maybeMultiSelect=false;
+    multiSelect=false;
+    readyMultiMove=false;
+    createEdge=false;
+    findEdgeTail=false;
+    moveEdgeLabel=false;
+}

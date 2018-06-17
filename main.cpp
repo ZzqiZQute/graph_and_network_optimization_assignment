@@ -3,7 +3,7 @@
 #include "launchdialog.h"
 #include "graph.h"
 #include "vertex.h"
-#include "vertexparams.h"
+#include "vertexparam.h"
 #include "bellmanmark.h"
 #include "floydmark.h"
 using namespace std;

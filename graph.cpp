@@ -27,7 +27,7 @@ void Graph::removeVertexAt(int pos){
     if(pos>0){
         for(int i=0;i<vertexs->size();i++){
             if(i!=pos){
-                QList<VertexParams*> *vp=vertexs->at(i)->getParams();
+                QList<VertexParam*> *vp=vertexs->at(i)->getParams();
                 auto b=vp->begin(),e=vp->end();
                 while(b!=e){
                     if((*b)->getP()==pos)
@@ -38,7 +38,7 @@ void Graph::removeVertexAt(int pos){
             }
         }
        for(int i=0;i<vertexs->size();i++){
-            QList<VertexParams*> *vp=vertexs->at(i)->getParams();
+            QList<VertexParam*> *vp=vertexs->at(i)->getParams();
             auto b=vp->begin(),e=vp->end();
             while(b!=e){
                 if((*b)->getP()>pos)
@@ -60,10 +60,14 @@ int Graph::getCount() const
 int Graph::bellman()
 {
     calcResult.clear();
-    calcResult<<"当前算法:Bellman";
+    calcResult<<"当前方法:Bellman";
     if(bellmanMark!=NULL)
         delete bellmanMark;
-    int k=0;
+    if(count<2){
+        calcResult<<"至少要有两个节点！！！";
+        return 2;
+    }
+    int k=1;
     bool changed=false;
     bellmanMark=new BellmanMark(count);
     BellmanMark* m=bellmanMark;
@@ -73,12 +77,12 @@ int Graph::bellman()
         m->setD(i,POS_INFINITY);
         m->setP(i,0);
     }
-    while(k<count)
+    while(k<=count)
     {
-        calcResult<<"第"+QString::number(k+1)+"次计算开始";
-        for(int j=1;j<=count;j++){
+        calcResult<<"第"+QString::number(k)+"次计算开始";
+        for(int j=2;j<=count;j++){
             Vertex* v=vertexs->at(j);
-            QList<VertexParams*> *vp=v->getParams();
+            QList<VertexParam*> *vp=v->getParams();
             for(auto q=vp->begin();q!=vp->end();++q){
                 int p=(*q)->getP();
                 int e=(*q)->getE();
@@ -92,10 +96,10 @@ int Graph::bellman()
         for(int j=1;j<=m->getCount();j++){
            int p=m->getP(j);
            int d=m->getD(j);
-           QString s= "\t"+QString::number(j)+":d="+(d==POS_INFINITY?"∞":QString::number(d))+" p="+QString::number(p);
+           QString s= "   ·"+QString::number(j)+":d="+(d==POS_INFINITY?"∞":QString::number(d))+" p="+QString::number(p);
            calcResult<<s;
         }
-        calcResult<<"第"+QString::number(k+1)+"次计算结束";
+        calcResult<<"第"+QString::number(k)+"次计算结束";
         if(!changed){
             calcResult<<"完成计算";
             return 0;
@@ -105,16 +109,22 @@ int Graph::bellman()
         }
     }
 
-    if(k>=count){
-        calcResult<<"检测到负回路，计算终止";
+    if(k>count){
+        calcResult<<"检测到负权值回路，计算终止";
         return 1;
     }
-    return 2;
+    return ERROR_CODE;
 }
 
-void Graph::floyd(){
+int Graph::floyd(){
+    calcResult.clear();
+    calcResult<<"当前方法:Floyd";
     if(floydMark!=NULL)
         delete floydMark;
+    if(count<2){
+        calcResult<<"至少要有两个节点！！！";
+        return ERROR_CODE;
+    }
     floydMark=new FloydMark(count);
     FloydMark* m=floydMark;
     for(int i=1;i<=count;i++){
@@ -123,7 +133,7 @@ void Graph::floyd(){
             else m->setD(i,j,POS_INFINITY);
             m->setP(i,j,i);
             Vertex* v=vertexs->at(j);
-            QList<VertexParams*> *vp=v->getParams();
+            QList<VertexParam*> *vp=v->getParams();
             for(auto k=vp->begin();k!=vp->end();++k){
                 if((*k)->getP()==i){
                     m->setD(i,j,(*k)->getE());
@@ -132,7 +142,7 @@ void Graph::floyd(){
         }
     }
 
-    for(int k=1;k<=count;k++)
+    for(int k=1;k<=count;k++){
         for(int i=1;i<=count;i++)
             for(int j=1;j<=count;j++){
                 int p=m->getD(i,k);
@@ -143,6 +153,112 @@ void Graph::floyd(){
 
                 }
             }
+        calcResult<<"第"+QString::number(k)+"次计算";
+        calcResult<<"P:";
+        QString temp="┌";
+        for(int i=0;i<count;i++){
+            temp+="------┬";
+        }
+        temp+="------┐";
+        calcResult<<temp;
+        temp="│      │";
+        for(int i=1;i<=count-1;i++){
+            temp+=QString("%1").arg(i,6)+"│";
+        }
+        temp+=QString("%1").arg(count,6)+"│";
+        calcResult<<temp;
+        for(int i=1;i<=count;i++){
+
+
+            if(i==1){
+                 temp="├------┼";
+                 for(int j=1;j<=count-1;j++){
+                     temp+="------┴";
+                 }
+                 temp+="------┤";
+            }else{
+                temp="├------┤";
+                for(int j=1;j<=count-1;j++){
+                    temp+="        ";
+                }
+                temp+="      │";
+
+            }
+            calcResult<<temp;
+            temp="│"+QString("%1").arg(i,6)+"│";
+            for(int j=1;j<=count-1;j++){
+                temp+=QString("%1").arg(m->getP(i,j),6);
+                temp+="  ";
+            }
+            temp+=QString("%1").arg(m->getP(i,count),6);
+            temp+="│";
+
+            calcResult<<temp;
+
+        }
+        temp="└------┴";
+        for(int j=1;j<=count-1;j++){
+            temp+="--------";
+        }
+        temp+="------┘";
+        calcResult<<temp;
+        calcResult<<"D:";
+        temp="┌";
+                for(int i=0;i<count;i++){
+                    temp+="------┬";
+                }
+                temp+="------┐";
+                calcResult<<temp;
+                temp="│      │";
+                for(int i=1;i<=count-1;i++){
+                    temp+=QString("%1").arg(i,6)+"│";
+                }
+                temp+=QString("%1").arg(count,6)+"│";
+                calcResult<<temp;
+                for(int i=1;i<=count;i++){
+                    if(i==1){
+                         temp="├------┼";
+                         for(int j=1;j<=count-1;j++){
+                             temp+="------┴";
+                         }
+                         temp+="------┤";
+                    }else{
+                        temp="├------┤";
+                        for(int j=1;j<=count-1;j++){
+                            temp+="        ";
+                        }
+                        temp+="      │";
+
+                    }
+                    calcResult<<temp;
+                    temp="│"+QString("%1").arg(i,6)+"│";
+                    for(int j=1;j<=count-1;j++){
+                        int d=m->getD(i,j);
+                        if(d<POS_INFINITY)
+                            temp+=QString("%1").arg(d,6);
+                        else
+                            temp+="    ∞";
+                        temp+="  ";
+                    }
+                    int d=m->getD(i,count);
+                    if(d<POS_INFINITY)
+                        temp+=QString("%1").arg(d,6);
+                    else
+                        temp+="    ∞";
+                    temp+="│";
+
+                    calcResult<<temp;
+
+                }
+                temp="└------┴";
+                for(int j=1;j<=count-1;j++){
+                    temp+="--------";
+                }
+                temp+="------┘";
+                calcResult<<temp;
+    }
+    calcResult<<"完成计算";
+    return 0;
 }
 
 BellmanMark *Graph::getBellmanMark() const

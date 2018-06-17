@@ -27,26 +27,26 @@ SOURCES += \
         main.cpp \
     vertex.cpp \
     graph.cpp \
-    vertexparams.cpp \
     bellmanmark.cpp \
     floydmark.cpp \
     displayframe.cpp \
     launchdialog.cpp \
     shortestpathwindow.cpp \
     common.cpp \
-    setdistancedialog.cpp
+    setdistancedialog.cpp \
+    vertexparam.cpp
 
 HEADERS += \
     vertex.h \
     graph.h \
     common.h \
-    vertexparams.h \
     bellmanmark.h \
     floydmark.h \
     displayframe.h \
     launchdialog.h \
     shortestpathwindow.h \
-    setdistancedialog.h
+    setdistancedialog.h \
+    vertexparam.h
 
 FORMS += \
     launchdialog.ui \

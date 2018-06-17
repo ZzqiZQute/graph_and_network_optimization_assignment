@@ -7,6 +7,9 @@ FloydMark::FloydMark(int count)
     c*=c;
     p=new int[c];
     d=new int[c];
+    vertex=new QList<int>();
+    floydStart=0;
+    reset();
 }
 void FloydMark::setP(int x,int y,int val){
     if(x>=1&&x<=count&&y>=1&&y<=count){
@@ -34,4 +37,60 @@ int FloydMark::getD(int x,int y){
 int FloydMark::getCount() const
 {
     return count;
+}
+
+void FloydMark::reset()
+{
+    vertex->clear();
+    negaCircuit=false;
+    nega=0;
+
+
+}
+
+int FloydMark::getFloydStart() const
+{
+    return floydStart;
+}
+
+void FloydMark::setFloydStart(int value)
+{
+    floydStart = value;
+}
+
+QList<int> *FloydMark::getVertex() const
+{
+    return vertex;
+}
+
+void FloydMark::addVertex(int i){
+    vertex->push_back(i);
+}
+bool FloydMark::findVertex(int i){
+    for(auto it=vertex->begin();it!=vertex->end();it++){
+        if(*it==i){
+            return true;
+        }
+    }
+    return false;
+}
+
+int FloydMark::getNega() const
+{
+    return nega;
+}
+
+void FloydMark::setNega(int value)
+{
+    nega = value;
+}
+
+bool FloydMark::getNegaCircuit() const
+{
+    return negaCircuit;
+}
+
+void FloydMark::setNegaCircuit(bool value)
+{
+    negaCircuit = value;
 }

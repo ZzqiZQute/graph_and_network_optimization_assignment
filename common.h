@@ -8,7 +8,7 @@
 #define MAX(a,b) (a<b?b:a)
 #include "graph.h"
 #include "vertex.h"
-#include "vertexparams.h"
+#include "vertexparam.h"
 #include "floydmark.h"
 #include "bellmanmark.h"
 double calcDeg(int x1,int y1,int x2,int y2);

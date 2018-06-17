@@ -20,6 +20,8 @@ public slots:
     void onBtnRemoveAllVertexClicked();
     void onRadioBtnEditModeToggled(bool);
     void onBtnCalcClicked();
+    void onActionOpen();
+    void onActionSave();
 private:
     Ui::ShortestPathWindow *ui;
     void init();

@@ -16,7 +16,7 @@ public:
     void removeVertexAt(int pos);
     int getCount() const;
     int bellman();
-    void floyd();
+    int floyd();
     BellmanMark *getBellmanMark() const;
     FloydMark *getFloydMark() const;
     int getLastX();

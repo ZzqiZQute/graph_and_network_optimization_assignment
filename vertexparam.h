@@ -1,12 +1,12 @@
-#ifndef VERTEXPARAMS_H
-#define VERTEXPARAMS_H
+#ifndef VERTEXPARAM_H
+#define VERTEXPARAM_H
 
 
-class VertexParams
+class VertexParam
 {
 public:
-    VertexParams();
-    VertexParams(int p,int e);
+    VertexParam();
+    VertexParam(int p,int e);
 
     int getP() const;
     void setP(int value);
@@ -62,4 +62,4 @@ private:
 
 };
 
-#endif // VERTEXPARAMS_H
+#endif // VERTEXPARAM_H

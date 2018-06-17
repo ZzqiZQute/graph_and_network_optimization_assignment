@@ -1,14 +1,14 @@
 #ifndef VERTEX_H
 #define VERTEX_H
 #include <QList>
-class VertexParams;
+class VertexParam;
 class Vertex
 {
 public:
     Vertex();
-    QList<VertexParams*> *getParams() const;
+    QList<VertexParam*> *getParams() const;
     ~Vertex();
-    void addVertexParams(VertexParams *vp);
+    void addVertexParams(VertexParam *vp);
     void removeVertexParamsAt(int pos);
 
     int getCenterY() const;
@@ -26,7 +26,7 @@ public:
     int getOriCenterY() const;
 
 private:
-    QList<VertexParams*> *params;
+    QList<VertexParam*> *params;
     int centerX;
     int centerY;
     bool selected;

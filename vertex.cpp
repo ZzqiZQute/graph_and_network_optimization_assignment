@@ -1,13 +1,13 @@
 #include "vertex.h"
-#include "vertexparams.h"
+#include "vertexparam.h"
 #include "common.h"
 Vertex::Vertex()
 {
-    params=new QList<VertexParams*>();
+    params=new QList<VertexParam*>();
     selected=false;
 }
 
-QList<VertexParams*>* Vertex::getParams() const
+QList<VertexParam*>* Vertex::getParams() const
 {
     return params;
 }
@@ -17,7 +17,7 @@ Vertex::~Vertex(){
     delete params;
 }
 
-void Vertex::addVertexParams(VertexParams* vp){
+void Vertex::addVertexParams(VertexParam* vp){
     for(int i=0;i<params->count();i++){
         if(params->at(i)->getP()==vp->getP()){
             params->removeAt(i);

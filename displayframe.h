@@ -3,9 +3,14 @@
 #include <QFrame>
 #include <QObject>
 #include "graph.h"
+
 class DisplayFrame : public QFrame
 {
+
 public:
+    enum Method{
+       Bellman,Floyd
+   };
     explicit DisplayFrame(QWidget* parent=0);
 
     Graph *getGraph() const;
@@ -18,6 +23,19 @@ public:
     void reset();
     bool getEditable() const;
     void setEditable(bool value);
+
+    int getWinOffsetY() const;
+
+    void setWinOffsetX(int value);
+
+    void setWinOffsetY(int value);
+
+    void setWinScale(double value);
+
+    void clearState();
+    bool getMethod() const;
+    void setMethod(bool value);
+    void saveWinOffset();
 
 protected:
     void paintEvent(QPaintEvent *event);
@@ -48,6 +66,7 @@ private:
     bool findEdgeTail;
     bool moveEdgeLabel;
     bool editable;
+    bool method;
     int moveVertexPos;
     int currentLMouseX;
     int currentLMouseY;
@@ -61,7 +80,9 @@ private:
     int createEdgeMouseY;
     int createEdgeVertexHead;
     int createEdgeVertexTail;
+    QString strHint;
     QWidget *mParent;
+
     void drawVertexs(QPainter *painter);
     int checkLBtnDownVertex();
     void drawTest(QPainter *painter);
@@ -74,6 +95,8 @@ private:
     void drawStraightMaybeEdge(QPainter *painter, Vertex *v1, QPoint p);
     QPoint calcEdgeCenter(Vertex *v1, Vertex *v2);
     void drawCurveEdge(QPainter *painter, Vertex *v1, Vertex *v2);
+    void drawHint(QPainter *painter);
+    int checkMouseMoveVertex(QPoint pos);
 };
 
 #endif // DISPLAYFRAME_H
