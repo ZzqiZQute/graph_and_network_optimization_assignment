@@ -26,6 +26,7 @@ private:
     Ui::ShortestPathWindow *ui;
     void init();
     DisplayFrame *shortestpath;
+    void makeHintText(QStringList list);
 };
 
 #endif // SHORTESTPATHWINDOW_H

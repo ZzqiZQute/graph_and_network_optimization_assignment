@@ -119,6 +119,7 @@ int Graph::bellman()
 int Graph::floyd(){
     calcResult.clear();
     calcResult<<"当前方法:Floyd";
+    calcResult<<"<span style='color:red;font-family:\"微软雅黑\"'><i>注意：使用Floyd方法需确保没有负权值回路<br>否则计算的结果有可能是错的</i></span>";
     if(floydMark!=NULL)
         delete floydMark;
     if(count<2){

@@ -1,11 +1,6 @@
 #include <QApplication>
 #include <iostream>
 #include "launchdialog.h"
-#include "graph.h"
-#include "vertex.h"
-#include "vertexparam.h"
-#include "bellmanmark.h"
-#include "floydmark.h"
 using namespace std;
 int main(int argc, char *argv[])
 {

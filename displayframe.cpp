@@ -135,6 +135,36 @@ void DisplayFrame::drawEdge(QPainter* painter){
 
                     }
                 }
+                else if(method==Floyd){
+                    FloydMark *m=graph->getFloydMark();
+                    if(m!=NULL)
+                    {
+                        bool b=false;
+                        for(int k=0;k<m->getVertex()->count()-1;k++){
+                            int t=m->getVertex()->at(k);
+                            int s=m->getVertex()->at(k+1);
+                            if(s==param->getP()&&t==i){
+                                b=true;
+                                break;
+                            }
+                            if(m->getNegaCircuit()&&s==i&&m->findVertex(param->getP()))
+                            {
+                                b=true;
+                                break;
+                            }
+                        }
+
+
+                        if(b){
+                            if(m->getNegaCircuit())
+                                painter->setPen(QPen(QColor(128,0,0),2));
+                            else
+                                painter->setPen(QPen(QColor(0,128,0),2));
+
+                        }
+
+                    }
+                }
             }
             if(!param->getCurve()){
                 drawStraightEdge(painter,v1,v2);
@@ -723,7 +753,7 @@ void DisplayFrame::mouseMoveEvent(QMouseEvent *event){
             {
                 if(pos>0){
                     mark->reset();
-                    if(mark->getFloydStart()>0){
+                    if(mark->getFloydStart()>0&&pos!=mark->getFloydStart()){
                         int p=mark->getP(mark->getFloydStart(),pos);
                         int d=mark->getD(mark->getFloydStart(),pos);
                         if(p!=0)
@@ -743,15 +773,47 @@ void DisplayFrame::mouseMoveEvent(QMouseEvent *event){
                             }
                             mark->addVertex(p);
                         }
+
+                        if(!mark->getNegaCircuit()){
+ END:                           if(mark->getD(mark->getFloydStart(),pos)==POS_INFINITY){
+                                strHint="使用Floyd方法计算得到\n此路不通";
+                            }
+                            else{
+                                strHint="使用Floyd方法计算得到\n"+QString::number(mark->getFloydStart())+"->"+QString::number(pos)+"的最短路径为:";
+                                for(int i=0;i<mark->getVertex()->count()-1;i++){
+                                    strHint+=QString::number(mark->getVertex()->at(mark->getVertex()->count()-1-i))+"->";
+
+                                }
+                                strHint+=QString::number(pos);
+                                strHint+="\n总长度:"+QString::number(mark->getD(mark->getFloydStart(),pos));
+                            }
+                        }else{
+
+                            strHint="使用Floyd方法计算得到\n由于节点";
+                            for(int i=mark->getVertex()->count()-1;i>=0;i--)
+                            {
+                                int v=mark->getVertex()->at(i);
+                                if(v!=mark->getNega()){
+                                    strHint+=QString::number(v)+",";
+                                }else{
+                                    strHint+=QString::number(v);
+                                    break;
+                                }
+                            }
+                            strHint+="构成了负权值回路\n因此无法计算最短路径";
+
+                        }
+
                     }
                 }
                 else{
+                    strHint="";
                     mark->reset();
                 }
             }
         }
     }
-END:
+
     update();
     event->accept();
 }

@@ -31,7 +31,6 @@ void ShortestPathWindow::init(){
     QStringList methodList;
     methodList<<"Bellman"<<"Floyd";
     ui->cbMethod->addItems(methodList);
-    ui->rbEditMode->setEnabled(false);
     connect(ui->btnAddVertex,SIGNAL(clicked()),this,SLOT(onBtnAddVertexClicked()));
     connect(ui->btnRemoveAllVertex,SIGNAL(clicked()),this,SLOT(onBtnRemoveAllVertexClicked()));
     connect(ui->rbEditMode,SIGNAL(toggled(bool)),this,SLOT(onRadioBtnEditModeToggled(bool)));
@@ -197,7 +196,6 @@ void ShortestPathWindow::onRadioBtnEditModeToggled(bool b){
         shortestpath->setEditable(true);
         ui->btnAddVertex->setEnabled(true);
         ui->btnRemoveAllVertex->setEnabled(true);
-        ui->rbEditMode->setEnabled(false);
     }
     else
     {
@@ -212,18 +210,24 @@ void ShortestPathWindow::onRadioBtnEditModeToggled(bool b){
 void ShortestPathWindow::onBtnCalcClicked()
 {
     ui->rbEditMode->setChecked(false);
-    ui->rbEditMode->setEnabled(true);
     int i=ui->cbMethod->currentIndex();
     if(i==0){
         shortestpath->setMethod(DisplayFrame::Bellman);
         shortestpath->getGraph()->bellman();   
         QStringList list=shortestpath->getGraph()->getCalcResult();
-        ui->tbDetail->setText(list.join("\n"));
+        makeHintText(list);
     }else if(i==1){
         shortestpath->setMethod(DisplayFrame::Floyd);
         shortestpath->getGraph()->floyd();
         QStringList list=shortestpath->getGraph()->getCalcResult();
-        ui->tbDetail->setText(list.join("\n"));
+         makeHintText(list);
     }
+
+}
+void ShortestPathWindow::makeHintText(QStringList list){
+    QString s="<!DOCTYPE HTML><html><head><meta name='qrichtext' content='1' /><style type='text/css'>p, li { white-space: pre-wrap; }</style></head><body style=\" font-family:'SimSun'; font-size:9pt; font-weight:400; font-style:normal;\">";
+    s+=list.join("<br>");
+    s+="</body></html>";
+    ui->tbDetail->setHtml(s);
 
 }
