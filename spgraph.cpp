@@ -1,7 +1,7 @@
 #include "common.h"
 #include <iostream>
 using namespace std;
-Graph::Graph()
+SPGraph::SPGraph()
 {
     vertexs=new QList<Vertex*>();
     vertexs->push_back(new Vertex());
@@ -11,19 +11,19 @@ Graph::Graph()
 }
 
 
-Graph::~Graph()
+SPGraph::~SPGraph()
 {
     vertexs->clear();
     delete vertexs;
 }
 
-void Graph::addVertex(Vertex *v)
+void SPGraph::addVertex(Vertex *v)
 {
     vertexs->push_back(v);
     count++;
 }
 
-void Graph::removeVertexAt(int pos){
+void SPGraph::removeVertexAt(int pos){
     if(pos>0){
         for(int i=0;i<vertexs->size();i++){
             if(i!=pos){
@@ -51,13 +51,13 @@ void Graph::removeVertexAt(int pos){
     }
 }
 
-int Graph::getCount() const
+int SPGraph::getCount() const
 {
     return count;
 }
 
 
-int Graph::bellman()
+int SPGraph::bellman()
 {
     calcResult.clear();
     calcResult<<"当前方法:Bellman";
@@ -116,7 +116,7 @@ int Graph::bellman()
     return ERROR_CODE;
 }
 
-int Graph::floyd(){
+int SPGraph::floyd(){
     calcResult.clear();
     calcResult<<"当前方法:Floyd";
     calcResult<<"<span style='color:red;font-family:\"微软雅黑\"'><i>注意：使用Floyd方法需确保没有负权值回路<br>否则计算的结果有可能是错的</i></span>";
@@ -262,12 +262,12 @@ int Graph::floyd(){
     return 0;
 }
 
-BellmanMark *Graph::getBellmanMark() const
+BellmanMark *SPGraph::getBellmanMark() const
 {
     return bellmanMark;
 }
 
-FloydMark *Graph::getFloydMark() const
+FloydMark *SPGraph::getFloydMark() const
 {
     return floydMark;
 }
@@ -275,25 +275,25 @@ FloydMark *Graph::getFloydMark() const
 
 
 
-void Graph::clearVertexs(){
+void SPGraph::clearVertexs(){
     vertexs->clear();
     vertexs->push_back(new Vertex());
     count=0;
 }
 
-Vertex* Graph::getVertexAt(int pos) const{
+Vertex* SPGraph::getVertexAt(int pos) const{
     return vertexs->at(pos);
 }
-int Graph::getLastX(){
+int SPGraph::getLastX(){
 
     return vertexs->at(count)->getCenterX();
 }
-int Graph::getLastY(){
+int SPGraph::getLastY(){
 
     return vertexs->at(count)->getCenterY();
 }
 
-QStringList Graph::getCalcResult() const
+QStringList SPGraph::getCalcResult() const
 {
     return calcResult;
 }

@@ -1,19 +1,19 @@
-#ifndef SHORTESTPATHWINDOW_H
-#define SHORTESTPATHWINDOW_H
+#ifndef SPWINDOW_H
+#define SPWINDOW_H
 
 #include <QMainWindow>
-class DisplayFrame;
+class SPFrame;
 namespace Ui {
-class ShortestPathWindow;
+class SPWindow;
 }
 
-class ShortestPathWindow : public QMainWindow
+class SPWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit ShortestPathWindow(QWidget *parent = 0);
-    ~ShortestPathWindow();
+    explicit SPWindow(QWidget *parent = 0);
+    ~SPWindow();
 
 public slots:
     void onBtnAddVertexClicked();
@@ -23,10 +23,10 @@ public slots:
     void onActionOpen();
     void onActionSave();
 private:
-    Ui::ShortestPathWindow *ui;
+    Ui::SPWindow *ui;
     void init();
-    DisplayFrame *shortestpath;
+    SPFrame *shortestpath;
     void makeHintText(QStringList list);
 };
 
-#endif // SHORTESTPATHWINDOW_H
+#endif // SPWINDOW_H

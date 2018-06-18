@@ -1,4 +1,4 @@
-#include "shortestpathwindow.h"
+#include "spwindow.h"
 #include "ui_shortestpathwindow.h"
 #include "common.h"
 #include <QMessageBox>
@@ -6,9 +6,9 @@
 #include <QScreen>
 #include <QFileDialog>
 #include <QTextCodec>
-ShortestPathWindow::ShortestPathWindow(QWidget *parent) :
+SPWindow::SPWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::ShortestPathWindow)
+    ui(new Ui::SPWindow)
 {
 
     ui->setupUi(this);
@@ -21,11 +21,11 @@ ShortestPathWindow::ShortestPathWindow(QWidget *parent) :
 
 }
 
-ShortestPathWindow::~ShortestPathWindow()
+SPWindow::~SPWindow()
 {
     delete ui;
 }
-void ShortestPathWindow::init(){
+void SPWindow::init(){
 
     shortestpath=ui->displayFrame;
     QStringList methodList;
@@ -40,7 +40,7 @@ void ShortestPathWindow::init(){
 
 
 }
-void ShortestPathWindow::onActionOpen(){
+void SPWindow::onActionOpen(){
     shortestpath->clearState();
     QTextCodec *codec=QTextCodec::codecForName("utf-8");
     QString filter=codec->toUnicode("最短路径文件(*.stp)");
@@ -59,7 +59,7 @@ void ShortestPathWindow::onActionOpen(){
             shortestpath->setWinOffsetY(tempint);
             file.read((char*)&tempdouble,sizeof(double));
             shortestpath->setWinScale(tempdouble);
-            Graph* g=shortestpath->getGraph();
+            SPGraph* g=shortestpath->getGraph();
             g->clearVertexs();
             int vertexcount;
             file.read((char*)&vertexcount,sizeof(int));
@@ -99,7 +99,7 @@ void ShortestPathWindow::onActionOpen(){
 
     }
 }
-void ShortestPathWindow::onActionSave(){
+void SPWindow::onActionSave(){
     shortestpath->clearState();
     QTextCodec *codec=QTextCodec::codecForName("utf-8");
     QString filter=codec->toUnicode("最短路径文件(*.stp)");
@@ -118,7 +118,7 @@ void ShortestPathWindow::onActionSave(){
             file.write((char*)&tempint,sizeof(int));
             tempdouble=shortestpath->getWinScale();
             file.write((char*)&tempdouble,sizeof(double));
-            Graph* g=shortestpath->getGraph();
+            SPGraph* g=shortestpath->getGraph();
             tempint=g->getCount();
             file.write((char*)&tempint,sizeof(int));
             for(int i=1;i<=g->getCount();i++){
@@ -155,10 +155,10 @@ void ShortestPathWindow::onActionSave(){
 
 
 }
-void ShortestPathWindow::onBtnAddVertexClicked(){
+void SPWindow::onBtnAddVertexClicked(){
 
     QRect rect=shortestpath->geometry();
-    Graph* graph=shortestpath->getGraph();
+    SPGraph* graph=shortestpath->getGraph();
     Vertex *v=new Vertex();
     if(graph->getCount()==0){
         v->setCenterX(VERTEX_SIZE/2);
@@ -181,17 +181,17 @@ void ShortestPathWindow::onBtnAddVertexClicked(){
     shortestpath->update();
 
 }
-void ShortestPathWindow::onBtnRemoveAllVertexClicked(){
+void SPWindow::onBtnRemoveAllVertexClicked(){
     if(QMessageBox::Yes==QMessageBox::warning(this,"警告","是否全部删除?",QMessageBox::Yes,QMessageBox::No))
     {
-        Graph* graph=shortestpath->getGraph();
+        SPGraph* graph=shortestpath->getGraph();
         graph->clearVertexs();
         shortestpath->reset();
         shortestpath->setFocus();
         shortestpath->update();
     }
 }
-void ShortestPathWindow::onRadioBtnEditModeToggled(bool b){
+void SPWindow::onRadioBtnEditModeToggled(bool b){
     if(b){
         shortestpath->setEditable(true);
         ui->btnAddVertex->setEnabled(true);
@@ -207,24 +207,24 @@ void ShortestPathWindow::onRadioBtnEditModeToggled(bool b){
     shortestpath->update();
 }
 
-void ShortestPathWindow::onBtnCalcClicked()
+void SPWindow::onBtnCalcClicked()
 {
     ui->rbEditMode->setChecked(false);
     int i=ui->cbMethod->currentIndex();
     if(i==0){
-        shortestpath->setMethod(DisplayFrame::Bellman);
+        shortestpath->setMethod(SPFrame::Bellman);
         shortestpath->getGraph()->bellman();   
         QStringList list=shortestpath->getGraph()->getCalcResult();
         makeHintText(list);
     }else if(i==1){
-        shortestpath->setMethod(DisplayFrame::Floyd);
+        shortestpath->setMethod(SPFrame::Floyd);
         shortestpath->getGraph()->floyd();
         QStringList list=shortestpath->getGraph()->getCalcResult();
          makeHintText(list);
     }
 
 }
-void ShortestPathWindow::makeHintText(QStringList list){
+void SPWindow::makeHintText(QStringList list){
     QString s="<!DOCTYPE HTML><html><head><meta name='qrichtext' content='1' /><style type='text/css'>p, li { white-space: pre-wrap; }</style></head><body style=\" font-family:'SimSun'; font-size:9pt; font-weight:400; font-style:normal;\">";
     s+=list.join("<br>");
     s+="</body></html>";

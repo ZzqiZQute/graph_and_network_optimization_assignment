@@ -1,21 +1,21 @@
-#ifndef DISPLAYFRAME_H
-#define DISPLAYFRAME_H
+#ifndef SP_FRAME
+#define SP_FRAME
 #include <QFrame>
 #include <QObject>
-#include "graph.h"
+#include "spgraph.h"
 
-class DisplayFrame : public QFrame
+class SPFrame : public QFrame
 {
 
 public:
     enum Method{
        Bellman,Floyd
    };
-    explicit DisplayFrame(QWidget* parent=0);
+    explicit SPFrame(QWidget* parent=0);
 
-    Graph *getGraph() const;
+    SPGraph *getGraph() const;
 
-    ~DisplayFrame();
+    ~SPFrame();
     double getWinScale() const;
 
     int getWinOffsetX() const;
@@ -46,7 +46,7 @@ protected:
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
 private:
-    Graph* graph;
+    SPGraph* graph;
     double winScale;
     int winOffsetX;
     int winOffsetY;
@@ -99,4 +99,4 @@ private:
     int checkMouseMoveVertex(QPoint pos);
 };
 
-#endif // DISPLAYFRAME_H
+#endif // SP_FRAME

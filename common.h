@@ -6,11 +6,13 @@
 #define PI 3.1415926535897932
 #define MIN(a,b) (a>b?b:a)
 #define MAX(a,b) (a<b?b:a)
-#include "graph.h"
+#include "spgraph.h"
 #include "vertex.h"
 #include "vertexparam.h"
 #include "floydmark.h"
 #include "bellmanmark.h"
+#include "basematrix.h"
+#include "basevector.h"
 double calcDeg(int x1,int y1,int x2,int y2);
 QPoint calcTail(int x,int y,double deg,double len);
 double calcDis(double x1, double y1, double x2, double y2);

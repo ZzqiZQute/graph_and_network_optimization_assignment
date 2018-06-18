@@ -1,6 +1,6 @@
 #include "launchdialog.h"
 #include "ui_launchdialog.h"
-#include "shortestpathwindow.h"
+#include "spwindow.h"
 LaunchDialog::LaunchDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::LaunchDialog)
@@ -16,7 +16,7 @@ LaunchDialog::~LaunchDialog()
 }
 void LaunchDialog::onBtnShortestPathClicked(){
     this->close();
-    ShortestPathWindow* window=new ShortestPathWindow();
+    SPWindow* window=new SPWindow();
     window->show();
 
 

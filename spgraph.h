@@ -1,15 +1,15 @@
-#ifndef GRAPH_H
-#define GRAPH_H
+#ifndef SPGRAPH_H
+#define SPGRAPH_H
 #include <QList>
 class Vertex;
 class BellmanMark;
 class FloydMark;
 using namespace std;
-class Graph
+class SPGraph
 {
 public:
-    Graph();
-    ~Graph();
+    SPGraph();
+    ~SPGraph();
     void addVertex(Vertex* v);
     void clearVertexs();
     Vertex *getVertexAt(int pos) const;
@@ -31,4 +31,4 @@ private:
     QStringList calcResult;
 };
 
-#endif // GRAPH_H
+#endif // SPGRAPH_H

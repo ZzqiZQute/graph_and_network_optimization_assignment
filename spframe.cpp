@@ -1,4 +1,4 @@
-﻿#include "displayframe.h"
+﻿#include "spframe.h"
 #include "common.h"
 #include "setdistancedialog.h"
 #include <math.h>
@@ -8,16 +8,16 @@
 #include <QMessageBox>
 #include <iostream>
 using namespace std;
-DisplayFrame::DisplayFrame(QWidget *parent):QFrame(parent)
+SPFrame::SPFrame(QWidget *parent):QFrame(parent)
 {
     this->mParent=parent;
-    graph=new Graph();
+    graph=new SPGraph();
     refresh=false;
     init();
     setMouseTracking(true);
 
 }
-void DisplayFrame::init(){
+void SPFrame::init(){
     clearState();
     editable=true;
     winScale=1;
@@ -34,10 +34,10 @@ void DisplayFrame::init(){
     createEdgeVertexTail=0;
 
 }
-DisplayFrame::~DisplayFrame(){
+SPFrame::~SPFrame(){
     delete graph;
 }
-void DisplayFrame::paintEvent(QPaintEvent *event)
+void SPFrame::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
     painter.setFont(QFont("微软雅黑",15));
@@ -68,14 +68,14 @@ void DisplayFrame::paintEvent(QPaintEvent *event)
 
     event->accept();
 }
-void DisplayFrame::drawHint(QPainter* painter){
+void SPFrame::drawHint(QPainter* painter){
     if(!editable){
         painter->setPen(QColor(Qt::blue));
         painter->drawText(QRect(50,50,painter->window().width()-50,painter->window().height()-50),strHint);
     }
 }
 
-void DisplayFrame::drawSelects(QPainter* painter){
+void SPFrame::drawSelects(QPainter* painter){
     if(maybeMultiSelect){
         painter->setBrush(QBrush(QColor(128,128,128,24)));
         int xx=maybeMultiSelectMouseX;
@@ -93,7 +93,7 @@ void DisplayFrame::drawSelects(QPainter* painter){
         painter->drawRect(p.rx(),p.ry(),w,h);
     }
 }
-void DisplayFrame::drawEdge(QPainter* painter){
+void SPFrame::drawEdge(QPainter* painter){
     painter->setPen(QPen());
     for(int i=1;i<=graph->getCount();i++){
         Vertex* v=graph->getVertexAt(i);
@@ -194,10 +194,10 @@ void DisplayFrame::drawEdge(QPainter* painter){
 
 
 }
-QPoint DisplayFrame::calcEdgeCenter(Vertex* v1,Vertex* v2){
+QPoint SPFrame::calcEdgeCenter(Vertex* v1,Vertex* v2){
     return  QPoint((v1->getCenterX()+v2->getCenterX())/2,(v1->getCenterY()+v2->getCenterY())/2);
 }
-void DisplayFrame::drawCurveEdge(QPainter* painter,Vertex* v1,Vertex* v2)
+void SPFrame::drawCurveEdge(QPainter* painter,Vertex* v1,Vertex* v2)
 {
     QPoint vCenter=QPoint(v1->getCenterX(),v1->getCenterY());
     int deg=calcDeg(v2->getCenterX(),v2->getCenterY(),v1->getCenterX(),v1->getCenterY());
@@ -229,7 +229,7 @@ void DisplayFrame::drawCurveEdge(QPainter* painter,Vertex* v1,Vertex* v2)
 
     }
 }
-void DisplayFrame::drawStraightEdge(QPainter* painter,Vertex* v1,Vertex* v2)
+void SPFrame::drawStraightEdge(QPainter* painter,Vertex* v1,Vertex* v2)
 {
     QPoint vCenter=QPoint(v1->getCenterX(),v1->getCenterY());
     int deg=calcDeg(v2->getCenterX(),v2->getCenterY(),v1->getCenterX(),v1->getCenterY());
@@ -251,7 +251,7 @@ void DisplayFrame::drawStraightEdge(QPainter* painter,Vertex* v1,Vertex* v2)
 
     }
 }
-void DisplayFrame::drawStraightMaybeEdge(QPainter* painter,Vertex* v1,QPoint p){
+void SPFrame::drawStraightMaybeEdge(QPainter* painter,Vertex* v1,QPoint p){
     QPoint vCenter=QPoint(v1->getCenterX(),v1->getCenterY());
     QPoint realPoint=p;
     QPoint startPoint;
@@ -272,7 +272,7 @@ void DisplayFrame::drawStraightMaybeEdge(QPainter* painter,Vertex* v1,QPoint p){
 
     }
 }
-void DisplayFrame::drawVertexs(QPainter* painter){
+void SPFrame::drawVertexs(QPainter* painter){
     painter->setPen(QPen());
     for(int i=1;i<=graph->getCount();i++){
         Vertex* v=graph->getVertexAt(i);
@@ -345,7 +345,7 @@ void DisplayFrame::drawVertexs(QPainter* painter){
         painter->drawText(rect,QString::number(i),QTextOption(Qt::AlignCenter));
     }
 }
-int DisplayFrame::checkLBtnDownVertex(){
+int SPFrame::checkLBtnDownVertex(){
 
     int ret=0;
     for(int i=graph->getCount();i>=1;i--){
@@ -358,7 +358,7 @@ int DisplayFrame::checkLBtnDownVertex(){
     }
     return ret;
 }
-int DisplayFrame::checkMouseMoveVertex(QPoint pos){
+int SPFrame::checkMouseMoveVertex(QPoint pos){
 
     int ret=0;
     QPoint realPoint=mouseToReal(pos.x(),pos.y());
@@ -373,7 +373,7 @@ int DisplayFrame::checkMouseMoveVertex(QPoint pos){
     }
     return ret;
 }
-void DisplayFrame::mousePressEvent(QMouseEvent *event){
+void SPFrame::mousePressEvent(QMouseEvent *event){
     int x=event->x();
     int y=event->y();
     if(editable){
@@ -494,7 +494,7 @@ void DisplayFrame::mousePressEvent(QMouseEvent *event){
     }
     else
     {
-        if(event->button()==Qt::LeftButton&&method==DisplayFrame::Floyd){
+        if(event->button()==Qt::LeftButton&&method==SPFrame::Floyd){
             int pos=checkMouseMoveVertex(event->pos());
             if(pos>0){
                 FloydMark* mark=graph->getFloydMark();
@@ -521,11 +521,11 @@ void DisplayFrame::mousePressEvent(QMouseEvent *event){
     update();
     event->accept();
 }
-void DisplayFrame::reset(){
+void SPFrame::reset(){
     refresh=false;
 }
 
-void DisplayFrame::mouseMoveEvent(QMouseEvent *event){
+void SPFrame::mouseMoveEvent(QMouseEvent *event){
     setFocus();
     int x=event->x();
     int y=event->y();
@@ -688,7 +688,7 @@ void DisplayFrame::mouseMoveEvent(QMouseEvent *event){
         }
     }else{
         int pos=checkMouseMoveVertex(event->pos());
-        if(method==DisplayFrame::Bellman){
+        if(method==SPFrame::Bellman){
             BellmanMark* mark=graph->getBellmanMark();
             if(mark!=NULL)
             {
@@ -747,7 +747,7 @@ void DisplayFrame::mouseMoveEvent(QMouseEvent *event){
 
 
 
-        }else if(method==DisplayFrame::Floyd){
+        }else if(method==SPFrame::Floyd){
             FloydMark* mark=graph->getFloydMark();
             if(mark!=NULL)
             {
@@ -817,7 +817,7 @@ void DisplayFrame::mouseMoveEvent(QMouseEvent *event){
     update();
     event->accept();
 }
-void DisplayFrame::mouseReleaseEvent(QMouseEvent *event){
+void SPFrame::mouseReleaseEvent(QMouseEvent *event){
     if(editable)
     {
         if(event->button()==Qt::LeftButton){
@@ -910,7 +910,7 @@ void DisplayFrame::mouseReleaseEvent(QMouseEvent *event){
     update();
     event->accept();
 }
-void DisplayFrame::wheelEvent(QWheelEvent *event){
+void SPFrame::wheelEvent(QWheelEvent *event){
     QPoint delta=event->angleDelta();
     int x=event->x();
     int y=event->y();
@@ -932,7 +932,7 @@ void DisplayFrame::wheelEvent(QWheelEvent *event){
     update();
     event->accept();
 }
-void DisplayFrame::keyPressEvent(QKeyEvent *event){
+void SPFrame::keyPressEvent(QKeyEvent *event){
     if(editable)
     {
         if(event->key()==Qt::Key_Control){
@@ -963,7 +963,7 @@ void DisplayFrame::keyPressEvent(QKeyEvent *event){
     event->accept();
 
 }
-void DisplayFrame::keyReleaseEvent(QKeyEvent *event){
+void SPFrame::keyReleaseEvent(QKeyEvent *event){
     if(editable)
     {
         if(event->key()==Qt::Key_Control){
@@ -975,48 +975,48 @@ void DisplayFrame::keyReleaseEvent(QKeyEvent *event){
     event->accept();
 }
 
-bool DisplayFrame::getMethod() const
+bool SPFrame::getMethod() const
 {
     return method;
 }
 
-void DisplayFrame::setMethod(bool value)
+void SPFrame::setMethod(bool value)
 {
     method = value;
 }
 
-void DisplayFrame::saveWinOffset()
+void SPFrame::saveWinOffset()
 {
     winOriOffsetX=winOffsetX;
     winOriOffsetY=winOffsetY;
 }
 
-void DisplayFrame::setWinScale(double value)
+void SPFrame::setWinScale(double value)
 {
     winScale = value;
 }
 
-void DisplayFrame::setWinOffsetY(int value)
+void SPFrame::setWinOffsetY(int value)
 {
     winOffsetY = value;
 }
 
-void DisplayFrame::setWinOffsetX(int value)
+void SPFrame::setWinOffsetX(int value)
 {
     winOffsetX = value;
 }
 
-int DisplayFrame::getWinOffsetY() const
+int SPFrame::getWinOffsetY() const
 {
     return winOffsetY;
 }
 
-bool DisplayFrame::getEditable() const
+bool SPFrame::getEditable() const
 {
     return editable;
 }
 
-void DisplayFrame::setEditable(bool value)
+void SPFrame::setEditable(bool value)
 {
     editable = value;
     if(editable){
@@ -1036,28 +1036,28 @@ void DisplayFrame::setEditable(bool value)
     }
 }
 
-int DisplayFrame::getWinOffsetX() const
+int SPFrame::getWinOffsetX() const
 {
     return winOffsetX;
 }
 
-double DisplayFrame::getWinScale() const
+double SPFrame::getWinScale() const
 {
     return winScale;
 }
-QPoint DisplayFrame::mouseToReal(int x,int y)
+QPoint SPFrame::mouseToReal(int x,int y)
 {
     return QPoint((x-winOffsetX)/winScale,(y-winOffsetY)/winScale);
 }
-QPoint DisplayFrame::realToMouse(int x,int y)
+QPoint SPFrame::realToMouse(int x,int y)
 {
     return QPoint(x*winScale+winOffsetX,y*winScale+winOffsetY);
 }
-Graph *DisplayFrame::getGraph() const
+SPGraph *SPFrame::getGraph() const
 {
     return graph;
 }
-void DisplayFrame::clearState(){
+void SPFrame::clearState(){
 
     winStartMove=false;
     keyCtrlDown=false;
