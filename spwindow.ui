@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ShortestPathWindow</class>
- <widget class="QMainWindow" name="ShortestPathWindow">
+ <class>SPWindow</class>
+ <widget class="QMainWindow" name="SPWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -206,7 +206,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>1114</width>
-     <height>26</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -258,7 +258,7 @@ p, li { white-space: pre-wrap; }
   <connection>
    <sender>actionExit</sender>
    <signal>triggered()</signal>
-   <receiver>ShortestPathWindow</receiver>
+   <receiver>SPWindow</receiver>
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">

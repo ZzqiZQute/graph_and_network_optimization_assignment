@@ -56,6 +56,6 @@ HEADERS += \
 
 FORMS += \
     launchdialog.ui \
-    shortestpathwindow.ui \
-    setdistancedialog.ui
+    setdistancedialog.ui \
+    spwindow.ui
 

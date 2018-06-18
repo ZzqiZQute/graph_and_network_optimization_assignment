@@ -1,5 +1,5 @@
 #include "spwindow.h"
-#include "ui_shortestpathwindow.h"
+#include "ui_spwindow.h"
 #include "common.h"
 #include <QMessageBox>
 #include <QGuiApplication>
