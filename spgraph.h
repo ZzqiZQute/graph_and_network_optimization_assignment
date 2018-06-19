@@ -1,7 +1,7 @@
 #ifndef SPGRAPH_H
 #define SPGRAPH_H
 #include <QList>
-class Vertex;
+class SPVertex;
 class BellmanMark;
 class FloydMark;
 using namespace std;
@@ -10,9 +10,9 @@ class SPGraph
 public:
     SPGraph();
     ~SPGraph();
-    void addVertex(Vertex* v);
+    void addVertex(SPVertex* v);
     void clearVertexs();
-    Vertex *getVertexAt(int pos) const;
+    SPVertex *getVertexAt(int pos) const;
     void removeVertexAt(int pos);
     int getCount() const;
     int bellman();
@@ -24,7 +24,7 @@ public:
     QStringList getCalcResult() const;
 
 private:
-    QList<Vertex*> *vertexs;
+    QList<SPVertex*> *vertexs;
     BellmanMark *bellmanMark;
     FloydMark* floydMark;
     int count;

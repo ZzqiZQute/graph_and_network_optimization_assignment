@@ -25,34 +25,38 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-    vertex.cpp \
     bellmanmark.cpp \
     floydmark.cpp \
     launchdialog.cpp \
     common.cpp \
     setdistancedialog.cpp \
-    vertexparam.cpp \
     basevector.cpp \
     basematrix.cpp \
     nsmgraph.cpp \
     spgraph.cpp \
     spwindow.cpp \
-    spframe.cpp
+    spframe.cpp \
+    spvertex.cpp \
+    spvertexparam.cpp \
+    nsmvertex.cpp \
+    nsmvertexparam.cpp
 
 HEADERS += \
-    vertex.h \
     common.h \
     bellmanmark.h \
     floydmark.h \
     launchdialog.h \
     setdistancedialog.h \
-    vertexparam.h \
     basevector.h \
     basematrix.h \
     nsmgraph.h \
     spgraph.h \
     spwindow.h \
-    spframe.h
+    spframe.h \
+    spvertex.h \
+    spvertexparam.h \
+    nsmvertex.h \
+    nsmvertexparam.h
 
 FORMS += \
     launchdialog.ui \

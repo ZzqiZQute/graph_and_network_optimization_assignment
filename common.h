@@ -7,8 +7,11 @@
 #define MIN(a,b) (a>b?b:a)
 #define MAX(a,b) (a<b?b:a)
 #include "spgraph.h"
-#include "vertex.h"
-#include "vertexparam.h"
+#include "spvertex.h"
+#include "spvertexparam.h"
+#include "nsmgraph.h"
+#include "nsmvertex.h"
+#include "nsmvertexparam.h"
 #include "floydmark.h"
 #include "bellmanmark.h"
 #include "basematrix.h"

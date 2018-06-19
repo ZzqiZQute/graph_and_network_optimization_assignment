@@ -1,12 +1,12 @@
-#ifndef VERTEXPARAM_H
-#define VERTEXPARAM_H
+#ifndef SPVERTEXPARAM_H
+#define SPVERTEXPARAM_H
 
 
-class VertexParam
+class SPVertexParam
 {
 public:
-    VertexParam();
-    VertexParam(int p,int e);
+    SPVertexParam();
+    SPVertexParam(int p,int e);
 
     int getP() const;
     void setP(int value);
@@ -62,4 +62,4 @@ private:
 
 };
 
-#endif // VERTEXPARAM_H
+#endif // SPVERTEXPARAM_H

@@ -17,7 +17,8 @@ void BaseMatrix::addVector(BaseVector *vector)
 
 }
 
-void BaseMatrix::removeVector(int v1,int v2){
+void BaseMatrix::removeVector(int v1,int v2)
+{
     for(int i=0;i<vectors->count();i++){
         if((v1==vectors->at(i)->getV1()&&v2==vectors->at(i)->getV2())
                 ||(v2==vectors->at(i)->getV1()&&v1==vectors->at(i)->getV2())){

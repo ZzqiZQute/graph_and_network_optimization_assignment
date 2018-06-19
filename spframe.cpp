@@ -96,11 +96,11 @@ void SPFrame::drawSelects(QPainter* painter){
 void SPFrame::drawEdge(QPainter* painter){
     painter->setPen(QPen());
     for(int i=1;i<=graph->getCount();i++){
-        Vertex* v=graph->getVertexAt(i);
+        SPVertex* v=graph->getVertexAt(i);
         for(int j=0;j<v->getParams()->count();j++){
-            VertexParam* param=v->getParams()->at(j);
-            Vertex* v1=graph->getVertexAt(param->getP());
-            Vertex* v2=v;
+            SPVertexParam* param=v->getParams()->at(j);
+            SPVertex* v1=graph->getVertexAt(param->getP());
+            SPVertex* v2=v;
             if(editable){
                 if(param->getHover())
                     painter->setPen(QColor(Qt::red));
@@ -181,23 +181,23 @@ void SPFrame::drawEdge(QPainter* painter){
     }
     if(createEdge){
         if(!findEdgeTail){
-            Vertex* v=graph->getVertexAt(createEdgeVertexHead);
+            SPVertex* v=graph->getVertexAt(createEdgeVertexHead);
             QPoint realPoint=mouseToReal(createEdgeMouseX,createEdgeMouseY);
             drawStraightMaybeEdge(painter,v,realPoint);
         }
         else{
-            Vertex* v1=graph->getVertexAt(createEdgeVertexHead);
-            Vertex* v2=graph->getVertexAt(createEdgeVertexTail);
+            SPVertex* v1=graph->getVertexAt(createEdgeVertexHead);
+            SPVertex* v2=graph->getVertexAt(createEdgeVertexTail);
             drawStraightEdge(painter,v1,v2);
         }
     }
 
 
 }
-QPoint SPFrame::calcEdgeCenter(Vertex* v1,Vertex* v2){
+QPoint SPFrame::calcEdgeCenter(SPVertex* v1,SPVertex* v2){
     return  QPoint((v1->getCenterX()+v2->getCenterX())/2,(v1->getCenterY()+v2->getCenterY())/2);
 }
-void SPFrame::drawCurveEdge(QPainter* painter,Vertex* v1,Vertex* v2)
+void SPFrame::drawCurveEdge(QPainter* painter,SPVertex* v1,SPVertex* v2)
 {
     QPoint vCenter=QPoint(v1->getCenterX(),v1->getCenterY());
     int deg=calcDeg(v2->getCenterX(),v2->getCenterY(),v1->getCenterX(),v1->getCenterY());
@@ -229,7 +229,7 @@ void SPFrame::drawCurveEdge(QPainter* painter,Vertex* v1,Vertex* v2)
 
     }
 }
-void SPFrame::drawStraightEdge(QPainter* painter,Vertex* v1,Vertex* v2)
+void SPFrame::drawStraightEdge(QPainter* painter,SPVertex* v1,SPVertex* v2)
 {
     QPoint vCenter=QPoint(v1->getCenterX(),v1->getCenterY());
     int deg=calcDeg(v2->getCenterX(),v2->getCenterY(),v1->getCenterX(),v1->getCenterY());
@@ -251,7 +251,7 @@ void SPFrame::drawStraightEdge(QPainter* painter,Vertex* v1,Vertex* v2)
 
     }
 }
-void SPFrame::drawStraightMaybeEdge(QPainter* painter,Vertex* v1,QPoint p){
+void SPFrame::drawStraightMaybeEdge(QPainter* painter,SPVertex* v1,QPoint p){
     QPoint vCenter=QPoint(v1->getCenterX(),v1->getCenterY());
     QPoint realPoint=p;
     QPoint startPoint;
@@ -275,7 +275,7 @@ void SPFrame::drawStraightMaybeEdge(QPainter* painter,Vertex* v1,QPoint p){
 void SPFrame::drawVertexs(QPainter* painter){
     painter->setPen(QPen());
     for(int i=1;i<=graph->getCount();i++){
-        Vertex* v=graph->getVertexAt(i);
+        SPVertex* v=graph->getVertexAt(i);
         QRect rect;
         rect.setLeft(v->getCenterX()-VERTEX_SIZE/2);
         rect.setTop(v->getCenterY()-VERTEX_SIZE/2);
@@ -349,7 +349,7 @@ int SPFrame::checkLBtnDownVertex(){
 
     int ret=0;
     for(int i=graph->getCount();i>=1;i--){
-        Vertex* v=graph->getVertexAt(i);
+        SPVertex* v=graph->getVertexAt(i);
         double dis=sqrt((realX-v->getCenterX())*(realX-v->getCenterX())+(realY-v->getCenterY())*(realY-v->getCenterY()));
         if(dis<VERTEX_SIZE/2){
             ret=i;
@@ -363,7 +363,7 @@ int SPFrame::checkMouseMoveVertex(QPoint pos){
     int ret=0;
     QPoint realPoint=mouseToReal(pos.x(),pos.y());
     for(int i=graph->getCount();i>=1;i--){
-        Vertex* v=graph->getVertexAt(i);
+        SPVertex* v=graph->getVertexAt(i);
         double dis=sqrt((realPoint.x()-v->getCenterX())*(realPoint.x()-v->getCenterX())
                         +(realPoint.y()-v->getCenterY())*(realPoint.y()-v->getCenterY()));
         if(dis<VERTEX_SIZE/2){
@@ -381,24 +381,24 @@ void SPFrame::mousePressEvent(QMouseEvent *event){
             int pos=checkLBtnDownVertex();
             if(!keyCtrlDown){
                 if(pos>0){
-                    Vertex* v=graph->getVertexAt(pos);
+                    SPVertex* v=graph->getVertexAt(pos);
                     if(!multiSelect){
                         moveVertexPos=pos;
                         moveVertexCenterX=v->getCenterX();
                         moveVertexCenterY=v->getCenterY();
                         v->setSelected(true);
                         for(int i=0;i<v->getParams()->count();i++){
-                            VertexParam* vp=v->getParams()->at(i);
-                            Vertex* v1=graph->getVertexAt(vp->getP());
+                            SPVertexParam* vp=v->getParams()->at(i);
+                            SPVertex* v1=graph->getVertexAt(vp->getP());
                             vp->setDeg(calcDeg(v1->getCenterX(),v1->getCenterY(),vp->getX(),vp->getY())
                                        -calcDeg(v1->getCenterX(),v1->getCenterY(),v->getCenterX(),v->getCenterY()));
                             vp->setDis(calcDis(v1->getCenterX(),v1->getCenterY(),vp->getX(),vp->getY()));
                         }
                         for(int i=1;i<=graph->getCount();i++){
-                            Vertex* v2=graph->getVertexAt(i);
+                            SPVertex* v2=graph->getVertexAt(i);
                             for(int j=0;j<v2->getParams()->count();j++)
                             {
-                                VertexParam *vp=v2->getParams()->at(j);
+                                SPVertexParam *vp=v2->getParams()->at(j);
                                 if(vp->getP()==pos)
                                 {
                                     vp->setDeg(calcDeg(v->getCenterX(),v->getCenterY(),vp->getX(),vp->getY())
@@ -420,17 +420,17 @@ void SPFrame::mousePressEvent(QMouseEvent *event){
                             moveVertexCenterY=v->getCenterY();
                             v->setSelected(true);
                             for(int i=0;i<v->getParams()->count();i++){
-                                VertexParam* vp=v->getParams()->at(i);
-                                Vertex* v1=graph->getVertexAt(vp->getP());
+                                SPVertexParam* vp=v->getParams()->at(i);
+                                SPVertex* v1=graph->getVertexAt(vp->getP());
                                 vp->setDeg(calcDeg(v1->getCenterX(),v1->getCenterY(),vp->getX(),vp->getY())
                                            -calcDeg(v1->getCenterX(),v1->getCenterY(),v->getCenterX(),v->getCenterY()));
                                 vp->setDis(calcDis(v1->getCenterX(),v1->getCenterY(),vp->getX(),vp->getY()));
                             }
                             for(int i=1;i<=graph->getCount();i++){
-                                Vertex* v2=graph->getVertexAt(i);
+                                SPVertex* v2=graph->getVertexAt(i);
                                 for(int j=0;j<v2->getParams()->count();j++)
                                 {
-                                    VertexParam *vp=v2->getParams()->at(j);
+                                    SPVertexParam *vp=v2->getParams()->at(j);
                                     if(vp->getP()==pos)
                                     {
                                         vp->setDeg(calcDeg(v->getCenterX(),v->getCenterY(),vp->getX(),vp->getY())
@@ -457,9 +457,9 @@ void SPFrame::mousePressEvent(QMouseEvent *event){
                 currentLMouseY=y;
                 bool bBreak=false;
                 for(int i=1;i<=graph->getCount();i++){
-                    Vertex* v=graph->getVertexAt(i);
+                    SPVertex* v=graph->getVertexAt(i);
                     for(int i=0;i<v->getParams()->count();i++){
-                        VertexParam* param=v->getParams()->at(i);
+                        SPVertexParam* param=v->getParams()->at(i);
                         QPoint mouseReal=mouseToReal(x,y);
                         if(mouseReal.x()<param->getX()+VERTEX_SIZE/2&&
                                 mouseReal.x()>param->getX()-VERTEX_SIZE/2&&
@@ -480,7 +480,7 @@ void SPFrame::mousePressEvent(QMouseEvent *event){
 
             }else{
                 if(pos>0){
-                    Vertex* v=graph->getVertexAt(pos);
+                    SPVertex* v=graph->getVertexAt(pos);
                     v->setSelected(true);
                     createEdge=true;
                     createEdgeVertexHead=pos;
@@ -553,7 +553,7 @@ void SPFrame::mouseMoveEvent(QMouseEvent *event){
                             ((yy>maybeMultiSelectMouseY&&yy<maybeMultiSelectMouseY2)||
                              (yy>maybeMultiSelectMouseY2&&yy<maybeMultiSelectMouseY))
                             ){
-                        Vertex* v=graph->getVertexAt(i);
+                        SPVertex* v=graph->getVertexAt(i);
                         v->setSelected(true);
                         graph->getVertexAt(i)->saveCenter();
                         b=true;
@@ -567,13 +567,13 @@ void SPFrame::mouseMoveEvent(QMouseEvent *event){
         if(readyMultiMove){
             for(int i=1;i<=graph->getCount();i++)
             {
-                Vertex *v=graph->getVertexAt(i);
+                SPVertex *v=graph->getVertexAt(i);
                 if(v->getSelected()){
                     v->setCenterX(v->getOriCenterX()+(x-currentLMouseX)/winScale);
                     v->setCenterY(v->getOriCenterY()+(y-currentLMouseY)/winScale);
                     for(int j=0;j<v->getParams()->count();j++){
-                        VertexParam *vp=v->getParams()->at(j);
-                        Vertex* v1=graph->getVertexAt(vp->getP());
+                        SPVertexParam *vp=v->getParams()->at(j);
+                        SPVertex* v1=graph->getVertexAt(vp->getP());
 
                         QPoint p=calcTail(v1->getCenterX(),v1->getCenterY(),
                                           calcDeg(v1->getCenterX(),v1->getCenterY(),v->getCenterX(),v->getCenterY())
@@ -583,9 +583,9 @@ void SPFrame::mouseMoveEvent(QMouseEvent *event){
                         vp->setY(p.y());
                     }
                     for(int j=1;j<=graph->getCount();j++){
-                        Vertex *v2=graph->getVertexAt(j);
+                        SPVertex *v2=graph->getVertexAt(j);
                         for(int k=0;k<v2->getParams()->count();k++){
-                            VertexParam *vp2=v2->getParams()->at(k);
+                            SPVertexParam *vp2=v2->getParams()->at(k);
                             if(vp2->getP()==i)
                             {
                                 QPoint p=calcTail(v->getCenterX(),v->getCenterY(),
@@ -603,7 +603,7 @@ void SPFrame::mouseMoveEvent(QMouseEvent *event){
         }
         else if(moveVertexPos>0){
             moveEdgeLabel=false;
-            Vertex *v=graph->getVertexAt(moveVertexPos);
+            SPVertex *v=graph->getVertexAt(moveVertexPos);
             v->setCenterX(moveVertexCenterX+(x-currentLMouseX)/winScale);
             v->setCenterY(moveVertexCenterY+(y-currentLMouseY)/winScale);
 
@@ -618,7 +618,7 @@ void SPFrame::mouseMoveEvent(QMouseEvent *event){
             {
                 findEdgeTail=true;
                 createEdgeVertexTail=pos;
-                Vertex* v=graph->getVertexAt(pos);
+                SPVertex* v=graph->getVertexAt(pos);
                 v->setSelected(true);
             }
             else{
@@ -629,13 +629,13 @@ void SPFrame::mouseMoveEvent(QMouseEvent *event){
         }
         if(moveEdgeLabel){
             for(int i=1;i<=graph->getCount();i++){
-                Vertex* v=graph->getVertexAt(i);
+                SPVertex* v=graph->getVertexAt(i);
                 for(int i=0;i<v->getParams()->count();i++){
-                    VertexParam* param=v->getParams()->at(i);
+                    SPVertexParam* param=v->getParams()->at(i);
                     if(param->getMoveFlag()){
                         param->setX(param->getOrix()+(x-currentLMouseX)/winScale);
                         param->setY(param->getOriy()+(y-currentLMouseY)/winScale);
-                        Vertex* v1=graph->getVertexAt(param->getP());
+                        SPVertex* v1=graph->getVertexAt(param->getP());
                         param->setDeg(calcDeg(v1->getCenterX(),v1->getCenterY(),param->getX(),param->getY())
                                       -calcDeg(v1->getCenterX(),v1->getCenterY(),v->getCenterX(),v->getCenterY()));
                         param->setDis(calcDis(v1->getCenterX(),v1->getCenterY(),param->getX(),param->getY()));
@@ -644,9 +644,9 @@ void SPFrame::mouseMoveEvent(QMouseEvent *event){
             }
         }
         for(int i=1;i<=graph->getCount();i++){
-            Vertex* v=graph->getVertexAt(i);
+            SPVertex* v=graph->getVertexAt(i);
             for(int j=0;j<v->getParams()->count();j++){
-                VertexParam* param=v->getParams()->at(j);
+                SPVertexParam* param=v->getParams()->at(j);
                 param->setHover(false);
                 QPoint mouseReal=mouseToReal(x,y);
                 if(mouseReal.x()<param->getX()+VERTEX_SIZE/2&&
@@ -659,8 +659,8 @@ void SPFrame::mouseMoveEvent(QMouseEvent *event){
             }
             if(v->getSelected()){
                 for(int j=0;j<v->getParams()->count();j++){
-                    VertexParam *vp=v->getParams()->at(j);
-                    Vertex* v1=graph->getVertexAt(vp->getP());
+                    SPVertexParam *vp=v->getParams()->at(j);
+                    SPVertex* v1=graph->getVertexAt(vp->getP());
 
                     QPoint p=calcTail(v1->getCenterX(),v1->getCenterY(),
                                       calcDeg(v1->getCenterX(),v1->getCenterY(),v->getCenterX(),v->getCenterY())
@@ -670,9 +670,9 @@ void SPFrame::mouseMoveEvent(QMouseEvent *event){
                     vp->setY(p.y());
                 }
                 for(int j=1;j<=graph->getCount();j++){
-                    Vertex *v2=graph->getVertexAt(j);
+                    SPVertex *v2=graph->getVertexAt(j);
                     for(int k=0;k<v2->getParams()->count();k++){
-                        VertexParam *vp2=v2->getParams()->at(k);
+                        SPVertexParam *vp2=v2->getParams()->at(k);
                         if(vp2->getP()==i)
                         {
                             QPoint p=calcTail(v->getCenterX(),v->getCenterY(),
@@ -832,16 +832,16 @@ void SPFrame::mouseReleaseEvent(QMouseEvent *event){
                     if(createEdgeVertexHead!=createEdgeVertexTail){
                         SetDistanceDialog dialog(this);
                         dialog.exec();
-                        Vertex * v=graph->getVertexAt(createEdgeVertexTail);
+                        SPVertex * v=graph->getVertexAt(createEdgeVertexTail);
                         if(dialog.getOk()){
                             int dis=dialog.getDistance();
-                            Vertex* v1=graph->getVertexAt(createEdgeVertexHead);
+                            SPVertex* v1=graph->getVertexAt(createEdgeVertexHead);
                             QPoint edgeCenter=calcEdgeCenter(v1,v);
                             int deg=calcDeg(v1->getCenterX(),v1->getCenterY(),v->getCenterX(),v->getCenterY())-90;
                             QPoint disText=calcTail(edgeCenter.x(),edgeCenter.y(),deg,VERTEX_SIZE/2);
-                            VertexParam* vp=new VertexParam(createEdgeVertexHead,dis);
+                            SPVertexParam* vp=new SPVertexParam(createEdgeVertexHead,dis);
                             for(int i=0;i<v1->getParams()->count();i++){
-                                VertexParam *vp1=v1->getParams()->at(i);
+                                SPVertexParam *vp1=v1->getParams()->at(i);
                                 if(vp1->getP()==createEdgeVertexTail){
                                     vp1->setCurve(true);
                                     vp->setCurve(true);
@@ -859,9 +859,9 @@ void SPFrame::mouseReleaseEvent(QMouseEvent *event){
                             bool b=false;
                             for(int i=0;i<v->getParams()->count();i++){
                                 if(v->getParams()->at(i)->getP()==createEdgeVertexHead){
-                                    Vertex *v1=graph->getVertexAt(createEdgeVertexHead);
+                                    SPVertex *v1=graph->getVertexAt(createEdgeVertexHead);
                                     for(int j=0;j<v1->getParams()->count();j++){
-                                        VertexParam *vp1=v1->getParams()->at(j);
+                                        SPVertexParam *vp1=v1->getParams()->at(j);
                                         if(vp1->getP()==createEdgeVertexTail)
                                         {
                                             vp1->setCurve(false);
@@ -883,9 +883,9 @@ void SPFrame::mouseReleaseEvent(QMouseEvent *event){
 
             }
             for(int i=1;i<=graph->getCount();i++){
-                Vertex* v=graph->getVertexAt(i);
+                SPVertex* v=graph->getVertexAt(i);
                 for(int i=0;i<v->getParams()->count();i++){
-                    VertexParam* param=v->getParams()->at(i);
+                    SPVertexParam* param=v->getParams()->at(i);
                     param->setMoveFlag(false);
                 }
             }
@@ -941,7 +941,7 @@ void SPFrame::keyPressEvent(QKeyEvent *event){
             maybeMultiSelect=false;
             readyMultiMove=false;
             if(moveVertexPos!=0){
-                Vertex* v=graph->getVertexAt(moveVertexPos);
+                SPVertex* v=graph->getVertexAt(moveVertexPos);
                 v->setSelected(false);
                 moveVertexPos=0;
             }
@@ -950,7 +950,7 @@ void SPFrame::keyPressEvent(QKeyEvent *event){
             }
         }else if(event->key()==Qt::Key_Delete){
             for(int i=1;i<=graph->getCount();i++){
-                Vertex* v=graph->getVertexAt(i);
+                SPVertex* v=graph->getVertexAt(i);
                 if(v->getSelected()){
                     graph->removeVertexAt(i);
                     i=0;

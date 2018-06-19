@@ -3,8 +3,8 @@
 using namespace std;
 SPGraph::SPGraph()
 {
-    vertexs=new QList<Vertex*>();
-    vertexs->push_back(new Vertex());
+    vertexs=new QList<SPVertex*>();
+    vertexs->push_back(new SPVertex());
     bellmanMark=NULL;
     floydMark=NULL;
     count=0;
@@ -17,7 +17,7 @@ SPGraph::~SPGraph()
     delete vertexs;
 }
 
-void SPGraph::addVertex(Vertex *v)
+void SPGraph::addVertex(SPVertex *v)
 {
     vertexs->push_back(v);
     count++;
@@ -27,7 +27,7 @@ void SPGraph::removeVertexAt(int pos){
     if(pos>0){
         for(int i=0;i<vertexs->size();i++){
             if(i!=pos){
-                QList<VertexParam*> *vp=vertexs->at(i)->getParams();
+                QList<SPVertexParam*> *vp=vertexs->at(i)->getParams();
                 auto b=vp->begin(),e=vp->end();
                 while(b!=e){
                     if((*b)->getP()==pos)
@@ -38,7 +38,7 @@ void SPGraph::removeVertexAt(int pos){
             }
         }
        for(int i=0;i<vertexs->size();i++){
-            QList<VertexParam*> *vp=vertexs->at(i)->getParams();
+            QList<SPVertexParam*> *vp=vertexs->at(i)->getParams();
             auto b=vp->begin(),e=vp->end();
             while(b!=e){
                 if((*b)->getP()>pos)
@@ -81,8 +81,8 @@ int SPGraph::bellman()
     {
         calcResult<<"第"+QString::number(k)+"次计算开始";
         for(int j=2;j<=count;j++){
-            Vertex* v=vertexs->at(j);
-            QList<VertexParam*> *vp=v->getParams();
+            SPVertex* v=vertexs->at(j);
+            QList<SPVertexParam*> *vp=v->getParams();
             for(auto q=vp->begin();q!=vp->end();++q){
                 int p=(*q)->getP();
                 int e=(*q)->getE();
@@ -133,8 +133,8 @@ int SPGraph::floyd(){
             if(i==j)m->setD(i,j,0);
             else m->setD(i,j,POS_INFINITY);
             m->setP(i,j,i);
-            Vertex* v=vertexs->at(j);
-            QList<VertexParam*> *vp=v->getParams();
+            SPVertex* v=vertexs->at(j);
+            QList<SPVertexParam*> *vp=v->getParams();
             for(auto k=vp->begin();k!=vp->end();++k){
                 if((*k)->getP()==i){
                     m->setD(i,j,(*k)->getE());
@@ -277,11 +277,11 @@ FloydMark *SPGraph::getFloydMark() const
 
 void SPGraph::clearVertexs(){
     vertexs->clear();
-    vertexs->push_back(new Vertex());
+    vertexs->push_back(new SPVertex());
     count=0;
 }
 
-Vertex* SPGraph::getVertexAt(int pos) const{
+SPVertex* SPGraph::getVertexAt(int pos) const{
     return vertexs->at(pos);
 }
 int SPGraph::getLastX(){

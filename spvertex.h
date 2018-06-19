@@ -1,14 +1,14 @@
-#ifndef VERTEX_H
-#define VERTEX_H
+#ifndef SPVERTEX_H
+#define SPVERTEX_H
 #include <QList>
-class VertexParam;
-class Vertex
+class SPVertexParam;
+class SPVertex
 {
 public:
-    Vertex();
-    QList<VertexParam*> *getParams() const;
-    ~Vertex();
-    void addVertexParams(VertexParam *vp);
+    SPVertex();
+    QList<SPVertexParam*> *getParams() const;
+    ~SPVertex();
+    void addVertexParams(SPVertexParam *vp);
     void removeVertexParamsAt(int pos);
 
     int getCenterY() const;
@@ -26,7 +26,7 @@ public:
     int getOriCenterY() const;
 
 private:
-    QList<VertexParam*> *params;
+    QList<SPVertexParam*> *params;
     int centerX;
     int centerY;
     bool selected;
@@ -35,4 +35,4 @@ private:
 
 };
 
-#endif // VERTEX_H
+#endif // SPVERTEX_H

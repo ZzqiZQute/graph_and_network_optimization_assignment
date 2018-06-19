@@ -39,6 +39,7 @@ void SPWindow::init(){
     connect(ui->actionSave,SIGNAL(triggered()),this,SLOT(onActionSave()));
 
 
+
 }
 void SPWindow::onActionOpen(){
     shortestpath->clearState();
@@ -64,7 +65,7 @@ void SPWindow::onActionOpen(){
             int vertexcount;
             file.read((char*)&vertexcount,sizeof(int));
             for(int i=1;i<=vertexcount;i++){
-                Vertex* v=new Vertex();
+                SPVertex* v=new SPVertex();
                 file.read((char*)&tempint,sizeof(int));
                 v->setCenterX(tempint);
                 file.read((char*)&tempint,sizeof(int));
@@ -72,7 +73,7 @@ void SPWindow::onActionOpen(){
                 int paramcount;
                 file.read((char*)&paramcount,sizeof(int));
                 for(int j=0;j<paramcount;j++){
-                    VertexParam* vp=new VertexParam();
+                    SPVertexParam* vp=new SPVertexParam();
                     file.read((char*)&tempint,sizeof(int));
                     vp->setX(tempint);
                     file.read((char*)&tempint,sizeof(int));
@@ -122,7 +123,7 @@ void SPWindow::onActionSave(){
             tempint=g->getCount();
             file.write((char*)&tempint,sizeof(int));
             for(int i=1;i<=g->getCount();i++){
-                Vertex* v=g->getVertexAt(i);
+                SPVertex* v=g->getVertexAt(i);
                 tempint=v->getCenterX();
                 file.write((char*)&tempint,sizeof(int));
                 tempint=v->getCenterY();
@@ -130,7 +131,7 @@ void SPWindow::onActionSave(){
                 tempint=v->getParams()->count();
                 file.write((char*)&tempint,sizeof(int));
                 for(int j=0;j<v->getParams()->count();j++){
-                    VertexParam* vp=v->getParams()->at(j);
+                    SPVertexParam* vp=v->getParams()->at(j);
                     tempint=vp->getX();
                     file.write((char*)&tempint,sizeof(int));
                     tempint=vp->getY();
@@ -159,7 +160,7 @@ void SPWindow::onBtnAddVertexClicked(){
 
     QRect rect=shortestpath->geometry();
     SPGraph* graph=shortestpath->getGraph();
-    Vertex *v=new Vertex();
+    SPVertex *v=new SPVertex();
     if(graph->getCount()==0){
         v->setCenterX(VERTEX_SIZE/2);
         v->setCenterY(VERTEX_SIZE/2);
