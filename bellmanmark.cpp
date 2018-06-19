@@ -3,7 +3,7 @@
 BellmanMark::BellmanMark(int count)
 {
     this->count=count;
-    d=new int[count+1];
+    d=new double[count+1];
     p=new int[count+1];
     vertex=new QList<int>();
     reset();
@@ -13,7 +13,7 @@ BellmanMark::~BellmanMark(){
     delete d;
     delete p;
 }
-int BellmanMark::getD(int pos){
+double BellmanMark::getD(int pos){
     if(pos>=1&&pos<=count)
         return *(d+pos);
     return ERROR_CODE;
@@ -23,7 +23,7 @@ int BellmanMark::getP(int pos){
         return *(p+pos);
      return ERROR_CODE;
 }
-void BellmanMark::setD(int pos,int val){
+void BellmanMark::setD(int pos, double val){
     if(pos>=1&&pos<=count)
         *(d+pos)=val;
 }

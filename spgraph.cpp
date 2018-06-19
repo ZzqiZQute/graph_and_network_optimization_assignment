@@ -37,7 +37,7 @@ void SPGraph::removeVertexAt(int pos){
                 }
             }
         }
-       for(int i=0;i<vertexs->size();i++){
+        for(int i=0;i<vertexs->size();i++){
             QList<SPVertexParam*> *vp=vertexs->at(i)->getParams();
             auto b=vp->begin(),e=vp->end();
             while(b!=e){
@@ -85,7 +85,7 @@ int SPGraph::bellman()
             QList<SPVertexParam*> *vp=v->getParams();
             for(auto q=vp->begin();q!=vp->end();++q){
                 int p=(*q)->getP();
-                int e=(*q)->getE();
+                double e=(*q)->getE();
                 if(m->getD(p)+e<m->getD(j)){
                     m->setD(j,m->getD(p)+e);
                     m->setP(j,p);
@@ -94,10 +94,10 @@ int SPGraph::bellman()
             }
         }
         for(int j=1;j<=m->getCount();j++){
-           int p=m->getP(j);
-           int d=m->getD(j);
-           QString s= "   ·"+QString::number(j)+":d="+(d==POS_INFINITY?"∞":QString::number(d))+" p="+QString::number(p);
-           calcResult<<s;
+            int p=m->getP(j);
+            double d=m->getD(j);
+            QString s= "   ·"+QString::number(j)+":d="+(d==POS_INFINITY?"∞":QString::number(d))+" p="+QString::number(p);
+            calcResult<<s;
         }
         calcResult<<"第"+QString::number(k)+"次计算结束";
         if(!changed){
@@ -146,117 +146,123 @@ int SPGraph::floyd(){
     for(int k=1;k<=count;k++){
         for(int i=1;i<=count;i++)
             for(int j=1;j<=count;j++){
-                int p=m->getD(i,k);
-                int q=m->getD(k,j);
+                double p=m->getD(i,k);
+                double q=m->getD(k,j);
                 if(p<POS_INFINITY&&q<POS_INFINITY&&p+q<m->getD(i,j)){
                     m->setD(i,j,p+q);
                     m->setP(i,j,m->getP(k,j));
 
                 }
             }
-        calcResult<<"第"+QString::number(k)+"次计算";
-        calcResult<<"P:";
-        QString temp="┌";
-        for(int i=0;i<count;i++){
-            temp+="------┬";
-        }
-        temp+="------┐";
-        calcResult<<temp;
-        temp="│      │";
-        for(int i=1;i<=count-1;i++){
-            temp+=QString("%1").arg(i,6)+"│";
-        }
-        temp+=QString("%1").arg(count,6)+"│";
-        calcResult<<temp;
-        for(int i=1;i<=count;i++){
 
-
-            if(i==1){
-                 temp="├------┼";
-                 for(int j=1;j<=count-1;j++){
-                     temp+="------┴";
-                 }
-                 temp+="------┤";
-            }else{
-                temp="├------┤";
-                for(int j=1;j<=count-1;j++){
-                    temp+="        ";
-                }
-                temp+="      │";
-
+        if(count<=FLOYDMAXDISPLAY){//只显示50条
+            calcResult<<"第"+QString::number(k)+"次计算";
+            calcResult<<"P:";
+            QString temp="┌";
+            for(int i=0;i<count;i++){
+                temp+="------┬";
             }
+            temp+="------┐";
             calcResult<<temp;
-            temp="│"+QString("%1").arg(i,6)+"│";
-            for(int j=1;j<=count-1;j++){
-                temp+=QString("%1").arg(m->getP(i,j),6);
-                temp+="  ";
+            temp="│      │";
+            for(int i=1;i<=count-1;i++){
+                temp+=QString("%1").arg(i,6)+"│";
             }
-            temp+=QString("%1").arg(m->getP(i,count),6);
-            temp+="│";
-
+            temp+=QString("%1").arg(count,6)+"│";
             calcResult<<temp;
+            for(int i=1;i<=count;i++){
 
-        }
-        temp="└------┴";
-        for(int j=1;j<=count-1;j++){
-            temp+="--------";
-        }
-        temp+="------┘";
-        calcResult<<temp;
-        calcResult<<"D:";
-        temp="┌";
-                for(int i=0;i<count;i++){
-                    temp+="------┬";
-                }
-                temp+="------┐";
-                calcResult<<temp;
-                temp="│      │";
-                for(int i=1;i<=count-1;i++){
-                    temp+=QString("%1").arg(i,6)+"│";
-                }
-                temp+=QString("%1").arg(count,6)+"│";
-                calcResult<<temp;
-                for(int i=1;i<=count;i++){
-                    if(i==1){
-                         temp="├------┼";
-                         for(int j=1;j<=count-1;j++){
-                             temp+="------┴";
-                         }
-                         temp+="------┤";
-                    }else{
-                        temp="├------┤";
-                        for(int j=1;j<=count-1;j++){
-                            temp+="        ";
-                        }
-                        temp+="      │";
 
-                    }
-                    calcResult<<temp;
-                    temp="│"+QString("%1").arg(i,6)+"│";
+                if(i==1){
+                    temp="├------┼";
                     for(int j=1;j<=count-1;j++){
-                        int d=m->getD(i,j);
-                        if(d<POS_INFINITY)
-                            temp+=QString("%1").arg(d,6);
-                        else
-                            temp+="    ∞";
-                        temp+="  ";
+                        temp+="------┴";
                     }
-                    int d=m->getD(i,count);
+                    temp+="------┤";
+                }else{
+                    temp="├------┤";
+                    for(int j=1;j<=count-1;j++){
+                        temp+="        ";
+                    }
+                    temp+="      │";
+
+                }
+                calcResult<<temp;
+                temp="│"+QString("%1").arg(i,6)+"│";
+                for(int j=1;j<=count-1;j++){
+                    temp+=QString("%1").arg(m->getP(i,j),6);
+                    temp+="  ";
+                }
+                temp+=QString("%1").arg(m->getP(i,count),6);
+                temp+="│";
+
+                calcResult<<temp;
+
+            }
+            temp="└------┴";
+            for(int j=1;j<=count-1;j++){
+                temp+="--------";
+            }
+            temp+="------┘";
+            calcResult<<temp;
+            calcResult<<"D:";
+            temp="┌";
+            for(int i=0;i<count;i++){
+                temp+="------┬";
+            }
+            temp+="------┐";
+            calcResult<<temp;
+            temp="│      │";
+            for(int i=1;i<=count-1;i++){
+                temp+=QString("%1").arg(i,6)+"│";
+            }
+            temp+=QString("%1").arg(count,6)+"│";
+            calcResult<<temp;
+            for(int i=1;i<=count;i++){
+                if(i==1){
+                    temp="├------┼";
+                    for(int j=1;j<=count-1;j++){
+                        temp+="------┴";
+                    }
+                    temp+="------┤";
+                }else{
+                    temp="├------┤";
+                    for(int j=1;j<=count-1;j++){
+                        temp+="        ";
+                    }
+                    temp+="      │";
+
+                }
+                calcResult<<temp;
+                temp="│"+QString("%1").arg(i,6)+"│";
+                for(int j=1;j<=count-1;j++){
+                    double d=m->getD(i,j);
                     if(d<POS_INFINITY)
                         temp+=QString("%1").arg(d,6);
                     else
                         temp+="    ∞";
-                    temp+="│";
-
-                    calcResult<<temp;
-
+                    temp+="  ";
                 }
-                temp="└------┴";
-                for(int j=1;j<=count-1;j++){
-                    temp+="--------";
-                }
-                temp+="------┘";
+                double d=m->getD(i,count);
+                if(d<POS_INFINITY)
+                    temp+=QString("%1").arg(d,6);
+                else
+                    temp+="    ∞";
+                temp+="│";
+
                 calcResult<<temp;
+
+            }
+            temp="└------┴";
+            for(int j=1;j<=count-1;j++){
+                temp+="--------";
+            }
+            temp+="------┘";
+            calcResult<<temp;
+        }
+    }
+    if(count>FLOYDMAXDISPLAY){
+        calcResult<<"数据量太大,显示被禁止了";
     }
     calcResult<<"完成计算";
     return 0;

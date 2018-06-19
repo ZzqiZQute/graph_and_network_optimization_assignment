@@ -8,9 +8,9 @@ public:
     BellmanMark(int count);
     ~BellmanMark();
 
-    int getD(int pos);
+    double getD(int pos);
     int getP(int pos);
-    void setD(int pos, int val);
+    void setD(int pos, double val);
     void setP(int pos, int val);
     int getCount() const;
 
@@ -26,7 +26,7 @@ public:
     void setNega(int value);
 
 private:
-    int *d;
+    double *d;
     int *p;
     int count;
     QList<int>* vertex;

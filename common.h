@@ -4,6 +4,7 @@
 #define ERROR_CODE -1073741824
 #define VERTEX_SIZE 36
 #define PI 3.1415926535897932
+#define FLOYDMAXDISPLAY 30
 #define MIN(a,b) (a>b?b:a)
 #define MAX(a,b) (a<b?b:a)
 #include "spgraph.h"

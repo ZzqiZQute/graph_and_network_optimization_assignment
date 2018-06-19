@@ -15,7 +15,7 @@ public:
     explicit SetDistanceDialog(QWidget *parent = 0);
     ~SetDistanceDialog();
 
-    int getDistance() const;
+    double getDistance() const;
 
     bool getHasValue() const;
 
@@ -28,7 +28,7 @@ protected:
     void accept();
 private:
     Ui::SetDistanceDialog *ui;
-    int distance;
+    double distance;
     void getDis();
     bool ok;
 };

@@ -1,5 +1,6 @@
 #include "spwindow.h"
 #include "ui_spwindow.h"
+#include "loadinfodialog.h"
 #include "common.h"
 #include <QMessageBox>
 #include <QGuiApplication>
@@ -37,10 +38,42 @@ void SPWindow::init(){
     connect(ui->btnCalculate,SIGNAL(clicked()),this,SLOT(onBtnCalcClicked()));
     connect(ui->actionOpen,SIGNAL(triggered()),this,SLOT(onActionOpen()));
     connect(ui->actionSave,SIGNAL(triggered()),this,SLOT(onActionSave()));
+    connect(ui->actionLoad,SIGNAL(triggered()),this,SLOT(onActionLoad()));
+    connect(ui->displayFrame,SIGNAL(hintChanged(QString)),this,SLOT(onHintChanged(QString)));
 
 
 
 }
+void SPWindow::onHintChanged(QString str){
+    ui->statusBar->showMessage(str);
+}
+
+void SPWindow::onActionLoad(){
+    LoadInfoDialog dialog(this);
+    dialog.exec();
+    if(dialog.getSuccess()){
+        SPGraph* graph=shortestpath->getGraph();
+        graph->clearVertexs();
+        shortestpath->reset();
+        for(int i=0;i<dialog.getVpos()->count();i++){
+            addVertex();
+        }
+        for(int i=0;i<dialog.getNodirEdge()->count();i++){
+            NoDirEdge n=dialog.getNodirEdge()->at(i);
+            SPVertex* v=graph->getVertexAt(n.v1);
+            SPVertexParam *param=new SPVertexParam(n.v2,n.dis);
+            param->setCurve(true);
+            v->addVertexParams(param);
+            v=graph->getVertexAt(n.v2);
+            param=new SPVertexParam(n.v1,n.dis);
+            param->setCurve(true);
+            v->addVertexParams(param);
+
+        }
+    }
+
+}
+
 void SPWindow::onActionOpen(){
     shortestpath->clearState();
     QTextCodec *codec=QTextCodec::codecForName("utf-8");
@@ -86,9 +119,12 @@ void SPWindow::onActionOpen(){
                     vp->setCurve(tempbool);
                     file.read((char*)&tempint,sizeof(int));
                     vp->setP(tempint);
-                    file.read((char*)&tempint,sizeof(int));
-                    vp->setE(tempint);
+                    file.read((char*)&tempdouble,sizeof(double));
+                    vp->setE(tempdouble);
+                    file.read((char*)&tempint,sizeof(tempint));
+                    vp->setWidth(tempint);
                     v->addVertexParams(vp);
+
 
                 }
                 g->addVertex(v);
@@ -144,7 +180,9 @@ void SPWindow::onActionSave(){
                     file.write((char*)&tempbool,sizeof(bool));
                     tempint=vp->getP();
                     file.write((char*)&tempint,sizeof(int));
-                    tempint=vp->getE();
+                    tempdouble=vp->getE();
+                    file.write((char*)&tempdouble,sizeof(double));
+                    tempint=vp->getWidth();
                     file.write((char*)&tempint,sizeof(int));
 
                 }
@@ -156,8 +194,7 @@ void SPWindow::onActionSave(){
 
 
 }
-void SPWindow::onBtnAddVertexClicked(){
-
+void SPWindow::addVertex(){
     QRect rect=shortestpath->geometry();
     SPGraph* graph=shortestpath->getGraph();
     SPVertex *v=new SPVertex();
@@ -178,6 +215,10 @@ void SPWindow::onBtnAddVertexClicked(){
 
     }
     graph->addVertex(v);
+}
+void SPWindow::onBtnAddVertexClicked(){
+
+    addVertex();
     shortestpath->setFocus();
     shortestpath->update();
 
@@ -214,14 +255,14 @@ void SPWindow::onBtnCalcClicked()
     int i=ui->cbMethod->currentIndex();
     if(i==0){
         shortestpath->setMethod(SPFrame::Bellman);
-        shortestpath->getGraph()->bellman();   
+        shortestpath->getGraph()->bellman();
         QStringList list=shortestpath->getGraph()->getCalcResult();
         makeHintText(list);
     }else if(i==1){
         shortestpath->setMethod(SPFrame::Floyd);
         shortestpath->getGraph()->floyd();
         QStringList list=shortestpath->getGraph()->getCalcResult();
-         makeHintText(list);
+        makeHintText(list);
     }
 
 }

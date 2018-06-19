@@ -7,9 +7,9 @@ class FloydMark
 public:
     FloydMark(int count);
     void setP(int x, int y, int val);
-    void setD(int x, int y, int val);
+    void setD(int x, int y, double val);
     int getP(int x, int y);
-    int getD(int x, int y);
+    double getD(int x, int y);
     int getCount() const;
     void reset();
 
@@ -27,7 +27,7 @@ public:
     void setNegaCircuit(bool value);
 
 private:
-    int* d;
+    double* d;
     int* p;
     int count;
     QList<int>* vertex;

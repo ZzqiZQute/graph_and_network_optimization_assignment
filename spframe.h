@@ -6,6 +6,7 @@
 
 class SPFrame : public QFrame
 {
+    Q_OBJECT
 
 public:
     enum Method{
@@ -36,7 +37,8 @@ public:
     bool getMethod() const;
     void setMethod(bool value);
     void saveWinOffset();
-
+signals:
+    void hintChanged(QString);
 protected:
     void paintEvent(QPaintEvent *event);
     void mousePressEvent(QMouseEvent *event);

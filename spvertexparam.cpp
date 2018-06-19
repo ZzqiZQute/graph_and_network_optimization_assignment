@@ -6,17 +6,19 @@ SPVertexParam::SPVertexParam()
     e=0;
     x=0;
     y=0;
+    width=0;
     hover=false;
     curve=false;
     moveFlag=false;
 }
 
-SPVertexParam::SPVertexParam(int p, int e)
+SPVertexParam::SPVertexParam(int p, double e)
 {
     this->p=p;
     this->e=e;
     x=0;
     y=0;
+    width=0;
     hover=false;
     curve=false;
     moveFlag=false;
@@ -32,12 +34,12 @@ void SPVertexParam::setP(int value)
     p = value;
 }
 
-int SPVertexParam::getE() const
+double SPVertexParam::getE() const
 {
     return e;
 }
 
-void SPVertexParam::setE(int value)
+void SPVertexParam::setE(double value)
 {
     e = value;
 }
@@ -140,6 +142,16 @@ double SPVertexParam::getDeg() const
 void SPVertexParam::setDeg(double value)
 {
     deg = value;
+}
+
+int SPVertexParam::getWidth() const
+{
+    return width;
+}
+
+void SPVertexParam::setWidth(int value)
+{
+    width = value;
 }
 
 

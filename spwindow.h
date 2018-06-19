@@ -22,11 +22,14 @@ public slots:
     void onBtnCalcClicked();
     void onActionOpen();
     void onActionSave();
+    void onActionLoad();
+    void onHintChanged(QString str);
 private:
     Ui::SPWindow *ui;
     void init();
     SPFrame *shortestpath;
     void makeHintText(QStringList list);
+    void addVertex();
 };
 
 #endif // SPWINDOW_H

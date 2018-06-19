@@ -6,7 +6,7 @@ FloydMark::FloydMark(int count)
     int c=count+1;
     c*=c;
     p=new int[c];
-    d=new int[c];
+    d=new double[c];
     vertex=new QList<int>();
     floydStart=0;
     reset();
@@ -16,7 +16,7 @@ void FloydMark::setP(int x,int y,int val){
         *(p+x*(count+1)+y)=val;
     }
 }
-void FloydMark::setD(int x,int y,int val){
+void FloydMark::setD(int x, int y, double val){
     if(x>=1&&x<=count&&y>=1&&y<=count){
         *(d+x*(count+1)+y)=val;
     }
@@ -27,7 +27,7 @@ int FloydMark::getP(int x,int y){
     }
     return ERROR_CODE;
 }
-int FloydMark::getD(int x,int y){
+double FloydMark::getD(int x,int y){
     if(x>=1&&x<=count&&y>=1&&y<=count){
         return *(d+x*(count+1)+y);
     }

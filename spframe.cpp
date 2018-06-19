@@ -58,13 +58,13 @@ void SPFrame::paintEvent(QPaintEvent *event)
 
     painter.translate(winOffsetX,winOffsetY);
     painter.scale(winScale,winScale);
-    drawVertexs(&painter);
     drawEdge(&painter);
+    drawVertexs(&painter);
     drawSelects(&painter);
     painter.scale(1/winScale,1/winScale);
     painter.translate(-winOffsetX,-winOffsetY);
 
-    drawHint(&painter);
+    //drawHint(&painter);
 
     event->accept();
 }
@@ -172,7 +172,7 @@ void SPFrame::drawEdge(QPainter* painter){
                 drawCurveEdge(painter,v1,v2);
             }
 
-            painter->drawText(QRect(param->getX()-VERTEX_SIZE/2,param->getY()-VERTEX_SIZE/2,VERTEX_SIZE,VERTEX_SIZE)
+            painter->drawText(QRect(param->getX()-param->getWidth()/2,param->getY()-VERTEX_SIZE/2,param->getWidth(),VERTEX_SIZE)
                               ,QString::number(param->getE()),QTextOption(Qt::AlignCenter));
             painter->setPen(QPen());
 
@@ -461,8 +461,8 @@ void SPFrame::mousePressEvent(QMouseEvent *event){
                     for(int i=0;i<v->getParams()->count();i++){
                         SPVertexParam* param=v->getParams()->at(i);
                         QPoint mouseReal=mouseToReal(x,y);
-                        if(mouseReal.x()<param->getX()+VERTEX_SIZE/2&&
-                                mouseReal.x()>param->getX()-VERTEX_SIZE/2&&
+                        if(mouseReal.x()<param->getX()+param->getWidth()/2&&
+                                mouseReal.x()>param->getX()-param->getWidth()/2&&
                                 mouseReal.y()<param->getY()+VERTEX_SIZE/2&&
                                 mouseReal.y()>param->getY()-VERTEX_SIZE/2){
                             maybeMultiSelect=false;
@@ -649,8 +649,8 @@ void SPFrame::mouseMoveEvent(QMouseEvent *event){
                 SPVertexParam* param=v->getParams()->at(j);
                 param->setHover(false);
                 QPoint mouseReal=mouseToReal(x,y);
-                if(mouseReal.x()<param->getX()+VERTEX_SIZE/2&&
-                        mouseReal.x()>param->getX()-VERTEX_SIZE/2&&
+                if(mouseReal.x()<param->getX()+param->getWidth()/2&&
+                        mouseReal.x()>param->getX()-param->getWidth()/2&&
                         mouseReal.y()<param->getY()+VERTEX_SIZE/2&&
                         mouseReal.y()>param->getY()-VERTEX_SIZE/2){
 
@@ -710,19 +710,19 @@ void SPFrame::mouseMoveEvent(QMouseEvent *event){
                         mark->addVertex(p);
                     }
                     if(!mark->getNegaCircuit()){
-                        strHint="使用Bellman方法计算得到\n1->"+QString::number(pos)+"的最短路径为:";
+                        strHint="1->"+QString::number(pos)+"的最短路径为:";
                         for(int i=0;i<mark->getVertex()->count()-1;i++){
                             strHint+=QString::number(mark->getVertex()->at(mark->getVertex()->count()-1-i))+"->";
 
                         }
                         strHint+=QString::number(pos);
-                        strHint+="\n总长度:"+QString::number(mark->getD(pos));
+                        strHint+=" 总长度:"+QString::number(mark->getD(pos));
                     }else{
                         if(mark->getD(pos)==POS_INFINITY){
-                            strHint="使用Bellman方法计算得到\n此路不通";
+                            strHint="此路不通";
                         }
                         else{
-                            strHint="使用Bellman方法计算得到\n由于节点";
+                            strHint="由于节点";
                             for(int i=mark->getVertex()->count()-1;i>=0;i--)
                             {
                                 int v=mark->getVertex()->at(i);
@@ -733,7 +733,7 @@ void SPFrame::mouseMoveEvent(QMouseEvent *event){
                                     break;
                                 }
                             }
-                            strHint+="构成了负权值回路\n因此无法计算最短路径";
+                            strHint+="构成了负权值回路,因此无法计算最短路径";
                         }
 
                     }
@@ -776,20 +776,20 @@ void SPFrame::mouseMoveEvent(QMouseEvent *event){
 
                         if(!mark->getNegaCircuit()){
  END:                           if(mark->getD(mark->getFloydStart(),pos)==POS_INFINITY){
-                                strHint="使用Floyd方法计算得到\n此路不通";
+                                strHint="此路不通";
                             }
                             else{
-                                strHint="使用Floyd方法计算得到\n"+QString::number(mark->getFloydStart())+"->"+QString::number(pos)+"的最短路径为:";
+                                strHint=QString::number(mark->getFloydStart())+"->"+QString::number(pos)+"的最短路径为:";
                                 for(int i=0;i<mark->getVertex()->count()-1;i++){
                                     strHint+=QString::number(mark->getVertex()->at(mark->getVertex()->count()-1-i))+"->";
 
                                 }
                                 strHint+=QString::number(pos);
-                                strHint+="\n总长度:"+QString::number(mark->getD(mark->getFloydStart(),pos));
+                                strHint+=" 总长度:"+QString::number(mark->getD(mark->getFloydStart(),pos));
                             }
                         }else{
 
-                            strHint="使用Floyd方法计算得到\n由于节点";
+                            strHint="由于节点";
                             for(int i=mark->getVertex()->count()-1;i>=0;i--)
                             {
                                 int v=mark->getVertex()->at(i);
@@ -800,7 +800,7 @@ void SPFrame::mouseMoveEvent(QMouseEvent *event){
                                     break;
                                 }
                             }
-                            strHint+="构成了负权值回路\n因此无法计算最短路径";
+                            strHint+="构成了负权值回路,因此无法计算最短路径";
 
                         }
 
@@ -812,6 +812,7 @@ void SPFrame::mouseMoveEvent(QMouseEvent *event){
                 }
             }
         }
+        emit hintChanged(strHint);
     }
 
     update();
@@ -834,7 +835,7 @@ void SPFrame::mouseReleaseEvent(QMouseEvent *event){
                         dialog.exec();
                         SPVertex * v=graph->getVertexAt(createEdgeVertexTail);
                         if(dialog.getOk()){
-                            int dis=dialog.getDistance();
+                            double dis=dialog.getDistance();
                             SPVertex* v1=graph->getVertexAt(createEdgeVertexHead);
                             QPoint edgeCenter=calcEdgeCenter(v1,v);
                             int deg=calcDeg(v1->getCenterX(),v1->getCenterY(),v->getCenterX(),v->getCenterY())-90;
@@ -850,6 +851,8 @@ void SPFrame::mouseReleaseEvent(QMouseEvent *event){
                             }
                             vp->setX(disText.x());
                             vp->setY(disText.y());
+                            int width=QFontMetrics(QFont("微软雅黑",15)).horizontalAdvance(QString::number(dis));
+                            vp->setWidth(width);
                             vp->setDeg(calcDeg(v1->getCenterX(),v1->getCenterY(),vp->getX(),vp->getY())
                                        -calcDeg(v1->getCenterX(),v1->getCenterY(),v->getCenterX(),v->getCenterY()));
                             vp->setDis(calcDis(v1->getCenterX(),v1->getCenterY(),vp->getX(),vp->getY()));

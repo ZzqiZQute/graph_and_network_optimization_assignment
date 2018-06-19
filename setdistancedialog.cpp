@@ -8,7 +8,7 @@ SetDistanceDialog::SetDistanceDialog(QWidget *parent) :
     distance=0;
     ok=false;
     ui->setupUi(this);
-    QRegExp regexp("-?\\d*");
+    QRegExp regexp("-?\\d*\\.?\\d*");
     QRegExpValidator *validator=new QRegExpValidator(regexp,this);
     ui->lineEdit->setValidator(validator);
     connect(ui->pushButton,SIGNAL(clicked()),this,SLOT(onBtnOkClicked()));
@@ -21,7 +21,7 @@ SetDistanceDialog::~SetDistanceDialog()
     delete ui;
 }
 
-int SetDistanceDialog::getDistance() const
+double SetDistanceDialog::getDistance() const
 {
     return distance;
 }
@@ -39,7 +39,7 @@ void SetDistanceDialog::accept(){
 void SetDistanceDialog::getDis(){
     QString s=ui->lineEdit->text();
     bool b;
-    int i=s.toInt(&b);
+    double i=s.toDouble(&b);
     if(b){
         ok=true;
         distance=i;

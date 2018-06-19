@@ -6,13 +6,13 @@ class SPVertexParam
 {
 public:
     SPVertexParam();
-    SPVertexParam(int p,int e);
+    SPVertexParam(int p, double e);
 
     int getP() const;
     void setP(int value);
 
-    int getE() const;
-    void setE(int value);
+    double getE() const;
+    void setE(double value);
 
 
     bool getCurve() const;
@@ -47,15 +47,19 @@ public:
     double getDeg() const;
     void setDeg(double value);
 
+    int getWidth() const;
+    void setWidth(int value);
+
 private:
     int p;//前继节点
-    int e;//边长
+    double e;//边长
     int x;
     int y;
     double deg;
     double dis;
     int orix;
     int oriy;
+    int width;
     bool moveFlag;
     bool curve;
     bool hover;
