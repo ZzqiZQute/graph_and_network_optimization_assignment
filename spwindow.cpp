@@ -62,11 +62,9 @@ void SPWindow::onActionLoad(){
             NoDirEdge n=dialog.getNodirEdge()->at(i);
             SPVertex* v=graph->getVertexAt(n.v1);
             SPVertexParam *param=new SPVertexParam(n.v2,n.dis);
-            param->setCurve(true);
             v->addVertexParams(param);
             v=graph->getVertexAt(n.v2);
             param=new SPVertexParam(n.v1,n.dis);
-            param->setCurve(true);
             v->addVertexParams(param);
 
         }
