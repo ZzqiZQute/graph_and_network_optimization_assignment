@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1114</width>
-    <height>694</height>
+    <height>699</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -206,7 +206,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>1114</width>
-     <height>23</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -215,7 +215,7 @@ p, li { white-space: pre-wrap; }
     </property>
     <addaction name="actionOpen"/>
     <addaction name="actionSave"/>
-    <addaction name="actionLoad"/>
+    <addaction name="actionNoDirGraph"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
@@ -246,9 +246,9 @@ p, li { white-space: pre-wrap; }
     <string>退出(&amp;X)</string>
    </property>
   </action>
-  <action name="actionLoad">
+  <action name="actionNoDirGraph">
    <property name="text">
-    <string>大量计算(&amp;L)</string>
+    <string>无向图导入(&amp;L)</string>
    </property>
   </action>
  </widget>

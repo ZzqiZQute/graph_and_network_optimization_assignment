@@ -3,7 +3,7 @@
 NSMVertex::NSMVertex()
 {
     b=0;
-    pi=0;
+    pi=POS_INFINITY;
     selected=false;
     params=new QList<NSMVertexParam*>();
 
@@ -12,7 +12,7 @@ NSMVertex::NSMVertex()
 NSMVertex::NSMVertex(int b)
 {
     this->b=b;
-    pi=0;
+    pi=POS_INFINITY;
     selected=false;
     params=new QList<NSMVertexParam*>();
 }

@@ -2,7 +2,7 @@
 #define COMMON_H
 #define POS_INFINITY 1073741823 //max pos integer /2
 #define ERROR_CODE -1073741824
-#define VERTEX_SIZE 36
+#define VERTEX_SIZE 50
 #define PI 3.1415926535897932
 #define FLOYDMAXDISPLAY 30
 #define MIN(a,b) (a>b?b:a)

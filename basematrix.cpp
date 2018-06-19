@@ -28,6 +28,28 @@ void BaseMatrix::removeVector(int v1,int v2)
     }
 }
 
+bool BaseMatrix::isBaseVector(int v1, int v2)
+{
+    for(int i=0;i<vectors->count();i++){
+        if((v1==vectors->at(i)->getV1()&&v2==vectors->at(i)->getV2())
+                ||(v2==vectors->at(i)->getV1()&&v1==vectors->at(i)->getV2())){
+            return true;
+        }
+    }
+    return false;
+}
+
+BaseVector *BaseMatrix::getBaseVector(int v1, int v2)
+{
+    for(int i=0;i<vectors->count();i++){
+        if((v1==vectors->at(i)->getV1()&&v2==vectors->at(i)->getV2())
+                ||(v2==vectors->at(i)->getV1()&&v1==vectors->at(i)->getV2())){
+            return vectors->at(i);
+        }
+    }
+    return NULL;
+}
+
 void BaseMatrix::clearVectors()
 {
     vectors->clear();
@@ -69,4 +91,17 @@ QList<int> BaseMatrix::getCircuit(int v1, int v2)
 
     }
     return list;
+}
+
+int BaseMatrix::getDegree(int v)
+{
+    int ret=0;
+    for(int i=0;i<vectors->count();i++){
+        if(v==vectors->at(i)->getV1()||v==vectors->at(i)->getV2())
+            ret++;
+    }
+    return ret;
+}
+bool BaseMatrix::isDegreeOne(int v){
+    return getDegree(v)==1;
 }

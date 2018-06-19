@@ -37,6 +37,7 @@ public:
     bool getMethod() const;
     void setMethod(bool value);
     void saveWinOffset();
+    static QPoint calcEdgeCenter(SPVertex *v1, SPVertex *v2);
 signals:
     void hintChanged(QString);
 protected:
@@ -95,7 +96,6 @@ private:
     void init();
     void drawStraightEdge(QPainter *painter, SPVertex *v1, SPVertex *v2);
     void drawStraightMaybeEdge(QPainter *painter, SPVertex *v1, QPoint p);
-    QPoint calcEdgeCenter(SPVertex *v1, SPVertex *v2);
     void drawCurveEdge(QPainter *painter, SPVertex *v1, SPVertex *v2);
     void drawHint(QPainter *painter);
     int checkMouseMoveVertex(QPoint pos);

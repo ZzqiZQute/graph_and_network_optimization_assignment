@@ -6,7 +6,7 @@ class NSMVertexParam
 {
 public:
     NSMVertexParam();
-    NSMVertexParam(int p, int capacity=-1);
+    NSMVertexParam(int p, int c=0,int capacity=-1);
     int getP() const;
     void setP(int value);
 
@@ -51,9 +51,16 @@ public:
     bool isDummy() const;
     void setDummy(bool value);
 
+    int getCapacity() const;
+    void setCapacity(int value);
+
+    int getC() const;
+    void setC(int value);
+
 private:
     int p;
     int capacity;
+    int c;
     int cost;
     int flow;
     int x;

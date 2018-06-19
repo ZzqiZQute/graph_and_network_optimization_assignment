@@ -22,7 +22,7 @@ public slots:
     void onBtnCalcClicked();
     void onActionOpen();
     void onActionSave();
-    void onActionLoad();
+    void onActionNoDirGraph();
     void onHintChanged(QString str);
 private:
     Ui::SPWindow *ui;

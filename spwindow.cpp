@@ -38,7 +38,7 @@ void SPWindow::init(){
     connect(ui->btnCalculate,SIGNAL(clicked()),this,SLOT(onBtnCalcClicked()));
     connect(ui->actionOpen,SIGNAL(triggered()),this,SLOT(onActionOpen()));
     connect(ui->actionSave,SIGNAL(triggered()),this,SLOT(onActionSave()));
-    connect(ui->actionLoad,SIGNAL(triggered()),this,SLOT(onActionLoad()));
+    connect(ui->actionNoDirGraph,SIGNAL(triggered()),this,SLOT(onActionNoDirGraph()));
     connect(ui->displayFrame,SIGNAL(hintChanged(QString)),this,SLOT(onHintChanged(QString)));
 
 
@@ -48,7 +48,7 @@ void SPWindow::onHintChanged(QString str){
     ui->statusBar->showMessage(str);
 }
 
-void SPWindow::onActionLoad(){
+void SPWindow::onActionNoDirGraph(){
     LoadInfoDialog dialog(this);
     dialog.exec();
     if(dialog.getSuccess()){
@@ -61,7 +61,16 @@ void SPWindow::onActionLoad(){
         for(int i=0;i<dialog.getNodirEdge()->count();i++){
             NoDirEdge n=dialog.getNodirEdge()->at(i);
             SPVertex* v=graph->getVertexAt(n.v1);
+            SPVertex* v2=graph->getVertexAt(n.v2);
+            QPoint p=SPFrame::calcEdgeCenter(v,v2);
             SPVertexParam *param=new SPVertexParam(n.v2,n.dis);
+            param->setX(p.x());
+            param->setY(p.y());
+            int width=QFontMetrics(QFont("微软雅黑",15)).horizontalAdvance(QString::number(n.dis));
+            param->setWidth(width);
+            param->setDeg(calcDeg(v->getCenterX(),v->getCenterY(),param->getX(),param->getY())
+                       -calcDeg(v->getCenterX(),v->getCenterY(),v2->getCenterX(),v2->getCenterY()));
+            param->setDis(calcDis(v->getCenterX(),v->getCenterY(),param->getX(),param->getY()));
             v->addVertexParams(param);
             v=graph->getVertexAt(n.v2);
             param=new SPVertexParam(n.v1,n.dis);
@@ -265,7 +274,7 @@ void SPWindow::onBtnCalcClicked()
 
 }
 void SPWindow::makeHintText(QStringList list){
-    QString s="<!DOCTYPE HTML><html><head><meta name='qrichtext' content='1' /><style type='text/css'>p, li { white-space: pre-wrap; }</style></head><body style=\" font-family:'SimSun'; font-size:9pt; font-weight:400; font-style:normal;\">";
+    QString s="<!DOCTYPE HTML><html><head><meta name='qrichtext' content='1' /></head><body style=\" font-family:'SimSun'; font-size:9pt; font-style:normal;\">";
     s+=list.join("<br>");
     s+="</body></html>";
     ui->tbDetail->setHtml(s);

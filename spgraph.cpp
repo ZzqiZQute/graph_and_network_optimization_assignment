@@ -110,7 +110,7 @@ int SPGraph::bellman()
     }
 
     if(k>count){
-        calcResult<<"检测到负权值回路，计算终止";
+        calcResult<<"<span style='color:red;font-family:\"微软雅黑\"'><i>检测到负权值回路，计算终止</i></span>";
         return 1;
     }
     return ERROR_CODE;
@@ -160,109 +160,212 @@ int SPGraph::floyd(){
             calcResult<<"P:";
             QString temp="┌";
             for(int i=0;i<count;i++){
-                temp+="------┬";
+                temp+="----------┬";
             }
-            temp+="------┐";
+            temp+="----------┐";
             calcResult<<temp;
-            temp="│      │";
+            temp="│          │";
             for(int i=1;i<=count-1;i++){
-                temp+=QString("%1").arg(i,6)+"│";
+                temp+=QString("%1").arg(i,10)+"│";
             }
-            temp+=QString("%1").arg(count,6)+"│";
+            temp+=QString("%1").arg(count,10)+"│";
             calcResult<<temp;
             for(int i=1;i<=count;i++){
 
 
                 if(i==1){
-                    temp="├------┼";
+                    temp="├----------┼";
                     for(int j=1;j<=count-1;j++){
-                        temp+="------┴";
+                        temp+="----------┴";
                     }
-                    temp+="------┤";
+                    temp+="----------┤";
                 }else{
-                    temp="├------┤";
+                    temp="├----------┤";
                     for(int j=1;j<=count-1;j++){
-                        temp+="        ";
+                        temp+="            ";
                     }
-                    temp+="      │";
+                    temp+="          │";
 
                 }
                 calcResult<<temp;
-                temp="│"+QString("%1").arg(i,6)+"│";
+                temp="│"+QString("%1").arg(i,10)+"│";
                 for(int j=1;j<=count-1;j++){
-                    temp+=QString("%1").arg(m->getP(i,j),6);
+                    temp+=QString("%1").arg(m->getP(i,j),10);
                     temp+="  ";
                 }
-                temp+=QString("%1").arg(m->getP(i,count),6);
+                temp+=QString("%1").arg(m->getP(i,count),10);
                 temp+="│";
 
                 calcResult<<temp;
 
             }
-            temp="└------┴";
+            temp="└----------┴";
             for(int j=1;j<=count-1;j++){
-                temp+="--------";
+                temp+="------------";
             }
-            temp+="------┘";
+            temp+="----------┘";
             calcResult<<temp;
             calcResult<<"D:";
             temp="┌";
             for(int i=0;i<count;i++){
-                temp+="------┬";
+                temp+="----------┬";
             }
-            temp+="------┐";
+            temp+="----------┐";
             calcResult<<temp;
-            temp="│      │";
+            temp="│          │";
             for(int i=1;i<=count-1;i++){
-                temp+=QString("%1").arg(i,6)+"│";
+                temp+=QString("%1").arg(i,10)+"│";
             }
-            temp+=QString("%1").arg(count,6)+"│";
+            temp+=QString("%1").arg(count,10)+"│";
             calcResult<<temp;
             for(int i=1;i<=count;i++){
                 if(i==1){
-                    temp="├------┼";
+                    temp="├----------┼";
                     for(int j=1;j<=count-1;j++){
-                        temp+="------┴";
+                        temp+="----------┴";
                     }
-                    temp+="------┤";
+                    temp+="----------┤";
                 }else{
-                    temp="├------┤";
+                    temp="├----------┤";
                     for(int j=1;j<=count-1;j++){
-                        temp+="        ";
+                        temp+="            ";
                     }
-                    temp+="      │";
+                    temp+="          │";
 
                 }
                 calcResult<<temp;
-                temp="│"+QString("%1").arg(i,6)+"│";
+                temp="│"+QString("%1").arg(i,10)+"│";
                 for(int j=1;j<=count-1;j++){
                     double d=m->getD(i,j);
                     if(d<POS_INFINITY)
-                        temp+=QString("%1").arg(d,6);
+                        temp+=QString("%1").arg(d,10);
                     else
-                        temp+="    ∞";
+                        temp+="        ∞";
                     temp+="  ";
                 }
                 double d=m->getD(i,count);
                 if(d<POS_INFINITY)
-                    temp+=QString("%1").arg(d,6);
+                    temp+=QString("%1").arg(d,10);
                 else
-                    temp+="    ∞";
+                    temp+="        ∞";
                 temp+="│";
 
                 calcResult<<temp;
 
             }
-            temp="└------┴";
+            temp="└----------┴";
             for(int j=1;j<=count-1;j++){
-                temp+="--------";
+                temp+="------------";
             }
-            temp+="------┘";
+            temp+="----------┘";
             calcResult<<temp;
         }
     }
     if(count>FLOYDMAXDISPLAY){
         calcResult<<"数据量太大,显示被禁止了";
+        calcResult<<"第"+QString::number(count)+"次计算";
+        calcResult<<"P:";
+        QString temp="┌";
+        for(int i=0;i<count;i++){
+            temp+="----------┬";
+        }
+        temp+="----------┐";
+        calcResult<<temp;
+        temp="│          │";
+        for(int i=1;i<=count-1;i++){
+            temp+=QString("%1").arg(i,10)+"│";
+        }
+        temp+=QString("%1").arg(count,10)+"│";
+        calcResult<<temp;
+        for(int i=1;i<=count;i++){
+
+
+            if(i==1){
+                temp="├----------┼";
+                for(int j=1;j<=count-1;j++){
+                    temp+="----------┴";
+                }
+                temp+="----------┤";
+            }else{
+                temp="├----------┤";
+                for(int j=1;j<=count-1;j++){
+                    temp+="            ";
+                }
+                temp+="          │";
+
+            }
+            calcResult<<temp;
+            temp="│"+QString("%1").arg(i,10)+"│";
+            for(int j=1;j<=count-1;j++){
+                temp+=QString("%1").arg(m->getP(i,j),10);
+                temp+="  ";
+            }
+            temp+=QString("%1").arg(m->getP(i,count),10);
+            temp+="│";
+
+            calcResult<<temp;
+
+        }
+        temp="└----------┴";
+        for(int j=1;j<=count-1;j++){
+            temp+="------------";
+        }
+        temp+="----------┘";
+        calcResult<<temp;
+        calcResult<<"D:";
+        temp="┌";
+        for(int i=0;i<count;i++){
+            temp+="----------┬";
+        }
+        temp+="----------┐";
+        calcResult<<temp;
+        temp="│          │";
+        for(int i=1;i<=count-1;i++){
+            temp+=QString("%1").arg(i,10)+"│";
+        }
+        temp+=QString("%1").arg(count,10)+"│";
+        calcResult<<temp;
+        for(int i=1;i<=count;i++){
+            if(i==1){
+                temp="├----------┼";
+                for(int j=1;j<=count-1;j++){
+                    temp+="----------┴";
+                }
+                temp+="----------┤";
+            }else{
+                temp="├----------┤";
+                for(int j=1;j<=count-1;j++){
+                    temp+="            ";
+                }
+                temp+="          │";
+
+            }
+            calcResult<<temp;
+            temp="│"+QString("%1").arg(i,10)+"│";
+            for(int j=1;j<=count-1;j++){
+                double d=m->getD(i,j);
+                if(d<POS_INFINITY)
+                    temp+=QString("%1").arg(d,10);
+                else
+                    temp+="        ∞";
+                temp+="  ";
+            }
+            double d=m->getD(i,count);
+            if(d<POS_INFINITY)
+                temp+=QString("%1").arg(d,10);
+            else
+                temp+="        ∞";
+            temp+="│";
+
+            calcResult<<temp;
+
+        }
+        temp="└----------┴";
+        for(int j=1;j<=count-1;j++){
+            temp+="------------";
+        }
+        temp+="----------┘";
+        calcResult<<temp;
     }
     calcResult<<"完成计算";
     return 0;

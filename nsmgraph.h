@@ -2,6 +2,7 @@
 #define NSMGRAPH_H
 #include <QList>
 class NSMVertex;
+class BaseMatrix;
 class NSMGraph
 {
 public:
@@ -12,11 +13,14 @@ public:
     NSMVertex *getVertexAt(int pos) const;
     void removeVertexAt(int pos);
     int getCount() const;
-    void ctsma();
+    int ctsma();
 private:
     QList<NSMVertex*> *vertexs;
+    BaseMatrix* baseMatrix;
     NSMVertex* dummy;
     int count;
+    void calcPi();
+    bool checkNonBaseVectorNega();
 };
 
 #endif // NSMGRAPH_H

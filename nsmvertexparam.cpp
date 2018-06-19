@@ -8,9 +8,10 @@ NSMVertexParam::NSMVertexParam()
     cost=0;
 }
 
-NSMVertexParam::NSMVertexParam(int p, int capacity)
+NSMVertexParam::NSMVertexParam(int p, int c, int capacity)
 {
     this->p=p;
+    this->c=c;
     this->capacity=capacity;
     flow=0;
     cost=0;
@@ -151,4 +152,24 @@ bool NSMVertexParam::isDummy() const
 void NSMVertexParam::setDummy(bool value)
 {
     bDummy = value;
+}
+
+int NSMVertexParam::getCapacity() const
+{
+    return capacity;
+}
+
+void NSMVertexParam::setCapacity(int value)
+{
+    capacity = value;
+}
+
+int NSMVertexParam::getC() const
+{
+    return c;
+}
+
+void NSMVertexParam::setC(int value)
+{
+    c = value;
 }
