@@ -1,12 +1,12 @@
 #ifndef NSMVERTEXPARAM_H
 #define NSMVERTEXPARAM_H
 
-
+#include "common.h"
 class NSMVertexParam
 {
 public:
     NSMVertexParam();
-    NSMVertexParam(int p, int c=0,int capacity=-1);
+    NSMVertexParam(int p, int c=0,int capacity=POS_INFINITY);
     int getP() const;
     void setP(int value);
 

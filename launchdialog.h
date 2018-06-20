@@ -17,6 +17,7 @@ public:
 
 public slots:
     void onBtnShortestPathClicked();
+    void onBtnNSMClicked();
 private:
     Ui::LaunchDialog *ui;
 };

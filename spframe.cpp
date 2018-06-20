@@ -8,9 +8,8 @@
 #include <QMessageBox>
 #include <iostream>
 using namespace std;
-SPFrame::SPFrame(QWidget *parent):QFrame(parent)
+SPFrame::SPFrame(QWidget *parent):mParent(parent)
 {
-    this->mParent=parent;
     graph=new SPGraph();
     refresh=false;
     init();

@@ -21,6 +21,7 @@ private:
     int count;
     void calcPi();
     bool checkNonBaseVectorNega();
+    void changeBaseVector();
 };
 
 #endif // NSMGRAPH_H

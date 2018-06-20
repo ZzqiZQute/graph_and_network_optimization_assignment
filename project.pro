@@ -40,7 +40,9 @@ SOURCES += \
     spvertexparam.cpp \
     nsmvertex.cpp \
     nsmvertexparam.cpp \
-    loadinfodialog.cpp
+    loadinfodialog.cpp \
+    nsmwindow.cpp \
+    nsmframe.cpp
 
 HEADERS += \
     common.h \
@@ -58,11 +60,14 @@ HEADERS += \
     spvertexparam.h \
     nsmvertex.h \
     nsmvertexparam.h \
-    loadinfodialog.h
+    loadinfodialog.h \
+    nsmwindow.h \
+    nsmframe.h
 
 FORMS += \
     launchdialog.ui \
     setdistancedialog.ui \
     spwindow.ui \
-    loadinfodialog.ui
+    loadinfodialog.ui \
+    nsmwindow.ui
 
