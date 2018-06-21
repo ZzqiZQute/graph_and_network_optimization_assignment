@@ -57,6 +57,9 @@ public:
     int getC() const;
     void setC(int value);
 
+    int getWidth() const;
+    void setWidth(int value);
+
 private:
     int p;
     int capacity;
@@ -65,6 +68,7 @@ private:
     int flow;
     int x;
     int y;
+    int width;
     double deg;
     double dis;
     int orix;

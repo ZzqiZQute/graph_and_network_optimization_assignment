@@ -14,14 +14,16 @@ public:
     void removeVertexAt(int pos);
     int getCount() const;
     int ctsma();
+    int getLastX();
+    int getLastY();
 private:
     QList<NSMVertex*> *vertexs;
     BaseMatrix* baseMatrix;
     NSMVertex* dummy;
     int count;
     void calcPi();
-    bool checkNonBaseVectorNega();
     void changeBaseVector();
+
 };
 
 #endif // NSMGRAPH_H

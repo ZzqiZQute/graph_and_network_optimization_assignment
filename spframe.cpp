@@ -53,7 +53,7 @@ void SPFrame::paintEvent(QPaintEvent *event)
     if(editable)
         painter.fillRect(rect,Qt::white);
     else
-        painter.fillRect(rect,QBrush(QColor(248,248,248)));
+        painter.fillRect(rect,QColor(248,248,248));
 
     painter.translate(winOffsetX,winOffsetY);
     painter.scale(winScale,winScale);
@@ -891,10 +891,6 @@ void SPFrame::mouseReleaseEvent(QMouseEvent *event){
                     param->setMoveFlag(false);
                 }
             }
-
-
-
-
         }
     }
     if(event->button()==Qt::RightButton){

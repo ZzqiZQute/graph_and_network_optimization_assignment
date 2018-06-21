@@ -17,6 +17,22 @@ public:
     int getPi() const;
     void setPi(int value);
 
+    int getCenterX() const;
+    void setCenterX(int value);
+
+    int getCenterY() const;
+    void setCenterY(int value);
+
+    bool getSelected() const;
+    void setSelected(bool value);
+
+    int getOriCenterX() const;
+    void setOriCenterX(int value);
+
+    int getOriCenterY() const;
+    void setOriCenterY(int value);
+
+    void saveCenter();
 private:
     QList<NSMVertexParam*> *params;
     int b;

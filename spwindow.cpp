@@ -28,7 +28,7 @@ SPWindow::~SPWindow()
 }
 void SPWindow::init(){
 
-    shortestpath=ui->displayFrame;
+    shortestpath=ui->shortestpath;
     QStringList methodList;
     methodList<<"Bellman"<<"Floyd";
     ui->cbMethod->addItems(methodList);
@@ -39,7 +39,7 @@ void SPWindow::init(){
     connect(ui->actionOpen,SIGNAL(triggered()),this,SLOT(onActionOpen()));
     connect(ui->actionSave,SIGNAL(triggered()),this,SLOT(onActionSave()));
     connect(ui->actionNoDirGraph,SIGNAL(triggered()),this,SLOT(onActionNoDirGraph()));
-    connect(ui->displayFrame,SIGNAL(hintChanged(QString)),this,SLOT(onHintChanged(QString)));
+    connect(ui->shortestpath,SIGNAL(hintChanged(QString)),this,SLOT(onHintChanged(QString)));
 
 
 

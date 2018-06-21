@@ -271,17 +271,14 @@ void NSMGraph::changeBaseVector(){
     }
 
 }
-bool NSMGraph::checkNonBaseVectorNega(){
-    for(int i=1;i<=count;i++){
-        NSMVertex* v=vertexs->at(i);
-        for(int j=0;j<v->getParams()->count();j++){
-            NSMVertexParam* vp=v->getParams()->at(j);
-            if(!baseMatrix->isBaseVector(i,vp->getP())){
-                NSMVertex* v2=vertexs->at(vp->getP());
-                int t=vp->getCost()-(v->getPi()-v2->getPi());//c-(PIj-PIi)
-                if(t<0)return true;
-            }
-        }
-    }
-    return false;
+
+int NSMGraph::getLastX()
+{
+    return vertexs->at(count)->getCenterX();
 }
+
+int NSMGraph::getLastY()
+{
+    return vertexs->at(count)->getCenterY();
+}
+

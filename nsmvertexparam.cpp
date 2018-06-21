@@ -6,6 +6,7 @@ NSMVertexParam::NSMVertexParam()
     capacity=0;
     flow=0;
     cost=0;
+    width=0;
 }
 
 NSMVertexParam::NSMVertexParam(int p, int c, int capacity)
@@ -15,6 +16,7 @@ NSMVertexParam::NSMVertexParam(int p, int c, int capacity)
     this->capacity=capacity;
     flow=0;
     cost=0;
+    width=0;
 
 }
 
@@ -172,4 +174,14 @@ int NSMVertexParam::getC() const
 void NSMVertexParam::setC(int value)
 {
     c = value;
+}
+
+int NSMVertexParam::getWidth() const
+{
+    return width;
+}
+
+void NSMVertexParam::setWidth(int value)
+{
+    width = value;
 }

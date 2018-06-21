@@ -63,3 +63,59 @@ void NSMVertex::setPi(int value)
 {
     pi = value;
 }
+
+int NSMVertex::getCenterX() const
+{
+    return centerX;
+}
+
+void NSMVertex::setCenterX(int value)
+{
+    centerX = value;
+}
+
+int NSMVertex::getCenterY() const
+{
+    return centerY;
+}
+
+void NSMVertex::setCenterY(int value)
+{
+    centerY = value;
+}
+
+bool NSMVertex::getSelected() const
+{
+    return selected;
+}
+
+void NSMVertex::setSelected(bool value)
+{
+    selected = value;
+}
+
+int NSMVertex::getOriCenterX() const
+{
+    return oriCenterX;
+}
+
+void NSMVertex::setOriCenterX(int value)
+{
+    oriCenterX = value;
+}
+
+int NSMVertex::getOriCenterY() const
+{
+    return oriCenterY;
+}
+
+void NSMVertex::setOriCenterY(int value)
+{
+    oriCenterY = value;
+}
+
+void NSMVertex::saveCenter()
+{
+    oriCenterX=centerX;
+    oriCenterY=centerY;
+}
