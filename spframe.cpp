@@ -931,6 +931,7 @@ void SPFrame::wheelEvent(QWheelEvent *event){
     winOffsetY=y-(y-oriOffsetY)*nowScale/oriscale;
     winOriOffsetX=winOffsetX;
     winOriOffsetY=winOffsetY;
+    saveWinOffset();
     update();
     event->accept();
 }
