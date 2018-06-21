@@ -119,3 +119,33 @@ void NSMVertex::saveCenter()
     oriCenterX=centerX;
     oriCenterY=centerY;
 }
+
+int NSMVertex::getBCenterX() const
+{
+    return bCenterX;
+}
+
+void NSMVertex::setBCenterX(int value)
+{
+    bCenterX = value;
+}
+
+int NSMVertex::getBCenterY() const
+{
+    return bCenterY;
+}
+
+void NSMVertex::setBCenterY(int value)
+{
+    bCenterY = value;
+}
+
+int NSMVertex::getBWidth() const
+{
+    return bWidth;
+}
+
+void NSMVertex::setBWidth(int value)
+{
+    bWidth = value;
+}

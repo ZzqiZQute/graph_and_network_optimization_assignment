@@ -33,6 +33,15 @@ public:
     void setOriCenterY(int value);
 
     void saveCenter();
+    int getBCenterX() const;
+    void setBCenterX(int value);
+
+    int getBCenterY() const;
+    void setBCenterY(int value);
+
+    int getBWidth() const;
+    void setBWidth(int value);
+
 private:
     QList<NSMVertexParam*> *params;
     int b;
@@ -42,6 +51,9 @@ private:
     bool selected;
     int oriCenterX;
     int oriCenterY;
+    int bCenterX;
+    int bCenterY;
+    int bWidth;
 };
 
 #endif // NSMVERTEX_H

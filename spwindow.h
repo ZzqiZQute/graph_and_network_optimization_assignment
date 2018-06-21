@@ -15,6 +15,8 @@ public:
     explicit SPWindow(QWidget *parent = 0);
     ~SPWindow();
 
+    QWidget *parent() const;
+
 public slots:
     void onBtnAddVertexClicked();
     void onBtnRemoveAllVertexClicked();
@@ -27,6 +29,7 @@ public slots:
 protected:
     void closeEvent(QCloseEvent *event);
 private:
+    QWidget* mParent;
     Ui::SPWindow *ui;
     void init();
     SPFrame *shortestpath;

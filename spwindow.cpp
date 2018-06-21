@@ -9,7 +9,7 @@
 #include <QFileDialog>
 #include <QTextCodec>
 SPWindow::SPWindow(QWidget *parent) :
-    QMainWindow(parent),
+    mParent(parent),
     ui(new Ui::SPWindow)
 {
 
@@ -24,6 +24,11 @@ SPWindow::SPWindow(QWidget *parent) :
 }
 void SPWindow::closeEvent(QCloseEvent *event){
     ((LaunchDialog*)parent())->show();
+}
+
+QWidget *SPWindow::parent() const
+{
+    return mParent;
 }
 SPWindow::~SPWindow()
 {

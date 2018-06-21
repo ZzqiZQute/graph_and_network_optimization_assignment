@@ -96,6 +96,7 @@ void NSMFrame::drawDemandsAndArcFlows(QPainter* painter){
 
     drawEdges(painter,DF);
     drawVertexs(painter,DF);
+    drawDemand(painter);
     drawSelects(painter);
 }
 
@@ -784,5 +785,18 @@ void NSMFrame::drawStraightEdge(QPainter* painter,NSMVertex* v1,NSMVertex* v2)
 
     }
 }
-
+void NSMFrame::drawDemand(QPainter* painter){
+    painter->setBrush(Qt::white);
+    painter->setFont(QFont("微软雅黑",15));
+    for(int i=1;i<=graph->getCount();i++){
+        NSMVertex* v=graph->getVertexAt(i);
+        QRect rect;
+        rect.setLeft(v->getBCenterX()-v->getBWidth()/2);
+        rect.setTop(v->getBCenterY()-VERTEX_SIZE/2);
+        rect.setWidth(v->getBWidth());
+        rect.setHeight(VERTEX_SIZE);
+        painter->drawRect(rect);
+        painter->drawText(rect,QString::number(v->getB()),QTextOption(Qt::AlignCenter));
+    }
+}
 

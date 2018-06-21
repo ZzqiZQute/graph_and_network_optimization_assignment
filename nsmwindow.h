@@ -16,11 +16,14 @@ public:
     explicit NSMWindow(QWidget *parent = 0);
     ~NSMWindow();
 
+    QWidget *parent() const;
+
 public slots:
     void onBtnAddVertexClicked();
 protected:
     void closeEvent(QCloseEvent *event);
 private:
+    QWidget* mParent;
     Ui::NSMWindow *ui;
     NSMFrame* nsm;
     void init();

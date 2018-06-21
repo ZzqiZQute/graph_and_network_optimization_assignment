@@ -84,6 +84,7 @@ private:
     void drawStraightMaybeEdge(QPainter *painter, NSMVertex *v1, QPoint p);
     void drawEdges(QPainter *painter, Type type);
     void drawStraightEdge(QPainter *painter, NSMVertex *v1, NSMVertex *v2);
+    void drawDemand(QPainter *painter);
 };
 
 #endif // NSMFRAME_H

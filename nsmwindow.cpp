@@ -5,9 +5,10 @@
 #include <QScreen>
 #include "common.h"
 NSMWindow::NSMWindow(QWidget *parent) :
-    QMainWindow(parent),
+    mParent(parent),
     ui(new Ui::NSMWindow)
 {
+    setWindowFlags(windowFlags()|Qt::Window);
     ui->setupUi(this);
     QScreen* screen=QGuiApplication::primaryScreen();
     QSize size=screen->size();
@@ -19,6 +20,11 @@ NSMWindow::NSMWindow(QWidget *parent) :
 }
 void NSMWindow::closeEvent(QCloseEvent *event){
     ((LaunchDialog*)parent())->show();
+}
+
+QWidget *NSMWindow::parent() const
+{
+    return mParent;
 }
 NSMWindow::~NSMWindow()
 {
@@ -56,6 +62,11 @@ void NSMWindow::addVertex(){
             }
 
         }
+        v->setBCenterY(v->getCenterY()-VERTEX_SIZE*3/2);
+        v->setBCenterX(v->getCenterX());
+        int width=QFontMetrics(QFont("微软雅黑",15)).horizontalAdvance(QString::number(dialog.getDemand()));
+        v->setBWidth(width+30);
+        v->setB(dialog.getDemand());
         graph->addVertex(v);
     }
 
