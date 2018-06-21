@@ -1,6 +1,7 @@
 #include "spwindow.h"
 #include "ui_spwindow.h"
 #include "loadinfodialog.h"
+#include "launchdialog.h"
 #include "common.h"
 #include <QMessageBox>
 #include <QGuiApplication>
@@ -21,10 +22,13 @@ SPWindow::SPWindow(QWidget *parent) :
     init();
 
 }
-
+void SPWindow::closeEvent(QCloseEvent *event){
+    ((LaunchDialog*)parent())->show();
+}
 SPWindow::~SPWindow()
 {
     delete ui;
+
 }
 void SPWindow::init(){
 

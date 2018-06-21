@@ -17,14 +17,16 @@ LaunchDialog::~LaunchDialog()
     delete ui;
 }
 void LaunchDialog::onBtnShortestPathClicked(){
-    this->close();
-    SPWindow* window=new SPWindow();
+    this->hide();
+    SPWindow* window=new SPWindow(this);
     window->show();
+
 
 
 }
 void LaunchDialog::onBtnNSMClicked(){
-    this->close();
-    NSMWindow* window=new NSMWindow();
+    this->hide();
+    NSMWindow* window=new NSMWindow(this);
     window->show();
+
 }

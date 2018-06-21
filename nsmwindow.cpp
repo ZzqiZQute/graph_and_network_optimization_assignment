@@ -1,5 +1,6 @@
 #include "nsmwindow.h"
 #include "ui_nsmwindow.h"
+#include "launchdialog.h"
 #include <QScreen>
 #include "common.h"
 NSMWindow::NSMWindow(QWidget *parent) :
@@ -15,10 +16,13 @@ NSMWindow::NSMWindow(QWidget *parent) :
     init();
 
 }
-
+void NSMWindow::closeEvent(QCloseEvent *event){
+    ((LaunchDialog*)parent())->show();
+}
 NSMWindow::~NSMWindow()
 {
     delete ui;
+
 }
 void NSMWindow::init(){
     nsm=ui->nsm;
@@ -26,6 +30,7 @@ void NSMWindow::init(){
 //    connect(ui->btnRemoveAllVertex,SIGNAL(clicked()),this,SLOT(onBtnRemoveAllVertexClicked()));
 //    connect(ui->rbEditMode,SIGNAL(toggled(bool)),this,SLOT(onRadioBtnEditModeToggled(bool)));
 //    connect(ui->btnCalculate,SIGNAL(clicked()),this,SLOT(onBtnCalcClicked()));
+
 
 }
 void NSMWindow::addVertex(){

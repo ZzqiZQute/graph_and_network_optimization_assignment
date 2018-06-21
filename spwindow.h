@@ -24,6 +24,8 @@ public slots:
     void onActionSave();
     void onActionNoDirGraph();
     void onHintChanged(QString str);
+protected:
+    void closeEvent(QCloseEvent *event);
 private:
     Ui::SPWindow *ui;
     void init();

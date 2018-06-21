@@ -18,6 +18,8 @@ public:
 
 public slots:
     void onBtnAddVertexClicked();
+protected:
+    void closeEvent(QCloseEvent *event);
 private:
     Ui::NSMWindow *ui;
     NSMFrame* nsm;
