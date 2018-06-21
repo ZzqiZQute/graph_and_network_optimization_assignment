@@ -42,7 +42,9 @@ SOURCES += \
     nsmvertexparam.cpp \
     loadinfodialog.cpp \
     nsmwindow.cpp \
-    nsmframe.cpp
+    nsmframe.cpp \
+    setcapacityandcostdialog.cpp \
+    setdemanddialog.cpp
 
 HEADERS += \
     common.h \
@@ -62,12 +64,16 @@ HEADERS += \
     nsmvertexparam.h \
     loadinfodialog.h \
     nsmwindow.h \
-    nsmframe.h
+    nsmframe.h \
+    setcapacityandcostdialog.h \
+    setdemanddialog.h
 
 FORMS += \
     launchdialog.ui \
     setdistancedialog.ui \
     spwindow.ui \
     loadinfodialog.ui \
-    nsmwindow.ui
+    nsmwindow.ui \
+    setcapacityandcostdialog.ui \
+    setdemanddialog.ui
 

@@ -530,9 +530,9 @@ void NSMFrame::mouseReleaseEvent(QMouseEvent *event)
                             }
                         }
                     }
-
+                     keyCtrlDown=false;
                 }
-                keyCtrlDown=false;
+
 
             }
             for(int i=1;i<=graph->getCount();i++){
@@ -574,7 +574,7 @@ void NSMFrame::wheelEvent(QWheelEvent *event)
         if(winScale>0.4)
             winScale-=0.05;
     }else{
-        if(winScale<2)
+        if(winScale<1.5)
             winScale+=0.05;
     }
     double nowScale=winScale;
@@ -666,7 +666,7 @@ double NSMFrame::getWinScale() const
 void NSMFrame::init(){
     clearState();
     editable=true;
-    winScale=0.6;
+    winScale=0.8;
     winOffsetX=0;
     winOffsetY=0;
     winOriOffsetX=0;

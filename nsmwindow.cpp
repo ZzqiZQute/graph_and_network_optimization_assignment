@@ -1,6 +1,7 @@
 #include "nsmwindow.h"
 #include "ui_nsmwindow.h"
 #include "launchdialog.h"
+#include "setdemanddialog.h"
 #include <QScreen>
 #include "common.h"
 NSMWindow::NSMWindow(QWidget *parent) :
@@ -34,26 +35,30 @@ void NSMWindow::init(){
 
 }
 void NSMWindow::addVertex(){
-    QRect rect=nsm->geometry();
-    NSMGraph* graph=nsm->getGraph();
-    NSMVertex *v=new NSMVertex();
-    if(graph->getCount()==0){
-        v->setCenterX(VERTEX_SIZE/2);
-        v->setCenterY(VERTEX_SIZE/2);
-
-    }else{
-        int lastx=graph->getLastX();
-        int lasty=graph->getLastY();
-        if(lastx+VERTEX_SIZE>(rect.width()*3/8-nsm->getWinOffsetX())/nsm->getWinScale()){
+    SetDemandDialog dialog(this);
+    if(dialog.exec()==QDialog::Accepted){
+        QRect rect=nsm->geometry();
+        NSMGraph* graph=nsm->getGraph();
+        NSMVertex *v=new NSMVertex();
+        if(graph->getCount()==0){
             v->setCenterX(VERTEX_SIZE/2);
-            v->setCenterY(lasty+VERTEX_SIZE);
-        }else{
-            v->setCenterX(lastx+VERTEX_SIZE);
-            v->setCenterY(lasty);
-        }
+            v->setCenterY(VERTEX_SIZE/2);
 
+        }else{
+            int lastx=graph->getLastX();
+            int lasty=graph->getLastY();
+            if(lastx+VERTEX_SIZE>(rect.width()*3/8-nsm->getWinOffsetX())/nsm->getWinScale()){
+                v->setCenterX(VERTEX_SIZE/2);
+                v->setCenterY(lasty+VERTEX_SIZE);
+            }else{
+                v->setCenterX(lastx+VERTEX_SIZE);
+                v->setCenterY(lasty);
+            }
+
+        }
+        graph->addVertex(v);
     }
-    graph->addVertex(v);
+
 }
 void NSMWindow::onBtnAddVertexClicked(){
 
