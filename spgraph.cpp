@@ -63,13 +63,13 @@ int SPGraph::bellman()
     calcResult<<"当前方法:Bellman";
     if(bellmanMark!=NULL)
         delete bellmanMark;
+    bellmanMark=new BellmanMark(count);
     if(count<2){
         calcResult<<"至少要有两个节点！！！";
         return 2;
     }
     int k=1;
     bool changed=false;
-    bellmanMark=new BellmanMark(count);
     BellmanMark* m=bellmanMark;
     m->setD(1,0);
     m->setP(1,0);
@@ -122,11 +122,11 @@ int SPGraph::floyd(){
     calcResult<<"<span style='color:red;font-family:\"微软雅黑\"'><i>注意：使用Floyd方法需确保没有负权值回路<br>否则计算的结果有可能是错的</i></span>";
     if(floydMark!=NULL)
         delete floydMark;
+    floydMark=new FloydMark(count);
     if(count<2){
         calcResult<<"至少要有两个节点！！！";
         return ERROR_CODE;
     }
-    floydMark=new FloydMark(count);
     FloydMark* m=floydMark;
     for(int i=1;i<=count;i++){
         for(int j=1;j<=count;j++){
