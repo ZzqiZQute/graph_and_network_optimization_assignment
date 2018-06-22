@@ -17,6 +17,9 @@
 #include "bellmanmark.h"
 #include "basematrix.h"
 #include "basevector.h"
+#include "nsmvertexdata.h"
+#include "nsmvertexparamdata.h"
+#include "nsmgraphdata.h"
 double calcDeg(int x1,int y1,int x2,int y2);
 QPoint calcTail(int x,int y,double deg,double len);
 double calcDis(double x1, double y1, double x2, double y2);

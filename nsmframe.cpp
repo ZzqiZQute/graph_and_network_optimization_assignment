@@ -18,6 +18,7 @@ NSMFrame::NSMFrame(QWidget *parent):mParent(parent)
 NSMFrame::~NSMFrame()
 {
     delete graph;
+
 }
 
 void NSMFrame::paintEvent(QPaintEvent *event)
@@ -652,21 +653,26 @@ void NSMFrame::mouseReleaseEvent(QMouseEvent *event)
 
     if(editable)
     {
-        if(event->button()==Qt::LeftButton){
-            for(int i=1;i<=graph->getCount();i++){
+        if(event->button()==Qt::LeftButton)
+        {
+            for(int i=1;i<=graph->getCount();i++)
+            {
                 NSMVertex* v=graph->getVertexAt(i);
                 if(v->getBClicked()&&x<painterRect.width()/2){
-
-                    QPoint mouseReal=mouseToReal2(x,y);
-                    if(mouseReal.x()<v->getBCenterX()+v->getBWidth()/2&&
-                            mouseReal.x()>v->getBCenterX()-v->getBWidth()/2&&
-                            mouseReal.y()<v->getBCenterY()+VERTEX_SIZE/2&&
-                            mouseReal.y()>v->getBCenterY()-VERTEX_SIZE/2)
+                    if(abs(maybeMultiSelectMouseX-maybeMultiSelectMouseX2)<2&&
+                            abs(maybeMultiSelectMouseY-maybeMultiSelectMouseY2)<2)
                     {
-                        SetDemandDialog dialog(this);
-                        dialog.setDemandText(QString::number(v->getB()));
-                        if(dialog.exec()==QDialog::Accepted){
-                            v->setB(dialog.getDemand());
+                        QPoint mouseReal=mouseToReal2(x,y);
+                        if(mouseReal.x()<v->getBCenterX()+v->getBWidth()/2&&
+                                mouseReal.x()>v->getBCenterX()-v->getBWidth()/2&&
+                                mouseReal.y()<v->getBCenterY()+VERTEX_SIZE/2&&
+                                mouseReal.y()>v->getBCenterY()-VERTEX_SIZE/2)
+                        {
+                            SetDemandDialog dialog(this);
+                            dialog.setDemandText(QString::number(v->getB()));
+                            if(dialog.exec()==QDialog::Accepted){
+                                v->setB(dialog.getDemand());
+                            }
                         }
                     }
 
@@ -1057,8 +1063,10 @@ void NSMFrame::drawCurveEdge(QPainter* painter,NSMVertex* v1,NSMVertex* v2)
     }
 }
 
+
+
 void NSMFrame::drawDemand(QPainter* painter){
-    painter->setBrush(Qt::white);
+    painter->setBrush(Qt::transparent);
     painter->setFont(QFont("微软雅黑",15));
     for(int i=1;i<=graph->getCount();i++){
         NSMVertex* v=graph->getVertexAt(i);
@@ -1067,20 +1075,13 @@ void NSMFrame::drawDemand(QPainter* painter){
         rect.setTop(v->getBCenterY()-VERTEX_SIZE/2);
         rect.setWidth(v->getBWidth());
         rect.setHeight(VERTEX_SIZE);
-        if(editable){
-
-            painter->setBrush(QBrush(QColor(Qt::white)));
-        }
-        else{
-            painter->setBrush(QColor(248,248,248));
-        }
 
         painter->drawRect(rect);
         painter->drawText(rect,QString::number(v->getB()),QTextOption(Qt::AlignCenter));
     }
 }
 void NSMFrame::drawDualVariable(QPainter* painter){
-    painter->setBrush(Qt::white);
+    painter->setBrush(Qt::transparent);
     painter->setFont(QFont("微软雅黑",15));
     for(int i=1;i<=graph->getCount();i++){
         NSMVertex* v=graph->getVertexAt(i);
@@ -1089,13 +1090,6 @@ void NSMFrame::drawDualVariable(QPainter* painter){
         rect.setTop(v->getPiCenterY()-VERTEX_SIZE/2);
         rect.setWidth(v->getPiWidth());
         rect.setHeight(VERTEX_SIZE);
-        if(editable){
-
-            painter->setBrush(QBrush(QColor(Qt::white)));
-
-        }else{
-            painter->setBrush(QColor(248,248,248));
-        }
         painter->drawRect(rect);
         if(v->getPi()==POS_INFINITY){
             painter->drawText(rect,"∞",QTextOption(Qt::AlignCenter));

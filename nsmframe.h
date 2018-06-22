@@ -5,6 +5,7 @@
 class NSMGraph;
 class NSMVertex;
 class NSMVertexParam;
+class NSMGraphData;
 class NSMFrame : public QFrame
 {
     Q_OBJECT
@@ -28,6 +29,8 @@ public:
     void reset();
     bool getEditable() const;
     void setEditable(bool value);
+
+
 
 protected:
     void paintEvent(QPaintEvent *event);
@@ -96,6 +99,7 @@ private:
     void drawFlowAndCapacity(QPainter *painter, NSMVertexParam *param);
     void drawCost(QPainter *painter, NSMVertexParam *param);
     void drawCurveEdge(QPainter *painter, NSMVertex *v1, NSMVertex *v2);
+
 };
 
 #endif // NSMFRAME_H

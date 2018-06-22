@@ -3,6 +3,7 @@
 #include <QList>
 class NSMVertex;
 class BaseMatrix;
+class NSMGraphData;
 class NSMGraph
 {
 public:
@@ -22,8 +23,10 @@ private:
     NSMVertex* dummy;
     int count;
     void calcPi();
-    void changeBaseVector();
+    void changeBaseVector(int phase);
+    QList<NSMGraphData*> *graphDatas;
 
+    void saveGraphData(int phase);
 };
 
 #endif // NSMGRAPH_H

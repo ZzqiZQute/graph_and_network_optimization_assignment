@@ -5,6 +5,7 @@ NSMGraph::NSMGraph()
     vertexs=new QList<NSMVertex*>();
     baseMatrix=new BaseMatrix();
     vertexs->push_back(new NSMVertex());
+    graphDatas=new QList<NSMGraphData*>();
     count=0;
     dummy=NULL;
 }
@@ -13,6 +14,8 @@ NSMGraph::~NSMGraph()
 {
     vertexs->clear();
     baseMatrix->clearVectors();
+    graphDatas->clear();
+    delete graphDatas;
     delete baseMatrix;
     delete vertexs;
 }
@@ -71,6 +74,7 @@ int NSMGraph::getCount() const
 
 int NSMGraph::ctsma()
 {
+    graphDatas->clear();
     dummy=new NSMVertex();
     baseMatrix->clearVectors();
     for(int i=1;i<=count;i++){
@@ -92,11 +96,14 @@ int NSMGraph::ctsma()
         }
     }
     addVertex(dummy);
-    //Phase1
+
     for(int i=1;i<count;i++){
         baseMatrix->addVector(new BaseVector(count,i));
     }
-    changeBaseVector();
+
+
+    //Phase1
+    changeBaseVector(1);
     int bcnt=0;
     for(int i=0;i<baseMatrix->getVectors()->count();i++){
         BaseVector* v=baseMatrix->getVectors()->at(i);
@@ -122,7 +129,7 @@ int NSMGraph::ctsma()
                 vp->setCost(vp->getC());
             }
         }
-        changeBaseVector();
+        changeBaseVector(2);
 
     }
 
@@ -182,9 +189,11 @@ void NSMGraph::calcPi(){
     }
 
 }
-void NSMGraph::changeBaseVector(){
+void NSMGraph::changeBaseVector(int phase){
+
     bool loop=true;
     while(loop){
+        saveGraphData(phase);
         loop=false;
         calcPi();
         BaseVector bv;
@@ -271,6 +280,7 @@ void NSMGraph::changeBaseVector(){
         baseMatrix->removeVector(bv2.getV1(),bv2.getV2());
         baseMatrix->addVector(new BaseVector(bv.getV1(),bv.getV2()));
 
+
     }
 
 }
@@ -284,4 +294,30 @@ int NSMGraph::getLastY()
 {
     return vertexs->at(count)->getCenterY();
 }
+void NSMGraph::saveGraphData(int phase){
+    NSMGraphData* gd=new NSMGraphData(phase);
+    for(int i=1;i<=count;i++){
+        NSMVertex* v=getVertexAt(i);
+        NSMVertexData* vd=new NSMVertexData();
+        vd->setB(v->getB());
+        vd->setPi(v->getPi());
+        for(int j=0;j<v->getParams()->count();j++){
+            NSMVertexParam* p=v->getParams()->at(j);
+            NSMVertexParamData* pd=new NSMVertexParamData();
+            pd->setC(p->getC());
+            pd->setCapacity(p->getCapacity());
+            pd->setCost(p->getCost());
+            pd->setFlow(p->getFlow());
+            pd->setP(p->getP());
+            pd->setRc(p->getRc());
+            vd->getParams()->append(pd);
 
+        }
+        gd->getVertexDatas()->append(vd);
+
+    }
+    for(int i=0;i<baseMatrix->getVectors()->count();i++){
+        gd->getBaseMatrix()->addVector(baseMatrix->getVectors()->at(i));
+    }
+    graphDatas->append(gd);
+}

@@ -44,7 +44,10 @@ SOURCES += \
     nsmwindow.cpp \
     nsmframe.cpp \
     setcapacityandcostdialog.cpp \
-    setdemanddialog.cpp
+    setdemanddialog.cpp \
+    nsmvertexdata.cpp \
+    nsmvertexparamdata.cpp \
+    nsmgraphdata.cpp
 
 HEADERS += \
     common.h \
@@ -66,7 +69,10 @@ HEADERS += \
     nsmwindow.h \
     nsmframe.h \
     setcapacityandcostdialog.h \
-    setdemanddialog.h
+    setdemanddialog.h \
+    nsmvertexdata.h \
+    nsmvertexparamdata.h \
+    nsmgraphdata.h
 
 FORMS += \
     launchdialog.ui \
