@@ -4,7 +4,9 @@
 #include <QPaintEvent>
 #include <QMouseEvent>
 #include "setcapacityandcostdialog.h"
+#include "setdemanddialog.h"
 #include "common.h"
+#include <QMessageBox>
 NSMFrame::NSMFrame(QWidget *parent):mParent(parent)
 {
     graph=new NSMGraph();
@@ -118,7 +120,7 @@ void NSMFrame::drawFlowAndCapacity(QPainter* painter,NSMVertexParam *param){
 }
 void NSMFrame::drawCost(QPainter* painter,NSMVertexParam* param){
     painter->drawText(QRect(param->getCX()-param->getCWidth()/2,param->getCY()-VERTEX_SIZE/2,param->getCWidth(),VERTEX_SIZE)
-                      ,QString::number(param->getCost()),QTextOption(Qt::AlignCenter));
+                      ,QString("%1 [%2]").arg(param->getCost()).arg(param->getRc()),QTextOption(Qt::AlignCenter));
     painter->setPen(QPen());
 }
 void NSMFrame::drawVertexs(QPainter* painter,Type type){
@@ -190,26 +192,31 @@ void NSMFrame::drawVertexsSelf(QPainter* painter){
             }else
                 painter->setPen(QPen());
         }else{
-
+            painter->setBrush(QColor(248,248,248));
         }
         painter->drawEllipse(rect);
         painter->drawText(rect,QString::number(i),QTextOption(Qt::AlignCenter));
     }
+    painter->setPen(QPen());
 }
 void NSMFrame::drawDemandsAndArcFlowsFrame(QPainter* painter){
-    painter->setFont(QFont("微软雅黑",15));
+    painter->setFont(QFont("微软雅黑",12));
     painter->setPen(QColor(128,0,0));
     painter->drawRect(painter->window().adjusted(0,0,-1,-1));
-    painter->drawText(50,50,"Demands and Arc Flows");
+    painter->drawText(10,20,"Demands and Arc Flows");
+    painter->drawText(10,40,"方框内为需求，括号外为流，括号内为容量");
     painter->setPen(QPen());
+    painter->setFont(QFont("微软雅黑",15));
 }
 
 void NSMFrame::drawCostAndDualVariablesFrame(QPainter* painter){
-    painter->setFont(QFont("微软雅黑",15));
+    painter->setFont(QFont("微软雅黑",12));
     painter->setPen(QColor(0,128,0));
     painter->drawRect(painter->window().adjusted(1,1,0,0));
-    painter->drawText(50,50,"Cost and Dual Variables");
+    painter->drawText(10,20,"Cost and Dual Variables");
+    painter->drawText(10,40,"方框内为对偶变量，括号外为费用，括号内为检验数");
     painter->setPen(QPen());
+    painter->setFont(QFont("微软雅黑",15));
 }
 void NSMFrame::mousePressEvent(QMouseEvent *event)
 {
@@ -313,6 +320,17 @@ void NSMFrame::mousePressEvent(QMouseEvent *event)
                             }
                         }
                         if(bBreak)break;
+                    }
+
+                    for(int i=1;i<=graph->getCount();i++){
+                        NSMVertex* v=graph->getVertexAt(i);
+                        QPoint mouseReal=mouseToReal2(x,y);
+                        if(mouseReal.x()<v->getBCenterX()+v->getBWidth()/2&&
+                                mouseReal.x()>v->getBCenterX()-v->getBWidth()/2&&
+                                mouseReal.y()<v->getBCenterY()+VERTEX_SIZE/2&&
+                                mouseReal.y()>v->getBCenterY()-VERTEX_SIZE/2){
+                            v->setBClicked(true);
+                        }
                     }
                 }else{
                     bool bBreak=false;
@@ -637,7 +655,22 @@ void NSMFrame::mouseReleaseEvent(QMouseEvent *event)
         if(event->button()==Qt::LeftButton){
             for(int i=1;i<=graph->getCount();i++){
                 NSMVertex* v=graph->getVertexAt(i);
+                if(v->getBClicked()&&x<painterRect.width()/2){
 
+                    QPoint mouseReal=mouseToReal2(x,y);
+                    if(mouseReal.x()<v->getBCenterX()+v->getBWidth()/2&&
+                            mouseReal.x()>v->getBCenterX()-v->getBWidth()/2&&
+                            mouseReal.y()<v->getBCenterY()+VERTEX_SIZE/2&&
+                            mouseReal.y()>v->getBCenterY()-VERTEX_SIZE/2)
+                    {
+                        SetDemandDialog dialog(this);
+                        dialog.setDemandText(QString::number(v->getB()));
+                        if(dialog.exec()==QDialog::Accepted){
+                            v->setB(dialog.getDemand());
+                        }
+                    }
+
+                }
                 if(!keyCtrlDown&&!multiSelect&&!maybeMultiSelect){
                     if(v->getSelected()&&abs(v->getOriCenterX()-v->getCenterX())<2&&abs(v->getOriCenterY()-v->getCenterY())<2)
                     {
@@ -652,6 +685,7 @@ void NSMFrame::mouseReleaseEvent(QMouseEvent *event)
                 v->saveCenter();
                 v->saveBCenter();
                 v->savePiCenter();
+                v->setBClicked(false);
                 if(!multiSelect){
                     v->setSelected(false);
                 }
@@ -667,7 +701,7 @@ void NSMFrame::mouseReleaseEvent(QMouseEvent *event)
                             NSMVertex* v1=graph->getVertexAt(createEdgeVertexHead);
                             QPoint edgeCenter=calcEdgeCenter(v1,v);
                             int deg=calcDeg(v1->getCenterX(),v1->getCenterY(),v->getCenterX(),v->getCenterY())-90;
-                            QPoint disText=calcTail(edgeCenter.x(),edgeCenter.y(),deg,VERTEX_SIZE);
+                            QPoint disText=calcTail(edgeCenter.x(),edgeCenter.y(),deg,VERTEX_SIZE*3/4);
                             NSMVertexParam* vp=new NSMVertexParam(createEdgeVertexHead,cost,capacity);
                             for(int i=0;i<v1->getParams()->count();i++){
                                 NSMVertexParam *vp1=v1->getParams()->at(i);
@@ -689,10 +723,9 @@ void NSMFrame::mouseReleaseEvent(QMouseEvent *event)
                             vp->setFDeg(calcDeg(v1->getCenterX(),v1->getCenterY(),vp->getFX(),vp->getFY())
                                         -calcDeg(v1->getCenterX(),v1->getCenterY(),v->getCenterX(),v->getCenterY()));
                             vp->setFDis(calcDis(v1->getCenterX(),v1->getCenterY(),vp->getFX(),vp->getFY()));
-                            disText=calcTail(edgeCenter.x(),edgeCenter.y(),deg,VERTEX_SIZE/2);
                             vp->setCX(disText.x());
                             vp->setCY(disText.y());
-                            width=QFontMetrics(QFont("微软雅黑",15)).horizontalAdvance(QString("%1").arg(vp->getCost()));
+                            width=QFontMetrics(QFont("微软雅黑",15)).horizontalAdvance(QString("%1 [%2]").arg(vp->getCost()).arg(vp->getRc()));
                             vp->setCWidth(width);
                             vp->setCDeg(calcDeg(v1->getCenterX(),v1->getCenterY(),vp->getCX(),vp->getCY())
                                         -calcDeg(v1->getCenterX(),v1->getCenterY(),v->getCenterX(),v->getCenterY()));
@@ -821,10 +854,24 @@ void NSMFrame::keyReleaseEvent(QKeyEvent *event)
         if(event->key()==Qt::Key_Control){
             keyCtrlDown=false;
             createEdge=false;
+            for(int i=1;i<=graph->getCount();i++){
+                graph->getVertexAt(i)->setSelected(false);
+            }
         }
+
     }
     update();
     event->accept();
+}
+
+bool NSMFrame::getEditable() const
+{
+    return editable;
+}
+
+void NSMFrame::setEditable(bool value)
+{
+    editable = value;
 }
 
 int NSMFrame::getWinOffsetY() const
@@ -1020,6 +1067,14 @@ void NSMFrame::drawDemand(QPainter* painter){
         rect.setTop(v->getBCenterY()-VERTEX_SIZE/2);
         rect.setWidth(v->getBWidth());
         rect.setHeight(VERTEX_SIZE);
+        if(editable){
+
+            painter->setBrush(QBrush(QColor(Qt::white)));
+        }
+        else{
+            painter->setBrush(QColor(248,248,248));
+        }
+
         painter->drawRect(rect);
         painter->drawText(rect,QString::number(v->getB()),QTextOption(Qt::AlignCenter));
     }
@@ -1034,6 +1089,13 @@ void NSMFrame::drawDualVariable(QPainter* painter){
         rect.setTop(v->getPiCenterY()-VERTEX_SIZE/2);
         rect.setWidth(v->getPiWidth());
         rect.setHeight(VERTEX_SIZE);
+        if(editable){
+
+            painter->setBrush(QBrush(QColor(Qt::white)));
+
+        }else{
+            painter->setBrush(QColor(248,248,248));
+        }
         painter->drawRect(rect);
         if(v->getPi()==POS_INFINITY){
             painter->drawText(rect,"∞",QTextOption(Qt::AlignCenter));

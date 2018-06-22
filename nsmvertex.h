@@ -1,6 +1,7 @@
 #ifndef NSMVERTEX_H
 #define NSMVERTEX_H
 #include <QList>
+#include <QFontMetrics>
 class NSMVertexParam;
 class NSMVertex
 {
@@ -68,6 +69,9 @@ public:
     int getLabelPos() const;
     void setLabelPos(int value);
 
+    bool getBClicked() const;
+    void setBClicked(bool value);
+
 private:
     QList<NSMVertexParam*> *params;
     int b;
@@ -88,6 +92,8 @@ private:
     int piOriCenterX;
     int piOriCenterY;
     int piWidth;
+    bool bClicked;
+    QFontMetrics* metrics;
 };
 
 #endif // NSMVERTEX_H

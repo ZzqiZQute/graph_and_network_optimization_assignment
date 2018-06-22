@@ -1,5 +1,6 @@
 #include "setdemanddialog.h"
 #include "ui_setdemanddialog.h"
+#include "common.h"
 #include <QRegExpValidator>
 SetDemandDialog::SetDemandDialog(QWidget *parent) :
     QDialog(parent),
@@ -24,8 +25,17 @@ void SetDemandDialog::onBtnOkClicked(){
 
 }
 
+void SetDemandDialog::setDemand(int value)
+{
+    demand = value;
+}
+
 int SetDemandDialog::getDemand() const
 {
     return demand;
+}
+void SetDemandDialog::setDemandText(QString s){
+    ui->lineEdit->setText(s);
+    ui->lineEdit->selectAll();
 }
 

@@ -26,6 +26,9 @@ public:
     void MoveVertexLabel(NSMVertex *v);
 
     void reset();
+    bool getEditable() const;
+    void setEditable(bool value);
+
 protected:
     void paintEvent(QPaintEvent *event);
     void mousePressEvent(QMouseEvent *event);

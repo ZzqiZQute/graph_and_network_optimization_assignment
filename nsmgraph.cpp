@@ -76,7 +76,7 @@ int NSMGraph::ctsma()
     for(int i=1;i<=count;i++){
         NSMVertex* v=getVertexAt(i);
         for(int j=0;j<v->getParams()->count();j++){
-            v->getParams()->at(i)->setC(v->getParams()->at(i)->getCost());
+            v->getParams()->at(j)->setC(v->getParams()->at(j)->getCost());
             v->getParams()->at(j)->setCost(0);
         }
         if(v->getB()<0){
@@ -125,6 +125,7 @@ int NSMGraph::ctsma()
         changeBaseVector();
 
     }
+
     return 0;
 
 
@@ -197,6 +198,7 @@ void NSMGraph::changeBaseVector(){
                 if(!baseMatrix->isBaseVector(i,vp->getP())){
                     NSMVertex* v2=vertexs->at(vp->getP());
                     int t=vp->getCost()-(v->getPi()-v2->getPi());//c-(PIj-PIi)
+                    vp->setRc(t);
                     if(t<0&&t<maxt){
                         loop=true;
                         bv.set(vp->getP(),i);

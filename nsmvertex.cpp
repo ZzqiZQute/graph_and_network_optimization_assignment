@@ -7,6 +7,8 @@ NSMVertex::NSMVertex()
     pi=POS_INFINITY;
     selected=false;
     params=new QList<NSMVertexParam*>();
+    metrics=new QFontMetrics(QFont("微软雅黑",15));
+    bClicked=false;
 
 }
 
@@ -17,12 +19,15 @@ NSMVertex::NSMVertex(int b)
     pi=POS_INFINITY;
     selected=false;
     params=new QList<NSMVertexParam*>();
+    metrics=new QFontMetrics(QFont("微软雅黑",15));
+    bClicked=false;
 }
 
 NSMVertex::~NSMVertex()
 {
     params->clear();
     delete params;
+    delete metrics;
 }
 
 QList<NSMVertexParam *> *NSMVertex::getParams() const
@@ -54,6 +59,7 @@ int NSMVertex::getB() const
 void NSMVertex::setB(int value)
 {
     b = value;
+    bWidth=metrics->horizontalAdvance(QString::number(b))+30;
 }
 
 int NSMVertex::getPi() const
@@ -64,6 +70,11 @@ int NSMVertex::getPi() const
 void NSMVertex::setPi(int value)
 {
     pi = value;
+    if(pi==POS_INFINITY)
+        piWidth=metrics->horizontalAdvance("∞")+30;
+    else
+        piWidth=metrics->horizontalAdvance(QString::number(pi))+30;
+
 }
 
 int NSMVertex::getCenterX() const
@@ -242,4 +253,14 @@ int NSMVertex::getLabelPos() const
 void NSMVertex::setLabelPos(int value)
 {
     labelPos = value;
+}
+
+bool NSMVertex::getBClicked() const
+{
+    return bClicked;
+}
+
+void NSMVertex::setBClicked(bool value)
+{
+    bClicked = value;
 }

@@ -3,6 +3,7 @@
 #include "launchdialog.h"
 #include "setdemanddialog.h"
 #include <QScreen>
+#include <QMessageBox>
 #include "common.h"
 NSMWindow::NSMWindow(QWidget *parent) :
     mParent(parent),
@@ -34,9 +35,9 @@ NSMWindow::~NSMWindow()
 void NSMWindow::init(){
     nsm=ui->nsm;
     connect(ui->btnAddVertex,SIGNAL(clicked()),this,SLOT(onBtnAddVertexClicked()));
-//    connect(ui->btnRemoveAllVertex,SIGNAL(clicked()),this,SLOT(onBtnRemoveAllVertexClicked()));
-//    connect(ui->rbEditMode,SIGNAL(toggled(bool)),this,SLOT(onRadioBtnEditModeToggled(bool)));
-//    connect(ui->btnCalculate,SIGNAL(clicked()),this,SLOT(onBtnCalcClicked()));
+    connect(ui->btnRemoveAllVertex,SIGNAL(clicked()),this,SLOT(onBtnRemoveAllVertexClicked()));
+    connect(ui->rbEditMode,SIGNAL(toggled(bool)),this,SLOT(onRadioBtnEditModeToggled(bool)));
+    connect(ui->btnCalculate,SIGNAL(clicked()),this,SLOT(onBtnCalcClicked()));
 
 
 }
@@ -82,4 +83,35 @@ void NSMWindow::onBtnAddVertexClicked(){
     nsm->setFocus();
     nsm->update();
 
+}
+void NSMWindow::onBtnCalcClicked(){
+    ui->rbEditMode->setChecked(false);
+    nsm->getGraph()->ctsma();
+    nsm->update();
+
+}
+void NSMWindow::onBtnRemoveAllVertexClicked(){
+    if(QMessageBox::Yes==QMessageBox::warning(this,"警告","是否全部删除?",QMessageBox::Yes,QMessageBox::No))
+    {
+        NSMGraph* graph=nsm->getGraph();
+        graph->clearVertexs();
+        nsm->reset();
+        nsm->setFocus();
+        nsm->update();
+    }
+}
+void NSMWindow::onRadioBtnEditModeToggled(bool b){
+    if(b){
+        nsm->setEditable(true);
+        ui->btnAddVertex->setEnabled(true);
+        ui->btnRemoveAllVertex->setEnabled(true);
+    }
+    else
+    {
+        nsm->setEditable(false);
+        ui->btnAddVertex->setEnabled(false);
+        ui->btnRemoveAllVertex->setEnabled(false);
+    }
+    nsm->setFocus();
+    nsm->update();
 }

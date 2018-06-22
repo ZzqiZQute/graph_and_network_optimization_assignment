@@ -20,6 +20,9 @@ public:
 
 public slots:
     void onBtnAddVertexClicked();
+    void onBtnCalcClicked();
+    void onBtnRemoveAllVertexClicked();
+    void onRadioBtnEditModeToggled(bool b);
 protected:
     void closeEvent(QCloseEvent *event);
 private:

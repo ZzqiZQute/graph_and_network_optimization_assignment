@@ -3,10 +3,17 @@
 NSMVertexParam::NSMVertexParam()
 {
     p=0;
-    capacity=0;
+    capacity=POS_INFINITY;
     flow=0;
     cost=0;
+    rc=0;
+    metrics=new QFontMetrics(QFont("微软雅黑",15));
 
+}
+
+NSMVertexParam::~NSMVertexParam()
+{
+    delete metrics;
 }
 
 NSMVertexParam::NSMVertexParam(int p, int c, int capacity)
@@ -15,6 +22,8 @@ NSMVertexParam::NSMVertexParam(int p, int c, int capacity)
     this->cost=c;
     this->capacity=capacity;
     flow=0;
+    rc=0;
+    metrics=new QFontMetrics(QFont("微软雅黑",15));
 
 
 }
@@ -37,6 +46,7 @@ int NSMVertexParam::getCost() const
 void NSMVertexParam::setCost(int value)
 {
     cost = value;
+    cWidth=metrics->horizontalAdvance(QString("%1 [%2]").arg(getCost()).arg(getRc()));
 }
 
 bool NSMVertexParam::getCurve() const
@@ -68,6 +78,11 @@ int NSMVertexParam::getFlow() const
 void NSMVertexParam::setFlow(int value)
 {
     flow = value;
+    if(getCapacity()==POS_INFINITY){
+        fWidth= metrics->horizontalAdvance(QString("%1 (∞)").arg(getFlow()));
+    }else{
+        fWidth= metrics->horizontalAdvance(QString("%1 (%2)").arg(getFlow()).arg(getCapacity()));
+    }
 }
 
 bool NSMVertexParam::isDummy() const
@@ -88,6 +103,11 @@ int NSMVertexParam::getCapacity() const
 void NSMVertexParam::setCapacity(int value)
 {
     capacity = value;
+    if(getCapacity()==POS_INFINITY){
+        fWidth= metrics->horizontalAdvance(QString("%1 (∞)").arg(getFlow()));
+    }else{
+        fWidth= metrics->horizontalAdvance(QString("%1 (%2)").arg(getFlow()).arg(getCapacity()));
+    }
 }
 
 int NSMVertexParam::getC() const
@@ -271,5 +291,15 @@ int NSMVertexParam::getOricY() const
 void NSMVertexParam::setOricY(int value)
 {
     oricY = value;
+}
+
+int NSMVertexParam::getRc() const
+{
+    return rc;
+}
+
+void NSMVertexParam::setRc(int value)
+{
+    rc = value;
 }
 

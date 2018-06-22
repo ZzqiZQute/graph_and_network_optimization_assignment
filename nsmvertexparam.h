@@ -2,10 +2,12 @@
 #define NSMVERTEXPARAM_H
 
 #include "common.h"
+#include <QFontMetrics>
 class NSMVertexParam
 {
 public:
     NSMVertexParam();
+    ~NSMVertexParam();
     NSMVertexParam(int p, int c=0,int capacity=POS_INFINITY);
     int getP() const;
     void setP(int value);
@@ -84,10 +86,14 @@ public:
     int getOricY() const;
     void setOricY(int value);
 
+    int getRc() const;
+    void setRc(int value);
+
 private:
     int p;
     int capacity;
     int c;
+    int rc;
     int cost;
     int flow;
     int fX;
@@ -109,6 +115,8 @@ private:
     bool curve;
     bool hover;
     bool bDummy;
+    QFontMetrics* metrics;
+
 };
 
 #endif // NSMVERTEXPARAM_H

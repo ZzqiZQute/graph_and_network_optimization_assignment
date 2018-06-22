@@ -17,6 +17,9 @@ public:
 
     int getDemand() const;
 
+    void setDemand(int value);
+
+    void setDemandText(QString s);
 public slots:
     void onBtnOkClicked();
 private:
