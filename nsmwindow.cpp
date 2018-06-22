@@ -55,7 +55,7 @@ void NSMWindow::addVertex(){
             int lasty=graph->getLastY();
             if(lastx+VERTEX_SIZE>(rect.width()*3/8-nsm->getWinOffsetX())/nsm->getWinScale()){
                 v->setCenterX(VERTEX_SIZE/2);
-                v->setCenterY(lasty+VERTEX_SIZE);
+                v->setCenterY(lasty+VERTEX_SIZE*3);
             }else{
                 v->setCenterX(lastx+VERTEX_SIZE);
                 v->setCenterY(lasty);
@@ -64,9 +64,14 @@ void NSMWindow::addVertex(){
         }
         v->setBCenterY(v->getCenterY()-VERTEX_SIZE*3/2);
         v->setBCenterX(v->getCenterX());
+        v->saveBCenter();
+        nsm->MoveVertexLabel(v);
         int width=QFontMetrics(QFont("微软雅黑",15)).horizontalAdvance(QString::number(dialog.getDemand()));
         v->setBWidth(width+30);
         v->setB(dialog.getDemand());
+        width=QFontMetrics(QFont("微软雅黑",15)).horizontalAdvance("∞");
+        v->setPiWidth(width+30);
+        v->setPi(POS_INFINITY);
         graph->addVertex(v);
     }
 

@@ -3,6 +3,7 @@
 NSMVertex::NSMVertex()
 {
     b=0;
+    labelPos=0;
     pi=POS_INFINITY;
     selected=false;
     params=new QList<NSMVertexParam*>();
@@ -12,6 +13,7 @@ NSMVertex::NSMVertex()
 NSMVertex::NSMVertex(int b)
 {
     this->b=b;
+    labelPos=0;
     pi=POS_INFINITY;
     selected=false;
     params=new QList<NSMVertexParam*>();
@@ -120,6 +122,18 @@ void NSMVertex::saveCenter()
     oriCenterY=centerY;
 }
 
+void NSMVertex::saveBCenter()
+{
+    bOriCenterX=bCenterX;
+    bOriCenterY=bCenterY;
+}
+
+void NSMVertex::savePiCenter()
+{
+    piOriCenterX=piCenterX;
+    piOriCenterY=piCenterY;
+}
+
 int NSMVertex::getBCenterX() const
 {
     return bCenterX;
@@ -148,4 +162,84 @@ int NSMVertex::getBWidth() const
 void NSMVertex::setBWidth(int value)
 {
     bWidth = value;
+}
+
+int NSMVertex::getBOriCenterX() const
+{
+    return bOriCenterX;
+}
+
+void NSMVertex::setBOriCenterX(int value)
+{
+    bOriCenterX = value;
+}
+
+int NSMVertex::getBOriCenterY() const
+{
+    return bOriCenterY;
+}
+
+void NSMVertex::setBOriCenterY(int value)
+{
+    bOriCenterY = value;
+}
+
+int NSMVertex::getPiCenterX() const
+{
+    return piCenterX;
+}
+
+void NSMVertex::setPiCenterX(int value)
+{
+    piCenterX = value;
+}
+
+int NSMVertex::getPiCenterY() const
+{
+    return piCenterY;
+}
+
+void NSMVertex::setPiCenterY(int value)
+{
+    piCenterY = value;
+}
+
+int NSMVertex::getPiOriCenterX() const
+{
+    return piOriCenterX;
+}
+
+void NSMVertex::setPiOriCenterX(int value)
+{
+    piOriCenterX = value;
+}
+
+int NSMVertex::getPiOriCenterY() const
+{
+    return piOriCenterY;
+}
+
+void NSMVertex::setPiOriCenterY(int value)
+{
+    piOriCenterY = value;
+}
+
+int NSMVertex::getPiWidth() const
+{
+    return piWidth;
+}
+
+void NSMVertex::setPiWidth(int value)
+{
+    piWidth = value;
+}
+
+int NSMVertex::getLabelPos() const
+{
+    return labelPos;
+}
+
+void NSMVertex::setLabelPos(int value)
+{
+    labelPos = value;
 }

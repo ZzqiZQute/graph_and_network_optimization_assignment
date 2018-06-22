@@ -33,7 +33,7 @@
      <item>
       <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>（负为发送 正为接收）</string>
+        <string>（负为发送 正为接收 0或空为中转）</string>
        </property>
       </widget>
      </item>

@@ -33,6 +33,8 @@ public:
     void setOriCenterY(int value);
 
     void saveCenter();
+    void saveBCenter();
+    void savePiCenter();
     int getBCenterX() const;
     void setBCenterX(int value);
 
@@ -42,10 +44,35 @@ public:
     int getBWidth() const;
     void setBWidth(int value);
 
+    int getBOriCenterX() const;
+    void setBOriCenterX(int value);
+
+    int getBOriCenterY() const;
+    void setBOriCenterY(int value);
+
+    int getPiCenterX() const;
+    void setPiCenterX(int value);
+
+    int getPiCenterY() const;
+    void setPiCenterY(int value);
+
+    int getPiOriCenterX() const;
+    void setPiOriCenterX(int value);
+
+    int getPiOriCenterY() const;
+    void setPiOriCenterY(int value);
+
+    int getPiWidth() const;
+    void setPiWidth(int value);
+
+    int getLabelPos() const;
+    void setLabelPos(int value);
+
 private:
     QList<NSMVertexParam*> *params;
     int b;
     int pi;
+    int labelPos;
     int centerX;
     int centerY;
     bool selected;
@@ -53,7 +80,14 @@ private:
     int oriCenterY;
     int bCenterX;
     int bCenterY;
+    int bOriCenterX;
+    int bOriCenterY;
     int bWidth;
+    int piCenterX;
+    int piCenterY;
+    int piOriCenterX;
+    int piOriCenterY;
+    int piWidth;
 };
 
 #endif // NSMVERTEX_H

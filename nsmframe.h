@@ -22,6 +22,7 @@ public:
     int getWinOffsetY() const;
     void setWinOffsetY(int value);
     NSMGraph* getGraph();
+    void MoveVertexLabel(NSMVertex *v);
 
     void reset();
 protected:
@@ -85,6 +86,8 @@ private:
     void drawEdges(QPainter *painter, Type type);
     void drawStraightEdge(QPainter *painter, NSMVertex *v1, NSMVertex *v2);
     void drawDemand(QPainter *painter);
+    void drawDualVariable(QPainter *painter);
+
 };
 
 #endif // NSMFRAME_H

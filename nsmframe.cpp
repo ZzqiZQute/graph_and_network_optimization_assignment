@@ -26,7 +26,7 @@ void NSMFrame::paintEvent(QPaintEvent *event)
         refresh=true;
         init();
         winOffsetX=painterRect.width()/8-VERTEX_SIZE/2;
-        winOffsetY=painterRect.height()/8-VERTEX_SIZE/2;
+        winOffsetY=painterRect.height()/4-VERTEX_SIZE/2;
         winOriOffsetX=winOffsetX;
         winOriOffsetY=winOffsetY;
     }
@@ -101,8 +101,9 @@ void NSMFrame::drawDemandsAndArcFlows(QPainter* painter){
 }
 
 void NSMFrame::drawCostAndDualVariables(QPainter* painter){
-    drawEdges(painter,DF);
+    drawEdges(painter,CV);
     drawVertexs(painter,CV);
+    drawDualVariable(painter);
     drawSelects(painter);
 }
 void NSMFrame::drawVertexs(QPainter* painter,Type type){
@@ -115,7 +116,7 @@ void NSMFrame::drawVertexs(QPainter* painter,Type type){
 }
 void NSMFrame::drawEdges(QPainter* painter,Type type){
 
-     painter->setPen(QPen());
+    painter->setPen(QPen());
     if(type==DF){
 
     }else if(type==CV){
@@ -211,8 +212,11 @@ void NSMFrame::mousePressEvent(QMouseEvent *event)
                             }
                         }
                     }else{
-                        if(v->getSelected())
+                        if(v->getSelected()){
                             readyMultiMove=true;
+                            v->saveBCenter();
+                            v->savePiCenter();
+                        }
                         else{
                             multiSelect=false;
                             for(int i=1;i<=graph->getCount();i++){
@@ -221,6 +225,8 @@ void NSMFrame::mousePressEvent(QMouseEvent *event)
                             moveVertexPos=pos;
                             moveVertexCenterX=v->getCenterX();
                             moveVertexCenterY=v->getCenterY();
+                            v->saveBCenter();
+                            v->savePiCenter();
                             v->setSelected(true);
                             for(int i=0;i<v->getParams()->count();i++){
                                 NSMVertexParam* vp=v->getParams()->at(i);
@@ -278,9 +284,6 @@ void NSMFrame::mousePressEvent(QMouseEvent *event)
                     }
                     if(bBreak)break;
                 }
-
-
-
             }else{
                 if(pos>0){
                     NSMVertex* v=graph->getVertexAt(pos);
@@ -335,20 +338,51 @@ void NSMFrame::mouseMoveEvent(QMouseEvent *event)
             bool b=false;
             maybeMultiSelectMouseX2=x;
             maybeMultiSelectMouseY2=y;
-            if(!(abs(maybeMultiSelectMouseX-x)<5)||!(abs(maybeMultiSelectMouseY-y)<5))
+            int xx1,yy1,xx2,yy2;
+            if(maybeMultiSelectMouseX<painterRect.width()/2){
+                if(maybeMultiSelectMouseX2<painterRect.width()/2){
+                    QPoint pp1=mouseToReal(maybeMultiSelectMouseX,maybeMultiSelectMouseY);
+                    QPoint pp2=mouseToReal(maybeMultiSelectMouseX2,maybeMultiSelectMouseY2);
+                    xx1=pp1.x();
+                    yy1=pp1.y();
+                    xx2=pp2.x();
+                    yy2=pp2.y();
+                }else{
+                    QPoint pp1=mouseToReal(maybeMultiSelectMouseX,maybeMultiSelectMouseY);
+                    QPoint pp2=mouseToReal2(maybeMultiSelectMouseX2,maybeMultiSelectMouseY2);
+                    xx1=pp1.x();
+                    yy1=pp1.y();
+                    xx2=pp2.x();
+                    yy2=pp2.y();
+                }
+            }else{
+                if(maybeMultiSelectMouseX2<painterRect.width()/2){
+                    QPoint pp1=mouseToReal(maybeMultiSelectMouseX,maybeMultiSelectMouseY);
+                    QPoint pp2=mouseToReal2(maybeMultiSelectMouseX2-painterRect.width()/2,maybeMultiSelectMouseY2);
+                    xx1=pp1.x();
+                    yy1=pp1.y();
+                    xx2=pp2.x();
+                    yy2=pp2.y();
+                }else{
+                    QPoint pp1=mouseToReal(maybeMultiSelectMouseX,maybeMultiSelectMouseY);
+                    QPoint pp2=mouseToReal(maybeMultiSelectMouseX2,maybeMultiSelectMouseY2);
+                    xx1=pp1.x();
+                    yy1=pp1.y();
+                    xx2=pp2.x();
+                    yy2=pp2.y();
+                }
+            }
+            if((abs(maybeMultiSelectMouseX-x)>5)&&(abs(maybeMultiSelectMouseY-y)>5))
                 for(int i=1;i<=graph->getCount();i++)
                 {
-                    QPoint p=realToMouse(graph->getVertexAt(i)->getCenterX(),graph->getVertexAt(i)->getCenterY());
-                    int xx=p.x();
-                    int yy=p.y();
-                    if(maybeMultiSelectMouseX>painterRect.width()/2){
-                        xx+=painterRect.width()/2;
-                    }
 
-                    if(((xx>maybeMultiSelectMouseX&&xx<maybeMultiSelectMouseX2)||
-                        (xx>maybeMultiSelectMouseX2&&xx<maybeMultiSelectMouseX))&&
-                            ((yy>maybeMultiSelectMouseY&&yy<maybeMultiSelectMouseY2)||
-                             (yy>maybeMultiSelectMouseY2&&yy<maybeMultiSelectMouseY))
+                    int xx=graph->getVertexAt(i)->getCenterX();
+                    int yy=graph->getVertexAt(i)->getCenterY();
+
+                    if(((xx>xx1&&xx<xx2)||
+                        (xx>xx2&&xx<xx1))&&
+                            ((yy>yy1&&yy<yy2)||
+                             (yy>yy2&&yy<yy1))
                             ){
                         NSMVertex* v=graph->getVertexAt(i);
                         v->setSelected(true);
@@ -368,6 +402,10 @@ void NSMFrame::mouseMoveEvent(QMouseEvent *event)
                 if(v->getSelected()){
                     v->setCenterX(v->getOriCenterX()+(x-currentLMouseX)/winScale);
                     v->setCenterY(v->getOriCenterY()+(y-currentLMouseY)/winScale);
+                    v->setBCenterX(v->getBOriCenterX()+(x-currentLMouseX)/winScale);
+                    v->setBCenterY(v->getBOriCenterY()+(y-currentLMouseY)/winScale);
+                    v->setPiCenterX(v->getPiOriCenterX()+(x-currentLMouseX)/winScale);
+                    v->setPiCenterY(v->getPiOriCenterY()+(y-currentLMouseY)/winScale);
                     for(int j=0;j<v->getParams()->count();j++){
                         NSMVertexParam *vp=v->getParams()->at(j);
                         NSMVertex* v1=graph->getVertexAt(vp->getP());
@@ -401,8 +439,14 @@ void NSMFrame::mouseMoveEvent(QMouseEvent *event)
         else if(moveVertexPos>0){
             moveEdgeLabel=false;
             NSMVertex *v=graph->getVertexAt(moveVertexPos);
-            v->setCenterX(moveVertexCenterX+(x-currentLMouseX)/winScale);
-            v->setCenterY(moveVertexCenterY+(y-currentLMouseY)/winScale);
+            int offsetx=(x-currentLMouseX)/winScale;
+            int offsety=(y-currentLMouseY)/winScale;
+            v->setCenterX(moveVertexCenterX+offsetx);
+            v->setCenterY(moveVertexCenterY+offsety);
+            v->setBCenterX(v->getBOriCenterX()+offsetx);
+            v->setBCenterY(v->getBOriCenterY()+offsety);
+            v->setPiCenterX(v->getPiOriCenterX()+offsetx);
+            v->setPiCenterY(v->getPiOriCenterY()+offsety);
 
         }
         if(createEdge){
@@ -497,9 +541,24 @@ void NSMFrame::mouseReleaseEvent(QMouseEvent *event)
     {
         if(event->button()==Qt::LeftButton){
             for(int i=1;i<=graph->getCount();i++){
-                graph->getVertexAt(i)->saveCenter();
+                NSMVertex* v=graph->getVertexAt(i);
+
+                if(!keyCtrlDown&&!multiSelect&&!maybeMultiSelect){
+                    if(v->getSelected()&&abs(v->getOriCenterX()-v->getCenterX())<2&&abs(v->getOriCenterY()-v->getCenterY())<2)
+                    {
+                        int pos=v->getLabelPos();
+                        pos++;
+                        if(pos>3)
+                            pos=0;
+                        v->setLabelPos(pos);
+                        MoveVertexLabel(v);
+                    }
+                }
+                v->saveCenter();
+                v->saveBCenter();
+                v->savePiCenter();
                 if(!multiSelect){
-                    graph->getVertexAt(i)->setSelected(false);
+                    v->setSelected(false);
                 }
             }
             if(createEdge){
@@ -531,7 +590,7 @@ void NSMFrame::mouseReleaseEvent(QMouseEvent *event)
                             }
                         }
                     }
-                     keyCtrlDown=false;
+                    keyCtrlDown=false;
                 }
 
 
@@ -551,6 +610,7 @@ void NSMFrame::mouseReleaseEvent(QMouseEvent *event)
         winOriOffsetY=winOffsetY;
         setCursor(Qt::ArrowCursor);
     }
+
     moveVertexPos=0;
     maybeMultiSelect=false;
     readyMultiMove=false;
@@ -799,4 +859,54 @@ void NSMFrame::drawDemand(QPainter* painter){
         painter->drawText(rect,QString::number(v->getB()),QTextOption(Qt::AlignCenter));
     }
 }
-
+void NSMFrame::drawDualVariable(QPainter* painter){
+    painter->setBrush(Qt::white);
+    painter->setFont(QFont("微软雅黑",15));
+    for(int i=1;i<=graph->getCount();i++){
+        NSMVertex* v=graph->getVertexAt(i);
+        QRect rect;
+        rect.setLeft(v->getPiCenterX()-v->getPiWidth()/2);
+        rect.setTop(v->getPiCenterY()-VERTEX_SIZE/2);
+        rect.setWidth(v->getPiWidth());
+        rect.setHeight(VERTEX_SIZE);
+        painter->drawRect(rect);
+        if(v->getPi()==POS_INFINITY){
+            painter->drawText(rect,"∞",QTextOption(Qt::AlignCenter));
+        }else
+        {
+            painter->drawText(rect,QString::number(v->getPi()),QTextOption(Qt::AlignCenter));
+        }
+    }
+}
+void NSMFrame::MoveVertexLabel(NSMVertex* v){
+    int pos=v->getLabelPos();
+    switch(pos)
+    {
+    case 0:
+        v->setBCenterY(v->getCenterY()-VERTEX_SIZE*3/2);
+        v->setBCenterX(v->getCenterX());
+        v->setPiCenterY(v->getCenterY()-VERTEX_SIZE*3/2);
+        v->setPiCenterX(v->getCenterX());
+        break;
+    case 1:
+        v->setBCenterX(v->getCenterX()+VERTEX_SIZE+v->getBWidth()/2);
+        v->setBCenterY(v->getCenterY());
+        v->setPiCenterX(v->getCenterX()+VERTEX_SIZE+v->getPiWidth()/2);
+        v->setPiCenterY(v->getCenterY());
+        break;
+    case 2:
+        v->setBCenterY(v->getCenterY()+VERTEX_SIZE*3/2);
+        v->setBCenterX(v->getCenterX());
+        v->setPiCenterY(v->getCenterY()+VERTEX_SIZE*3/2);
+        v->setPiCenterX(v->getCenterX());
+        break;
+    case 3:
+        v->setBCenterX(v->getCenterX()-VERTEX_SIZE-v->getBWidth()/2);
+        v->setBCenterY(v->getCenterY());
+        v->setPiCenterX(v->getCenterX()-VERTEX_SIZE-v->getPiWidth()/2);
+        v->setPiCenterY(v->getCenterY());
+        break;
+    }
+    v->saveBCenter();
+    v->savePiCenter();
+}
