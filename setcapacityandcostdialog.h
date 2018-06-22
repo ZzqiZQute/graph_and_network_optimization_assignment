@@ -15,8 +15,18 @@ public:
     explicit SetCapacityAndCostDialog(QWidget *parent = 0);
     ~SetCapacityAndCostDialog();
 
+    int getCapacity() const;
+    void setCapacity(int value);
+
+    int getCost() const;
+    void setCost(int value);
+
+public slots:
+    void onBtnOKClicked();
 private:
     Ui::SetCapacityAndCostDialog *ui;
+    int capacity;
+    int cost;
 };
 
 #endif // SETCAPACITYANDCOSTDIALOG_H

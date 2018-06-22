@@ -2,16 +2,22 @@
 <ui version="4.0">
  <class>SetCapacityAndCostDialog</class>
  <widget class="QDialog" name="SetCapacityAndCostDialog">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>345</width>
-    <height>108</height>
+    <width>382</width>
+    <height>124</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>设置费用与容量</string>
+  </property>
+  <property name="windowOpacity">
+   <double>1.000000000000000</double>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
@@ -22,7 +28,7 @@
     </widget>
    </item>
    <item row="0" column="1">
-    <widget class="QLineEdit" name="lineEdit"/>
+    <widget class="QLineEdit" name="tbCost"/>
    </item>
    <item row="0" column="2">
     <widget class="QLabel" name="label_3">
@@ -39,7 +45,7 @@
     </widget>
    </item>
    <item row="1" column="1">
-    <widget class="QLineEdit" name="lineEdit_2"/>
+    <widget class="QLineEdit" name="tbCapacity"/>
    </item>
    <item row="1" column="2">
     <widget class="QLabel" name="label_4">
@@ -64,7 +70,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="btnOK">
        <property name="text">
         <string>确定</string>
        </property>

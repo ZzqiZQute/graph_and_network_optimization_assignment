@@ -76,6 +76,7 @@ int NSMGraph::ctsma()
     for(int i=1;i<=count;i++){
         NSMVertex* v=getVertexAt(i);
         for(int j=0;j<v->getParams()->count();j++){
+            v->getParams()->at(i)->setC(v->getParams()->at(i)->getCost());
             v->getParams()->at(j)->setCost(0);
         }
         if(v->getB()<0){

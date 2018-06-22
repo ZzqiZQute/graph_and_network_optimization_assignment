@@ -4,6 +4,7 @@
 #include <QFrame>
 class NSMGraph;
 class NSMVertex;
+class NSMVertexParam;
 class NSMFrame : public QFrame
 {
     Q_OBJECT
@@ -87,7 +88,11 @@ private:
     void drawStraightEdge(QPainter *painter, NSMVertex *v1, NSMVertex *v2);
     void drawDemand(QPainter *painter);
     void drawDualVariable(QPainter *painter);
-
+    QPoint calcEdgeCenter(NSMVertex *v1, NSMVertex *v2);
+    void setDegAndDisByVertexMove(NSMVertex *v1, NSMVertex *v2, NSMVertexParam *vp);
+    void drawFlowAndCapacity(QPainter *painter, NSMVertexParam *param);
+    void drawCost(QPainter *painter, NSMVertexParam *param);
+    void drawCurveEdge(QPainter *painter, NSMVertex *v1, NSMVertex *v2);
 };
 
 #endif // NSMFRAME_H

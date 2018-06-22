@@ -830,10 +830,9 @@ void SPFrame::mouseReleaseEvent(QMouseEvent *event){
             if(createEdge){
                 if(findEdgeTail){
                     if(createEdgeVertexHead!=createEdgeVertexTail){
-                        SetDistanceDialog dialog(this);
-                        dialog.exec();
                         SPVertex * v=graph->getVertexAt(createEdgeVertexTail);
-                        if(dialog.getOk()){
+                        SetDistanceDialog dialog(this);
+                        if(dialog.exec()==QDialog::Accepted){
                             double dis=dialog.getDistance();
                             SPVertex* v1=graph->getVertexAt(createEdgeVertexHead);
                             QPoint edgeCenter=calcEdgeCenter(v1,v);

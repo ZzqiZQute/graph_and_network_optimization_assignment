@@ -6,17 +6,16 @@ NSMVertexParam::NSMVertexParam()
     capacity=0;
     flow=0;
     cost=0;
-    width=0;
+
 }
 
 NSMVertexParam::NSMVertexParam(int p, int c, int capacity)
 {
     this->p=p;
-    this->c=c;
+    this->cost=c;
     this->capacity=capacity;
     flow=0;
-    cost=0;
-    width=0;
+
 
 }
 
@@ -40,76 +39,6 @@ void NSMVertexParam::setCost(int value)
     cost = value;
 }
 
-int NSMVertexParam::getX() const
-{
-    return x;
-}
-
-void NSMVertexParam::setX(int value)
-{
-    x = value;
-}
-
-int NSMVertexParam::getY() const
-{
-    return y;
-}
-
-void NSMVertexParam::setY(int value)
-{
-    y = value;
-}
-
-double NSMVertexParam::getDeg() const
-{
-    return deg;
-}
-
-void NSMVertexParam::setDeg(double value)
-{
-    deg = value;
-}
-
-double NSMVertexParam::getDis() const
-{
-    return dis;
-}
-
-void NSMVertexParam::setDis(double value)
-{
-    dis = value;
-}
-
-int NSMVertexParam::getOrix() const
-{
-    return orix;
-}
-
-void NSMVertexParam::setOrix(int value)
-{
-    orix = value;
-}
-
-int NSMVertexParam::getOriy() const
-{
-    return oriy;
-}
-
-void NSMVertexParam::setOriy(int value)
-{
-    oriy = value;
-}
-
-bool NSMVertexParam::getMoveFlag() const
-{
-    return moveFlag;
-}
-
-void NSMVertexParam::setMoveFlag(bool value)
-{
-    moveFlag = value;
-}
-
 bool NSMVertexParam::getCurve() const
 {
     return curve;
@@ -130,11 +59,6 @@ void NSMVertexParam::setHover(bool value)
     hover = value;
 }
 
-void NSMVertexParam::saveXY()
-{
-    orix=x;
-    oriy=y;
-}
 
 int NSMVertexParam::getFlow() const
 {
@@ -176,12 +100,176 @@ void NSMVertexParam::setC(int value)
     c = value;
 }
 
-int NSMVertexParam::getWidth() const
+
+int NSMVertexParam::getFWidth() const
 {
-    return width;
+    return fWidth;
 }
 
-void NSMVertexParam::setWidth(int value)
+void NSMVertexParam::setFWidth(int value)
 {
-    width = value;
+    fWidth = value;
 }
+
+int NSMVertexParam::getCWidth() const
+{
+    return cWidth;
+}
+
+void NSMVertexParam::setCWidth(int value)
+{
+    cWidth = value;
+}
+
+double NSMVertexParam::getFDeg() const
+{
+    return fDeg;
+}
+
+void NSMVertexParam::setFDeg(double value)
+{
+    fDeg = value;
+}
+
+double NSMVertexParam::getFDis() const
+{
+    return fDis;
+}
+
+void NSMVertexParam::setFDis(double value)
+{
+    fDis = value;
+}
+
+double NSMVertexParam::getCDeg() const
+{
+    return cDeg;
+}
+
+void NSMVertexParam::setCDeg(double value)
+{
+    cDeg = value;
+}
+
+double NSMVertexParam::getCDis() const
+{
+    return cDis;
+}
+
+void NSMVertexParam::setCDis(double value)
+{
+    cDis = value;
+}
+
+int NSMVertexParam::getFX() const
+{
+    return fX;
+}
+
+void NSMVertexParam::setFX(int value)
+{
+    fX = value;
+}
+
+int NSMVertexParam::getFY() const
+{
+    return fY;
+}
+
+void NSMVertexParam::setFY(int value)
+{
+    fY = value;
+}
+
+int NSMVertexParam::getCX() const
+{
+    return cX;
+}
+
+void NSMVertexParam::setCX(int value)
+{
+    cX = value;
+}
+
+int NSMVertexParam::getCY() const
+{
+    return cY;
+}
+
+void NSMVertexParam::setCY(int value)
+{
+    cY = value;
+}
+
+bool NSMVertexParam::getMoveCFlag() const
+{
+    return moveCFlag;
+}
+
+void NSMVertexParam::setMoveCFlag(bool value)
+{
+    moveCFlag = value;
+}
+
+bool NSMVertexParam::getMoveFFlag() const
+{
+    return moveFFlag;
+}
+
+void NSMVertexParam::setMoveFFlag(bool value)
+{
+    moveFFlag = value;
+}
+
+void NSMVertexParam::saveCXY()
+{
+    oricX=cX;
+    oricY=cY;
+}
+
+void NSMVertexParam::saveFXY()
+{
+    orifX=fX;
+    orifY=fY;
+}
+
+int NSMVertexParam::getOrifX() const
+{
+    return orifX;
+}
+
+void NSMVertexParam::setOrifX(int value)
+{
+    orifX = value;
+}
+
+int NSMVertexParam::getOrifY() const
+{
+    return orifY;
+}
+
+void NSMVertexParam::setOrifY(int value)
+{
+    orifY = value;
+}
+
+int NSMVertexParam::getOricX() const
+{
+    return oricX;
+}
+
+void NSMVertexParam::setOricX(int value)
+{
+    oricX = value;
+}
+
+int NSMVertexParam::getOricY() const
+{
+    return oricY;
+}
+
+void NSMVertexParam::setOricY(int value)
+{
+    oricY = value;
+}
+

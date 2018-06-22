@@ -13,29 +13,6 @@ public:
     int getCost() const;
     void setCost(int value);
 
-
-
-    int getX() const;
-    void setX(int value);
-
-    int getY() const;
-    void setY(int value);
-
-    double getDeg() const;
-    void setDeg(double value);
-
-    double getDis() const;
-    void setDis(double value);
-
-    int getOrix() const;
-    void setOrix(int value);
-
-    int getOriy() const;
-    void setOriy(int value);
-
-    bool getMoveFlag() const;
-    void setMoveFlag(bool value);
-
     bool getCurve() const;
     void setCurve(bool value);
 
@@ -43,7 +20,6 @@ public:
     void setHover(bool value);
 
 
-    void saveXY();
 
     int getFlow() const;
     void setFlow(int value);
@@ -57,8 +33,56 @@ public:
     int getC() const;
     void setC(int value);
 
-    int getWidth() const;
-    void setWidth(int value);
+    int getFWidth() const;
+    void setFWidth(int value);
+
+    int getCWidth() const;
+    void setCWidth(int value);
+
+    double getFDeg() const;
+    void setFDeg(double value);
+
+    double getFDis() const;
+    void setFDis(double value);
+
+    double getCDeg() const;
+    void setCDeg(double value);
+
+    double getCDis() const;
+    void setCDis(double value);
+
+    int getFX() const;
+    void setFX(int value);
+
+    int getFY() const;
+    void setFY(int value);
+
+    int getCX() const;
+    void setCX(int value);
+
+    int getCY() const;
+    void setCY(int value);
+
+    bool getMoveCFlag() const;
+    void setMoveCFlag(bool value);
+
+    bool getMoveFFlag() const;
+    void setMoveFFlag(bool value);
+
+    void saveCXY();
+    void saveFXY();
+
+    int getOrifX() const;
+    void setOrifX(int value);
+
+    int getOrifY() const;
+    void setOrifY(int value);
+
+    int getOricX() const;
+    void setOricX(int value);
+
+    int getOricY() const;
+    void setOricY(int value);
 
 private:
     int p;
@@ -66,14 +90,22 @@ private:
     int c;
     int cost;
     int flow;
-    int x;
-    int y;
-    int width;
-    double deg;
-    double dis;
-    int orix;
-    int oriy;
-    bool moveFlag;
+    int fX;
+    int fY;
+    int cX;
+    int cY;
+    int fWidth;
+    int cWidth;
+    double fDeg;
+    double fDis;
+    double cDeg;
+    double cDis;
+    int orifX;
+    int orifY;
+    int oricX;
+    int oricY;
+    bool moveCFlag;
+    bool moveFFlag;
     bool curve;
     bool hover;
     bool bDummy;

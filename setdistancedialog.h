@@ -19,7 +19,6 @@ public:
 
     bool getHasValue() const;
 
-    bool getOk() const;
 
 
 public slots:
@@ -30,7 +29,6 @@ private:
     Ui::SetDistanceDialog *ui;
     double distance;
     void getDis();
-    bool ok;
 };
 
 #endif // SETDISTANCEDIALOG_H

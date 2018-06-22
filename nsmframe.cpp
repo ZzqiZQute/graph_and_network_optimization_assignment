@@ -3,6 +3,8 @@
 #include <QPainter>
 #include <QPaintEvent>
 #include <QMouseEvent>
+#include "setcapacityandcostdialog.h"
+#include "common.h"
 NSMFrame::NSMFrame(QWidget *parent):mParent(parent)
 {
     graph=new NSMGraph();
@@ -96,32 +98,65 @@ void NSMFrame::drawDemandsAndArcFlows(QPainter* painter){
 
     drawEdges(painter,DF);
     drawVertexs(painter,DF);
-    drawDemand(painter);
     drawSelects(painter);
 }
 
 void NSMFrame::drawCostAndDualVariables(QPainter* painter){
     drawEdges(painter,CV);
     drawVertexs(painter,CV);
-    drawDualVariable(painter);
     drawSelects(painter);
+}
+void NSMFrame::drawFlowAndCapacity(QPainter* painter,NSMVertexParam *param){
+    if(param->getCapacity()==POS_INFINITY){
+        painter->drawText(QRect(param->getFX()-param->getFWidth()/2,param->getFY()-VERTEX_SIZE/2,param->getFWidth(),VERTEX_SIZE)
+                          ,QString("%1 (∞)").arg(param->getFlow()),QTextOption(Qt::AlignCenter));
+    }else{
+        painter->drawText(QRect(param->getFX()-param->getFWidth()/2,param->getFY()-VERTEX_SIZE/2,param->getFWidth(),VERTEX_SIZE)
+                          ,QString("%1 (%2)").arg(param->getFlow()).arg(param->getCapacity()),QTextOption(Qt::AlignCenter));
+    }
+    painter->setPen(QPen());
+}
+void NSMFrame::drawCost(QPainter* painter,NSMVertexParam* param){
+    painter->drawText(QRect(param->getCX()-param->getCWidth()/2,param->getCY()-VERTEX_SIZE/2,param->getCWidth(),VERTEX_SIZE)
+                      ,QString::number(param->getCost()),QTextOption(Qt::AlignCenter));
+    painter->setPen(QPen());
 }
 void NSMFrame::drawVertexs(QPainter* painter,Type type){
     drawVertexsSelf(painter);
     if(type==DF){
-
+        drawDemand(painter);
     }else if(type==CV){
-
+        drawDualVariable(painter);
     }
 }
 void NSMFrame::drawEdges(QPainter* painter,Type type){
 
     painter->setPen(QPen());
-    if(type==DF){
-
-    }else if(type==CV){
+    for(int i=1;i<=graph->getCount();i++){
+        NSMVertex* v=graph->getVertexAt(i);
+        for(int j=0;j<v->getParams()->count();j++){
+            NSMVertexParam* param=v->getParams()->at(j);
+            NSMVertex* v1=graph->getVertexAt(param->getP());
+            NSMVertex* v2=v;
+            if(editable){
+                if(param->getHover())
+                    painter->setPen(QColor(Qt::red));
+            }else{
+            }
+            if(!param->getCurve()){
+                drawStraightEdge(painter,v1,v2);
+            }else{
+                drawCurveEdge(painter,v1,v2);
+            }
+            if(type==DF){
+                drawFlowAndCapacity(painter,param);
+            }else if(type==CV){
+                drawCost(painter,param);
+            }
+        }
 
     }
+
     if(createEdge){
         if(!findEdgeTail){
             NSMVertex* v=graph->getVertexAt(createEdgeVertexHead);
@@ -194,9 +229,8 @@ void NSMFrame::mousePressEvent(QMouseEvent *event)
                         for(int i=0;i<v->getParams()->count();i++){
                             NSMVertexParam* vp=v->getParams()->at(i);
                             NSMVertex* v1=graph->getVertexAt(vp->getP());
-                            vp->setDeg(calcDeg(v1->getCenterX(),v1->getCenterY(),vp->getX(),vp->getY())
-                                       -calcDeg(v1->getCenterX(),v1->getCenterY(),v->getCenterX(),v->getCenterY()));
-                            vp->setDis(calcDis(v1->getCenterX(),v1->getCenterY(),vp->getX(),vp->getY()));
+                            setDegAndDisByVertexMove(v1,v,vp);
+
                         }
                         for(int i=1;i<=graph->getCount();i++){
                             NSMVertex* v2=graph->getVertexAt(i);
@@ -205,9 +239,7 @@ void NSMFrame::mousePressEvent(QMouseEvent *event)
                                 NSMVertexParam *vp=v2->getParams()->at(j);
                                 if(vp->getP()==pos)
                                 {
-                                    vp->setDeg(calcDeg(v->getCenterX(),v->getCenterY(),vp->getX(),vp->getY())
-                                               -calcDeg(v->getCenterX(),v->getCenterY(),v2->getCenterX(),v2->getCenterY()));
-                                    vp->setDis(calcDis(v->getCenterX(),v->getCenterY(),vp->getX(),vp->getY()));
+                                    setDegAndDisByVertexMove(v,v2,vp);
                                 }
                             }
                         }
@@ -231,9 +263,7 @@ void NSMFrame::mousePressEvent(QMouseEvent *event)
                             for(int i=0;i<v->getParams()->count();i++){
                                 NSMVertexParam* vp=v->getParams()->at(i);
                                 NSMVertex* v1=graph->getVertexAt(vp->getP());
-                                vp->setDeg(calcDeg(v1->getCenterX(),v1->getCenterY(),vp->getX(),vp->getY())
-                                           -calcDeg(v1->getCenterX(),v1->getCenterY(),v->getCenterX(),v->getCenterY()));
-                                vp->setDis(calcDis(v1->getCenterX(),v1->getCenterY(),vp->getX(),vp->getY()));
+                                setDegAndDisByVertexMove(v1,v,vp);
                             }
                             for(int i=1;i<=graph->getCount();i++){
                                 NSMVertex* v2=graph->getVertexAt(i);
@@ -242,9 +272,7 @@ void NSMFrame::mousePressEvent(QMouseEvent *event)
                                     NSMVertexParam *vp=v2->getParams()->at(j);
                                     if(vp->getP()==pos)
                                     {
-                                        vp->setDeg(calcDeg(v->getCenterX(),v->getCenterY(),vp->getX(),vp->getY())
-                                                   -calcDeg(v->getCenterX(),v->getCenterY(),v2->getCenterX(),v2->getCenterY()));
-                                        vp->setDis(calcDis(v->getCenterX(),v->getCenterY(),vp->getX(),vp->getY()));
+                                        setDegAndDisByVertexMove(v,v2,vp);
                                     }
                                 }
                             }
@@ -264,25 +292,49 @@ void NSMFrame::mousePressEvent(QMouseEvent *event)
                 }
                 currentLMouseX=x;
                 currentLMouseY=y;
-                bool bBreak=false;
-                for(int i=1;i<=graph->getCount();i++){
-                    NSMVertex* v=graph->getVertexAt(i);
-                    for(int i=0;i<v->getParams()->count();i++){
-                        NSMVertexParam* param=v->getParams()->at(i);
-                        QPoint mouseReal=mouseToReal(x,y);
-                        if(mouseReal.x()<param->getX()+param->getWidth()/2&&
-                                mouseReal.x()>param->getX()-param->getWidth()/2&&
-                                mouseReal.y()<param->getY()+VERTEX_SIZE/2&&
-                                mouseReal.y()>param->getY()-VERTEX_SIZE/2){
-                            maybeMultiSelect=false;
-                            moveEdgeLabel=true;
-                            param->setMoveFlag(true);
-                            param->saveXY();
-                            bBreak=true;
-                            break;
+                if(x<painterRect.width()/2)
+                {
+                    bool bBreak=false;
+                    for(int i=1;i<=graph->getCount();i++){
+                        NSMVertex* v=graph->getVertexAt(i);
+                        for(int i=0;i<v->getParams()->count();i++){
+                            NSMVertexParam* param=v->getParams()->at(i);
+                            QPoint mouseReal=mouseToReal2(x,y);
+                            if(mouseReal.x()<param->getFX()+param->getFWidth()/2&&
+                                    mouseReal.x()>param->getFX()-param->getFWidth()/2&&
+                                    mouseReal.y()<param->getFY()+VERTEX_SIZE/2&&
+                                    mouseReal.y()>param->getFY()-VERTEX_SIZE/2){
+                                maybeMultiSelect=false;
+                                moveEdgeLabel=true;
+                                param->setMoveFFlag(true);
+                                param->saveFXY();
+                                bBreak=true;
+                                break;
+                            }
                         }
+                        if(bBreak)break;
                     }
-                    if(bBreak)break;
+                }else{
+                    bool bBreak=false;
+                    for(int i=1;i<=graph->getCount();i++){
+                        NSMVertex* v=graph->getVertexAt(i);
+                        for(int i=0;i<v->getParams()->count();i++){
+                            NSMVertexParam* param=v->getParams()->at(i);
+                            QPoint mouseReal=mouseToReal2(x-painterRect.width()/2,y);
+                            if(mouseReal.x()<param->getCX()+param->getCWidth()/2&&
+                                    mouseReal.x()>param->getCX()-param->getCWidth()/2&&
+                                    mouseReal.y()<param->getCY()+VERTEX_SIZE/2&&
+                                    mouseReal.y()>param->getCY()-VERTEX_SIZE/2){
+                                maybeMultiSelect=false;
+                                moveEdgeLabel=true;
+                                param->setMoveCFlag(true);
+                                param->saveCXY();
+                                bBreak=true;
+                                break;
+                            }
+                        }
+                        if(bBreak)break;
+                    }
                 }
             }else{
                 if(pos>0){
@@ -412,10 +464,16 @@ void NSMFrame::mouseMoveEvent(QMouseEvent *event)
 
                         QPoint p=calcTail(v1->getCenterX(),v1->getCenterY(),
                                           calcDeg(v1->getCenterX(),v1->getCenterY(),v->getCenterX(),v->getCenterY())
-                                          +vp->getDeg()
-                                          ,vp->getDis());
-                        vp->setX(p.x());
-                        vp->setY(p.y());
+                                          +vp->getCDeg()
+                                          ,vp->getCDis());
+                        vp->setCX(p.x());
+                        vp->setCY(p.y());
+                        p=calcTail(v1->getCenterX(),v1->getCenterY(),
+                                   calcDeg(v1->getCenterX(),v1->getCenterY(),v->getCenterX(),v->getCenterY())
+                                   +vp->getFDeg()
+                                   ,vp->getFDis());
+                        vp->setFX(p.x());
+                        vp->setFY(p.y());
                     }
                     for(int j=1;j<=graph->getCount();j++){
                         NSMVertex *v2=graph->getVertexAt(j);
@@ -425,10 +483,16 @@ void NSMFrame::mouseMoveEvent(QMouseEvent *event)
                             {
                                 QPoint p=calcTail(v->getCenterX(),v->getCenterY(),
                                                   calcDeg(v->getCenterX(),v->getCenterY(),v2->getCenterX(),v2->getCenterY())
-                                                  +vp2->getDeg()
-                                                  ,vp2->getDis());
-                                vp2->setX(p.x());
-                                vp2->setY(p.y());
+                                                  +vp2->getCDeg()
+                                                  ,vp2->getCDis());
+                                vp2->setCX(p.x());
+                                vp2->setCY(p.y());
+                                p=calcTail(v->getCenterX(),v->getCenterY(),
+                                           calcDeg(v->getCenterX(),v->getCenterY(),v2->getCenterX(),v2->getCenterY())
+                                           +vp2->getFDeg()
+                                           ,vp2->getFDis());
+                                vp2->setFX(p.x());
+                                vp2->setFY(p.y());
                             }
                         }
                     }
@@ -473,13 +537,21 @@ void NSMFrame::mouseMoveEvent(QMouseEvent *event)
                 NSMVertex* v=graph->getVertexAt(i);
                 for(int i=0;i<v->getParams()->count();i++){
                     NSMVertexParam* param=v->getParams()->at(i);
-                    if(param->getMoveFlag()){
-                        param->setX(param->getOrix()+(x-currentLMouseX)/winScale);
-                        param->setY(param->getOriy()+(y-currentLMouseY)/winScale);
+                    if(param->getMoveCFlag()){
+                        param->setCX(param->getOricX()+(x-currentLMouseX)/winScale);
+                        param->setCY(param->getOricY()+(y-currentLMouseY)/winScale);
                         NSMVertex* v1=graph->getVertexAt(param->getP());
-                        param->setDeg(calcDeg(v1->getCenterX(),v1->getCenterY(),param->getX(),param->getY())
-                                      -calcDeg(v1->getCenterX(),v1->getCenterY(),v->getCenterX(),v->getCenterY()));
-                        param->setDis(calcDis(v1->getCenterX(),v1->getCenterY(),param->getX(),param->getY()));
+                        param->setCDeg(calcDeg(v1->getCenterX(),v1->getCenterY(),param->getCX(),param->getCY())
+                                       -calcDeg(v1->getCenterX(),v1->getCenterY(),v->getCenterX(),v->getCenterY()));
+                        param->setCDis(calcDis(v1->getCenterX(),v1->getCenterY(),param->getCX(),param->getCY()));
+                    }
+                    if(param->getMoveFFlag()){
+                        param->setFX(param->getOrifX()+(x-currentLMouseX)/winScale);
+                        param->setFY(param->getOrifY()+(y-currentLMouseY)/winScale);
+                        NSMVertex* v1=graph->getVertexAt(param->getP());
+                        param->setFDeg(calcDeg(v1->getCenterX(),v1->getCenterY(),param->getFX(),param->getFY())
+                                       -calcDeg(v1->getCenterX(),v1->getCenterY(),v->getCenterX(),v->getCenterY()));
+                        param->setFDis(calcDis(v1->getCenterX(),v1->getCenterY(),param->getFX(),param->getFY()));
                     }
                 }
             }
@@ -489,13 +561,24 @@ void NSMFrame::mouseMoveEvent(QMouseEvent *event)
             for(int j=0;j<v->getParams()->count();j++){
                 NSMVertexParam* param=v->getParams()->at(j);
                 param->setHover(false);
-                QPoint mouseReal=mouseToReal(x,y);
-                if(mouseReal.x()<param->getX()+param->getWidth()/2&&
-                        mouseReal.x()>param->getX()-param->getWidth()/2&&
-                        mouseReal.y()<param->getY()+VERTEX_SIZE/2&&
-                        mouseReal.y()>param->getY()-VERTEX_SIZE/2){
+                if(x<painterRect.width()/2){
+                    QPoint mouseReal=mouseToReal2(x,y);
+                    if(mouseReal.x()<param->getFX()+param->getFWidth()/2&&
+                            mouseReal.x()>param->getFX()-param->getFWidth()/2&&
+                            mouseReal.y()<param->getFY()+VERTEX_SIZE/2&&
+                            mouseReal.y()>param->getFY()-VERTEX_SIZE/2){
 
-                    param->setHover(true);
+                        param->setHover(true);
+                    }
+                }else{
+                    QPoint mouseReal=mouseToReal2(x-painterRect.width()/2,y);
+                    if(mouseReal.x()<param->getCX()+param->getCWidth()/2&&
+                            mouseReal.x()>param->getCX()-param->getCWidth()/2&&
+                            mouseReal.y()<param->getCY()+VERTEX_SIZE/2&&
+                            mouseReal.y()>param->getCY()-VERTEX_SIZE/2){
+
+                        param->setHover(true);
+                    }
                 }
             }
             if(v->getSelected()){
@@ -505,10 +588,16 @@ void NSMFrame::mouseMoveEvent(QMouseEvent *event)
 
                     QPoint p=calcTail(v1->getCenterX(),v1->getCenterY(),
                                       calcDeg(v1->getCenterX(),v1->getCenterY(),v->getCenterX(),v->getCenterY())
-                                      +vp->getDeg()
-                                      ,vp->getDis());
-                    vp->setX(p.x());
-                    vp->setY(p.y());
+                                      +vp->getCDeg()
+                                      ,vp->getCDis());
+                    vp->setCX(p.x());
+                    vp->setCY(p.y());
+                    p=calcTail(v1->getCenterX(),v1->getCenterY(),
+                               calcDeg(v1->getCenterX(),v1->getCenterY(),v->getCenterX(),v->getCenterY())
+                               +vp->getFDeg()
+                               ,vp->getFDis());
+                    vp->setFX(p.x());
+                    vp->setFY(p.y());
                 }
                 for(int j=1;j<=graph->getCount();j++){
                     NSMVertex *v2=graph->getVertexAt(j);
@@ -518,10 +607,16 @@ void NSMFrame::mouseMoveEvent(QMouseEvent *event)
                         {
                             QPoint p=calcTail(v->getCenterX(),v->getCenterY(),
                                               calcDeg(v->getCenterX(),v->getCenterY(),v2->getCenterX(),v2->getCenterY())
-                                              +vp2->getDeg()
-                                              ,vp2->getDis());
-                            vp2->setX(p.x());
-                            vp2->setY(p.y());
+                                              +vp2->getCDeg()
+                                              ,vp2->getCDis());
+                            vp2->setCX(p.x());
+                            vp2->setCY(p.y());
+                            p=calcTail(v->getCenterX(),v->getCenterY(),
+                                       calcDeg(v->getCenterX(),v->getCenterY(),v2->getCenterX(),v2->getCenterY())
+                                       +vp2->getFDeg()
+                                       ,vp2->getFDis());
+                            vp2->setFX(p.x());
+                            vp2->setFY(p.y());
                         }
                     }
                 }
@@ -565,8 +660,44 @@ void NSMFrame::mouseReleaseEvent(QMouseEvent *event)
                 if(findEdgeTail){
                     if(createEdgeVertexHead!=createEdgeVertexTail){
                         NSMVertex * v=graph->getVertexAt(createEdgeVertexTail);
-
-                        if(false){
+                        SetCapacityAndCostDialog dialog(this);
+                        if(dialog.exec()==QDialog::Accepted){
+                            int cost=dialog.getCost();
+                            int capacity=dialog.getCapacity();
+                            NSMVertex* v1=graph->getVertexAt(createEdgeVertexHead);
+                            QPoint edgeCenter=calcEdgeCenter(v1,v);
+                            int deg=calcDeg(v1->getCenterX(),v1->getCenterY(),v->getCenterX(),v->getCenterY())-90;
+                            QPoint disText=calcTail(edgeCenter.x(),edgeCenter.y(),deg,VERTEX_SIZE);
+                            NSMVertexParam* vp=new NSMVertexParam(createEdgeVertexHead,cost,capacity);
+                            for(int i=0;i<v1->getParams()->count();i++){
+                                NSMVertexParam *vp1=v1->getParams()->at(i);
+                                if(vp1->getP()==createEdgeVertexTail){
+                                    vp1->setCurve(true);
+                                    vp->setCurve(true);
+                                    break;
+                                }
+                            }
+                            vp->setFX(disText.x());
+                            vp->setFY(disText.y());
+                            int width;
+                            if(vp->getCapacity()==POS_INFINITY){
+                                width= QFontMetrics(QFont("微软雅黑",15)).horizontalAdvance(QString("%1 (∞)").arg(vp->getFlow()));
+                            }else{
+                                width= QFontMetrics(QFont("微软雅黑",15)).horizontalAdvance(QString("%1 (%2)").arg(vp->getFlow()).arg(vp->getCapacity()));
+                            }
+                            vp->setFWidth(width);
+                            vp->setFDeg(calcDeg(v1->getCenterX(),v1->getCenterY(),vp->getFX(),vp->getFY())
+                                        -calcDeg(v1->getCenterX(),v1->getCenterY(),v->getCenterX(),v->getCenterY()));
+                            vp->setFDis(calcDis(v1->getCenterX(),v1->getCenterY(),vp->getFX(),vp->getFY()));
+                            disText=calcTail(edgeCenter.x(),edgeCenter.y(),deg,VERTEX_SIZE/2);
+                            vp->setCX(disText.x());
+                            vp->setCY(disText.y());
+                            width=QFontMetrics(QFont("微软雅黑",15)).horizontalAdvance(QString("%1").arg(vp->getCost()));
+                            vp->setCWidth(width);
+                            vp->setCDeg(calcDeg(v1->getCenterX(),v1->getCenterY(),vp->getCX(),vp->getCY())
+                                        -calcDeg(v1->getCenterX(),v1->getCenterY(),v->getCenterX(),v->getCenterY()));
+                            vp->setCDis(calcDis(v1->getCenterX(),v1->getCenterY(),vp->getCX(),vp->getCY()));
+                            v->addVertexParams(vp);
 
                         }else{
                             bool b=false;
@@ -599,7 +730,8 @@ void NSMFrame::mouseReleaseEvent(QMouseEvent *event)
                 NSMVertex* v=graph->getVertexAt(i);
                 for(int i=0;i<v->getParams()->count();i++){
                     NSMVertexParam* param=v->getParams()->at(i);
-                    param->setMoveFlag(false);
+                    param->setMoveCFlag(false);
+                    param->setMoveFFlag(false);
                 }
             }
         }
@@ -845,6 +977,39 @@ void NSMFrame::drawStraightEdge(QPainter* painter,NSMVertex* v1,NSMVertex* v2)
 
     }
 }
+void NSMFrame::drawCurveEdge(QPainter* painter,NSMVertex* v1,NSMVertex* v2)
+{
+    QPoint vCenter=QPoint(v1->getCenterX(),v1->getCenterY());
+    int deg=calcDeg(v2->getCenterX(),v2->getCenterY(),v1->getCenterX(),v1->getCenterY());
+    QPoint realPoint=calcTail(v2->getCenterX(),v2->getCenterY(),deg,VERTEX_SIZE/2);
+    QPoint startPoint;
+    QPoint middlePoint;
+    int length=sqrt((realPoint.x()-vCenter.x())*(realPoint.x()-vCenter.x())+
+                    (realPoint.y()-vCenter.y())*(realPoint.y()-vCenter.y()));
+    int c=VERTEX_SIZE/2+1;
+    if(length>c){
+        startPoint.setX(c*(realPoint.x()-vCenter.x())/length+vCenter.x());
+        startPoint.setY(c*(realPoint.y()-vCenter.y())/length+vCenter.y());
+
+        double deg=calcDeg(startPoint.x(),startPoint.y(),realPoint.x(),realPoint.y());
+        int degoffset=30;
+        deg-=degoffset;
+        middlePoint=calcTail(startPoint.x(),startPoint.y(),deg,length/2/cos(degoffset*PI/180));
+        QPainterPath path(QPointF(startPoint.x(),startPoint.y()));
+        path.quadTo(QPointF(middlePoint.x(),middlePoint.y()),QPointF(realPoint.x(),realPoint.y()));
+        painter->setBrush(QBrush(Qt::transparent));
+        painter->drawPath(path);
+        deg=calcDeg(realPoint.x(),realPoint.y(),startPoint.x(),startPoint.y());
+        deg+=degoffset;
+        for(int j=-30;j<=30;j++)
+        {
+            QPoint p=calcTail(realPoint.x(),realPoint.y(),deg+j,VERTEX_SIZE/8/cos(j*PI/180));
+            painter->drawLine(realPoint,p);
+        }
+
+    }
+}
+
 void NSMFrame::drawDemand(QPainter* painter){
     painter->setBrush(Qt::white);
     painter->setFont(QFont("微软雅黑",15));
@@ -909,4 +1074,17 @@ void NSMFrame::MoveVertexLabel(NSMVertex* v){
     }
     v->saveBCenter();
     v->savePiCenter();
+}
+QPoint NSMFrame::calcEdgeCenter(NSMVertex* v1,NSMVertex* v2){
+    return  QPoint((v1->getCenterX()+v2->getCenterX())/2,(v1->getCenterY()+v2->getCenterY())/2);
+}
+void NSMFrame::setDegAndDisByVertexMove(NSMVertex* v1,NSMVertex* v2,NSMVertexParam* vp){
+
+    vp->setCDeg(calcDeg(v1->getCenterX(),v1->getCenterY(),vp->getCX(),vp->getCY())
+                -calcDeg(v1->getCenterX(),v1->getCenterY(),v2->getCenterX(),v2->getCenterY()));
+    vp->setCDis(calcDis(v1->getCenterX(),v1->getCenterY(),vp->getCX(),vp->getCY()));
+
+    vp->setFDeg(calcDeg(v1->getCenterX(),v1->getCenterY(),vp->getFX(),vp->getFY())
+                -calcDeg(v1->getCenterX(),v1->getCenterY(),v2->getCenterX(),v2->getCenterY()));
+    vp->setFDis(calcDis(v1->getCenterX(),v1->getCenterY(),vp->getFX(),vp->getFY()));
 }

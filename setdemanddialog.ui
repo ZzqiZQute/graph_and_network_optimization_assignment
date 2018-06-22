@@ -2,12 +2,15 @@
 <ui version="4.0">
  <class>SetDemandDialog</class>
  <widget class="QDialog" name="SetDemandDialog">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>308</width>
-    <height>82</height>
+    <width>380</width>
+    <height>86</height>
    </rect>
   </property>
   <property name="windowTitle">

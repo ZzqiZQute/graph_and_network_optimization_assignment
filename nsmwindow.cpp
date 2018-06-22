@@ -57,7 +57,7 @@ void NSMWindow::addVertex(){
                 v->setCenterX(VERTEX_SIZE/2);
                 v->setCenterY(lasty+VERTEX_SIZE*3);
             }else{
-                v->setCenterX(lastx+VERTEX_SIZE);
+                v->setCenterX(lastx+VERTEX_SIZE*3/2);
                 v->setCenterY(lasty);
             }
 
