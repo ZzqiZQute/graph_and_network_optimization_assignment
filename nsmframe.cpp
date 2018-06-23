@@ -60,6 +60,7 @@ void NSMFrame::paintEvent(QPaintEvent *event)
     painter.translate(winOffsetX,winOffsetY);
     painter.scale(winScale,winScale);
     drawCostAndDualVariables(&painter);
+    event->accept();
 }
 void NSMFrame::drawSelects(QPainter* painter){
     if(maybeMultiSelect){
@@ -145,6 +146,7 @@ void NSMFrame::drawEdges(QPainter* painter,Type type){
                 if(param->getHover())
                     painter->setPen(QColor(Qt::red));
             }else{
+
             }
             if(!param->getCurve()){
                 drawStraightEdge(painter,v1,v2);
@@ -685,7 +687,7 @@ void NSMFrame::mouseReleaseEvent(QMouseEvent *event)
                         if(pos>3)
                             pos=0;
                         v->setLabelPos(pos);
-                        MoveVertexLabel(v);
+                        moveVertexLabel(v);
                     }
                 }
                 v->saveCenter();
@@ -1099,7 +1101,7 @@ void NSMFrame::drawDualVariable(QPainter* painter){
         }
     }
 }
-void NSMFrame::MoveVertexLabel(NSMVertex* v){
+void NSMFrame::moveVertexLabel(NSMVertex* v){
     int pos=v->getLabelPos();
     switch(pos)
     {

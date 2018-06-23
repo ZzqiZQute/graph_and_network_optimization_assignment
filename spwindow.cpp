@@ -24,6 +24,7 @@ SPWindow::SPWindow(QWidget *parent) :
 }
 void SPWindow::closeEvent(QCloseEvent *event){
     ((LaunchDialog*)parent())->show();
+    event->accept();
 }
 
 QWidget *SPWindow::parent() const

@@ -17,6 +17,10 @@ public:
     int ctsma();
     int getLastX();
     int getLastY();
+    QList<NSMGraphData *> *getGraphData() const;
+
+    BaseMatrix *getBaseMatrix() const;
+
 private:
     QList<NSMVertex*> *vertexs;
     BaseMatrix* baseMatrix;
@@ -24,9 +28,9 @@ private:
     int count;
     void calcPi();
     void changeBaseVector(int phase);
-    QList<NSMGraphData*> *graphDatas;
+    QList<NSMGraphData*> *graphData;
 
-    void saveGraphData(int phase);
+    void addGraphData(int phase);
 };
 
 #endif // NSMGRAPH_H

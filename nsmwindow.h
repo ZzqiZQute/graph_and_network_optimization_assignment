@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 class NSMFrame;
+class NSMGraphData;
 namespace Ui {
 class NSMWindow;
 }
@@ -23,14 +24,19 @@ public slots:
     void onBtnCalcClicked();
     void onBtnRemoveAllVertexClicked();
     void onRadioBtnEditModeToggled(bool b);
+    void onActionOpen();
+    void onActionSave();
 protected:
     void closeEvent(QCloseEvent *event);
 private:
     QWidget* mParent;
     Ui::NSMWindow *ui;
     NSMFrame* nsm;
+    NSMGraphData* oriGraphData;
     void init();
     void addVertex();
+    void saveOriGraphData();
+    void loadOriGraphData();
 };
 
 #endif // NSMWINDOW_H

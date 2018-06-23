@@ -5,7 +5,7 @@ NSMGraph::NSMGraph()
     vertexs=new QList<NSMVertex*>();
     baseMatrix=new BaseMatrix();
     vertexs->push_back(new NSMVertex());
-    graphDatas=new QList<NSMGraphData*>();
+    graphData=new QList<NSMGraphData*>();
     count=0;
     dummy=NULL;
 }
@@ -14,8 +14,8 @@ NSMGraph::~NSMGraph()
 {
     vertexs->clear();
     baseMatrix->clearVectors();
-    graphDatas->clear();
-    delete graphDatas;
+    graphData->clear();
+    delete graphData;
     delete baseMatrix;
     delete vertexs;
 }
@@ -74,7 +74,7 @@ int NSMGraph::getCount() const
 
 int NSMGraph::ctsma()
 {
-    graphDatas->clear();
+    graphData->clear();
     dummy=new NSMVertex();
     baseMatrix->clearVectors();
     for(int i=1;i<=count;i++){
@@ -98,7 +98,11 @@ int NSMGraph::ctsma()
     addVertex(dummy);
 
     for(int i=1;i<count;i++){
-        baseMatrix->addVector(new BaseVector(count,i));
+        NSMVertex* v=getVertexAt(i);
+        if(v->getB()<0)
+            baseMatrix->addVector(new BaseVector(i,count));
+        else
+            baseMatrix->addVector(new BaseVector(count,i));
     }
 
 
@@ -193,7 +197,7 @@ void NSMGraph::changeBaseVector(int phase){
 
     bool loop=true;
     while(loop){
-        saveGraphData(phase);
+        addGraphData(phase);
         loop=false;
         calcPi();
         BaseVector bv;
@@ -285,6 +289,16 @@ void NSMGraph::changeBaseVector(int phase){
 
 }
 
+QList<NSMGraphData *> *NSMGraph::getGraphData() const
+{
+    return graphData;
+}
+
+BaseMatrix *NSMGraph::getBaseMatrix() const
+{
+    return baseMatrix;
+}
+
 int NSMGraph::getLastX()
 {
     return vertexs->at(count)->getCenterX();
@@ -294,7 +308,7 @@ int NSMGraph::getLastY()
 {
     return vertexs->at(count)->getCenterY();
 }
-void NSMGraph::saveGraphData(int phase){
+void NSMGraph::addGraphData(int phase){
     NSMGraphData* gd=new NSMGraphData(phase);
     for(int i=1;i<=count;i++){
         NSMVertex* v=getVertexAt(i);
@@ -319,5 +333,5 @@ void NSMGraph::saveGraphData(int phase){
     for(int i=0;i<baseMatrix->getVectors()->count();i++){
         gd->getBaseMatrix()->addVector(baseMatrix->getVectors()->at(i));
     }
-    graphDatas->append(gd);
+    graphData->append(gd);
 }

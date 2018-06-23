@@ -24,11 +24,12 @@ public:
     int getWinOffsetY() const;
     void setWinOffsetY(int value);
     NSMGraph* getGraph();
-    void MoveVertexLabel(NSMVertex *v);
+    void moveVertexLabel(NSMVertex *v);
 
     void reset();
     bool getEditable() const;
     void setEditable(bool value);
+    void saveWinOffset();
 
 
 
@@ -81,7 +82,6 @@ private:
     QPoint mouseToReal(int x, int y);
     QPoint realToMouse(int x, int y);
     void init();
-    void saveWinOffset();
     void drawDemandsAndArcFlowsFrame(QPainter *painter);
     void drawCostAndDualVariablesFrame(QPainter *painter);
     void drawVertexs(QPainter *painter, Type type);
