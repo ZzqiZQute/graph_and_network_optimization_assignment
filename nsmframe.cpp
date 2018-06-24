@@ -11,6 +11,8 @@ NSMFrame::NSMFrame(QWidget *parent):mParent(parent)
 {
     graph=new NSMGraph();
     refresh=false;
+    dummyVertex=NULL;
+    currentGraphData=NULL;
     init();
     setMouseTracking(true);
 }
@@ -189,7 +191,7 @@ void NSMFrame::drawVertexsSelf(QPainter* painter){
             if(v->getSelected()){
                 painter->setBrush(QBrush(QColor(234,234,234)));
             }else{
-                painter->setBrush(QBrush(QColor(Qt::white)));
+                painter->setBrush(QBrush(QColor(Qt::transparent)));
             }if(keyCtrlDown){
                 painter->setPen(QPen(Qt::black,2));
             }else
@@ -208,8 +210,12 @@ void NSMFrame::drawDemandsAndArcFlowsFrame(QPainter* painter){
     painter->drawRect(painter->window().adjusted(0,0,-1,-1));
     painter->drawText(10,20,"Demands and Arc Flows");
     painter->drawText(10,40,"方框内为需求，括号外为流，括号内为容量");
-    painter->setPen(QPen());
     painter->setFont(QFont("微软雅黑",15));
+    if(currentGraphData!=NULL){
+        painter->drawText(10,80,QString("Phase:%1").arg(currentGraphData->getPhase()));
+    }
+    painter->setPen(QPen());
+
 }
 
 void NSMFrame::drawCostAndDualVariablesFrame(QPainter* painter){
@@ -218,8 +224,12 @@ void NSMFrame::drawCostAndDualVariablesFrame(QPainter* painter){
     painter->drawRect(painter->window().adjusted(1,1,0,0));
     painter->drawText(10,20,"Cost and Dual Variables");
     painter->drawText(10,40,"方框内为对偶变量，括号外为费用，括号内为检验数");
-    painter->setPen(QPen());
     painter->setFont(QFont("微软雅黑",15));
+    if(currentGraphData!=NULL){
+        painter->drawText(10,80,QString("Phase:%1").arg(currentGraphData->getPhase()));
+    }
+    painter->setPen(QPen());
+
 }
 void NSMFrame::mousePressEvent(QMouseEvent *event)
 {
@@ -951,6 +961,7 @@ void NSMFrame::saveWinOffset()
     winOriOffsetX=winOffsetX;
     winOriOffsetY=winOffsetY;
 }
+
 QPoint NSMFrame::mouseToReal(int x,int y)
 {
     int width=painterRect.width();
@@ -1145,4 +1156,88 @@ void NSMFrame::setDegAndDisByVertexMove(NSMVertex* v1,NSMVertex* v2,NSMVertexPar
     vp->setFDeg(calcDeg(v1->getCenterX(),v1->getCenterY(),vp->getFX(),vp->getFY())
                 -calcDeg(v1->getCenterX(),v1->getCenterY(),v2->getCenterX(),v2->getCenterY()));
     vp->setFDis(calcDis(v1->getCenterX(),v1->getCenterY(),vp->getFX(),vp->getFY()));
+}
+void NSMFrame::setGraphData(int num){
+    NSMGraphData* data=graph->getGraphData()->at(num);
+    currentGraphData=data;
+    if(dummyVertex!=NULL){
+        delete dummyVertex;
+        dummyVertex=NULL;
+    }
+    QFontMetrics metrics(QFont("微软雅黑",15));
+    for(int i=1;i<=graph->getCount();i++){
+        NSMVertex* v=graph->getVertexAt(i);
+        NSMVertexData* vd=data->getVertexDatas()->at(i-1);
+        v->setB(vd->getB());
+        v->setBWidth(30+metrics.horizontalAdvance(QString::number(v->getB())));
+        v->setPi(vd->getPi());
+        if(v->getPi()==POS_INFINITY){
+            v->setPiWidth(30+metrics.horizontalAdvance("∞"));
+        }else{
+            v->setPiWidth(30+metrics.horizontalAdvance(QString::number(v->getPi())));
+        }
+        for(int j=0;j<v->getParams()->count();j++){
+            NSMVertexParam* p=v->getParams()->at(j);
+            NSMVertexParamData* pd=vd->getParams()->at(j);
+
+            p->setC(pd->getC());
+            p->setCapacity(pd->getCapacity());
+            p->setCost(pd->getCost());
+            p->setFlow(pd->getFlow());
+            p->setP(pd->getP());
+            p->setRc(pd->getRc());
+            int width=metrics.horizontalAdvance(QString("%1 [%2]").arg(p->getCost()).arg(p->getRc()));
+            p->setCWidth(width);
+            if(p->getCapacity()==POS_INFINITY){
+                width= metrics.horizontalAdvance(QString("%1 (∞)").arg(p->getFlow()));
+            }else{
+                width= metrics.horizontalAdvance(QString("%1 (%2)").arg(p->getFlow()).arg(p->getCapacity()));
+            }
+            p->setFWidth(width);
+
+        }
+    }
+    if(data->getVertexDatas()->count()>graph->getCount()){
+        dummyVertex=new NSMVertex(0);
+        NSMVertex* v=dummyVertex;
+        NSMVertexData* vd=data->getVertexDatas()->at(data->getVertexDatas()->count()-1);
+        v->setB(vd->getB());
+        v->setBWidth(30+metrics.horizontalAdvance(QString::number(v->getB())));
+        v->setPi(vd->getPi());
+        if(v->getPi()==POS_INFINITY){
+            v->setPiWidth(30+metrics.horizontalAdvance("∞"));
+        }else{
+            v->setPiWidth(30+metrics.horizontalAdvance(QString::number(v->getPi())));
+        }
+        for(int j=0;j<v->getParams()->count();j++){
+            NSMVertexParam* p=v->getParams()->at(j);
+            NSMVertexParamData* pd=vd->getParams()->at(j);
+
+            p->setC(pd->getC());
+            p->setCapacity(pd->getCapacity());
+            p->setCost(pd->getCost());
+            p->setFlow(pd->getFlow());
+            p->setP(pd->getP());
+            p->setRc(pd->getRc());
+            int width=metrics.horizontalAdvance(QString("%1 [%2]").arg(p->getCost()).arg(p->getRc()));
+            p->setCWidth(width);
+            if(p->getCapacity()==POS_INFINITY){
+                width= metrics.horizontalAdvance(QString("%1 (∞)").arg(p->getFlow()));
+            }else{
+                width= metrics.horizontalAdvance(QString("%1 (%2)").arg(p->getFlow()).arg(p->getCapacity()));
+            }
+            p->setFWidth(width);
+
+        }
+    }
+    update();
+}
+
+void NSMFrame::clearCurrentGraphData()
+{
+    currentGraphData=NULL;
+}
+void NSMFrame::setCurrentGraphData(NSMGraphData* data)
+{
+    currentGraphData=data;
 }

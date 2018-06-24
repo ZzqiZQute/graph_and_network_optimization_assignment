@@ -23,8 +23,6 @@ public:
 
 public slots:
     void onBtnOkClicked();
-protected:
-    void accept();
 private:
     Ui::SetDistanceDialog *ui;
     double distance;

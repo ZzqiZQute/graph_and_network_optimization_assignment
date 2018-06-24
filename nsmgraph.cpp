@@ -134,6 +134,7 @@ int NSMGraph::ctsma()
             }
         }
         changeBaseVector(2);
+        addGraphData(2);
 
     }
 
@@ -297,6 +298,18 @@ QList<NSMGraphData *> *NSMGraph::getGraphData() const
 BaseMatrix *NSMGraph::getBaseMatrix() const
 {
     return baseMatrix;
+}
+
+void NSMGraph::clearVerticesStates()
+{
+    for(int i=1;i<=count;i++){
+        NSMVertex* v=getVertexAt(i);
+        for(int j=0;j<v->getParams()->count();j++){
+            NSMVertexParam* vp=v->getParams()->at(j);
+            vp->setMoveCFlag(false);
+            vp->setMoveFFlag(false);
+        }
+    }
 }
 
 int NSMGraph::getLastX()

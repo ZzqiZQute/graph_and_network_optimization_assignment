@@ -26,6 +26,10 @@ public slots:
     void onRadioBtnEditModeToggled(bool b);
     void onActionOpen();
     void onActionSave();
+    void onBtnPrevClicked();
+    void onBtnNextClicked();
+    void onCbStepCurrentIndexChanged(int num);
+
 protected:
     void closeEvent(QCloseEvent *event);
 private:

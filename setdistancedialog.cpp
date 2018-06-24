@@ -30,11 +30,6 @@ void SetDistanceDialog::onBtnOkClicked(){
     this->close();
 }
 
-
-void SetDistanceDialog::accept(){
-    getDis();
-    QDialog::accept();
-}
 void SetDistanceDialog::getDis(){
     QString s=ui->lineEdit->text();
     bool b;

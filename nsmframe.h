@@ -11,7 +11,7 @@ class NSMFrame : public QFrame
     Q_OBJECT
 public:
     enum Type{
-     DF,CV
+        DF,CV
     };
     explicit NSMFrame(QWidget* parent=0);
     ~NSMFrame();
@@ -30,9 +30,9 @@ public:
     bool getEditable() const;
     void setEditable(bool value);
     void saveWinOffset();
-
-
-
+    void setGraphData(int num);
+    void clearCurrentGraphData();
+    void setCurrentGraphData(NSMGraphData *data);
 protected:
     void paintEvent(QPaintEvent *event);
     void mousePressEvent(QMouseEvent *event);
@@ -43,6 +43,7 @@ protected:
     void keyReleaseEvent(QKeyEvent *event);
 private:
     NSMGraph* graph;
+    NSMVertex* dummyVertex;
     double winScale;
     int winOffsetX;
     int winOffsetY;
@@ -77,6 +78,7 @@ private:
     bool editable;
     QWidget* mParent;
     QRect painterRect;
+    NSMGraphData* currentGraphData;
     void drawDemandsAndArcFlows(QPainter *painter);
     void drawCostAndDualVariables(QPainter *painter);
     QPoint mouseToReal(int x, int y);

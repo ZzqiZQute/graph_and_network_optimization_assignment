@@ -155,7 +155,7 @@ int SPGraph::floyd(){
                 }
             }
 
-        if(count<=FLOYDMAXDISPLAY){//只显示50条
+        if(count<=FLOYDMAXDISPLAY){
             calcResult<<"第"+QString::number(k)+"次计算";
             calcResult<<"P:";
             QString temp="┌";

@@ -20,7 +20,7 @@ public:
     QList<NSMGraphData *> *getGraphData() const;
 
     BaseMatrix *getBaseMatrix() const;
-
+ void clearVerticesStates();
 private:
     QList<NSMVertex*> *vertexs;
     BaseMatrix* baseMatrix;

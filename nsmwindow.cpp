@@ -34,7 +34,7 @@ NSMWindow::~NSMWindow()
 {
     delete ui;
     if(oriGraphData!=NULL){
-       delete oriGraphData;
+        delete oriGraphData;
     }
 
 }
@@ -43,10 +43,13 @@ void NSMWindow::init(){
     oriGraphData=NULL;
     connect(ui->btnAddVertex,SIGNAL(clicked()),this,SLOT(onBtnAddVertexClicked()));
     connect(ui->btnRemoveAllVertex,SIGNAL(clicked()),this,SLOT(onBtnRemoveAllVertexClicked()));
+    connect(ui->btnNext,SIGNAL(clicked()),this,SLOT(onBtnNextClicked()));
+    connect(ui->btnPrev,SIGNAL(clicked()),this,SLOT(onBtnPrevClicked()));
     connect(ui->rbEditMode,SIGNAL(toggled(bool)),this,SLOT(onRadioBtnEditModeToggled(bool)));
     connect(ui->btnCalculate,SIGNAL(clicked()),this,SLOT(onBtnCalcClicked()));
     connect(ui->actionOpen,SIGNAL(triggered()),this,SLOT(onActionOpen()));
     connect(ui->actionSave,SIGNAL(triggered()),this,SLOT(onActionSave()));
+    connect(ui->cbStep,SIGNAL(currentIndexChanged(int)),this,SLOT(onCbStepCurrentIndexChanged(int)));
 
 }
 void NSMWindow::addVertex(){
@@ -98,11 +101,25 @@ void NSMWindow::onBtnCalcClicked(){
     }
     ui->rbEditMode->setChecked(false);
     loadOriGraphData();
+    nsm->setCurrentGraphData(oriGraphData);
     if(ERROR_CODE!=nsm->getGraph()->ctsma()){
-        QList<NSMGraphData*>* data=nsm->getGraph()->getGraphData();
+        QList<NSMGraphData*>* dataList=nsm->getGraph()->getGraphData();
+        disconnect(ui->cbStep,SIGNAL(currentIndexChanged(int)),this,SLOT(onCbStepCurrentIndexChanged(int)));
         ui->cbStep->clear();
-        for(int i=1;i<=data->count();i++){
-            ui->cbStep->addItem(QString::number(i));
+        connect(ui->cbStep,SIGNAL(currentIndexChanged(int)),this,SLOT(onCbStepCurrentIndexChanged(int)));
+        int p1=0;
+        int p2=0;
+        for(int i=0;i<dataList->count();i++){
+            NSMGraphData* data=dataList->at(i);
+            if(data->getPhase()==1){
+                p1++;
+                ui->cbStep->addItem(QString("Phase1:%1").arg(p1));
+            }else if(data->getPhase()==2){
+                p2++;
+                ui->cbStep->addItem(QString("Phase2:%1").arg(p2));
+            }else{
+
+            }
         }
         ui->cbStep->setCurrentIndex(ui->cbStep->count()-1);
     }else{
@@ -124,15 +141,25 @@ void NSMWindow::onBtnRemoveAllVertexClicked(){
 void NSMWindow::onRadioBtnEditModeToggled(bool b){
     if(b){
         loadOriGraphData();
+        nsm->clearCurrentGraphData();
         nsm->setEditable(true);
+        nsm->clearState();
+        nsm->getGraph()->clearVerticesStates();
         ui->btnAddVertex->setEnabled(true);
         ui->btnRemoveAllVertex->setEnabled(true);
+        ui->btnPrev->setEnabled(false);
+        ui->btnNext->setEnabled(false);
+        ui->cbStep->setEnabled(false);
     }
     else
     {
+        ui->cbStep->setCurrentIndex(ui->cbStep->count()-1);
         nsm->setEditable(false);
         ui->btnAddVertex->setEnabled(false);
         ui->btnRemoveAllVertex->setEnabled(false);
+        ui->btnPrev->setEnabled(true);
+        ui->btnNext->setEnabled(true);
+        ui->cbStep->setEnabled(true);
     }
     nsm->setFocus();
     nsm->update();
@@ -220,6 +247,8 @@ void NSMWindow::onActionOpen(){
                     file.read((char*)&tempint,sizeof(int));
                     vp->setP(tempint);
                     v->addVertexParams(vp);
+                    vp->saveCXY();
+                    vp->saveFXY();
 
 
                 }
@@ -233,6 +262,8 @@ void NSMWindow::onActionOpen(){
             }
             nsm->saveWinOffset();
             ui->rbEditMode->setChecked(true);
+            nsm->clearState();
+            nsm->getGraph()->clearVerticesStates();
             update();
         }
 
@@ -359,22 +390,39 @@ void NSMWindow::saveOriGraphData(){
 
 }
 void NSMWindow::loadOriGraphData(){
+    QFontMetrics metrics(QFont("微软雅黑",15));
     NSMGraph* graph=nsm->getGraph();
     if(oriGraphData!=NULL){
         for(int i=1;i<=graph->getCount();i++){
             NSMVertex* v=graph->getVertexAt(i);
             NSMVertexData* vd=oriGraphData->getVertexDatas()->at(i-1);
             v->setB(vd->getB());
+            v->setBWidth(30+metrics.horizontalAdvance(QString::number(v->getB())));
             v->setPi(vd->getPi());
+            if(v->getPi()==POS_INFINITY){
+                v->setPiWidth(30+metrics.horizontalAdvance("∞"));
+            }else{
+                v->setPiWidth(30+metrics.horizontalAdvance(QString::number(v->getPi())));
+            }
             for(int j=0;j<v->getParams()->count();j++){
                 NSMVertexParam* p=v->getParams()->at(j);
                 NSMVertexParamData* pd=vd->getParams()->at(j);
+
                 p->setC(pd->getC());
                 p->setCapacity(pd->getCapacity());
                 p->setCost(pd->getCost());
                 p->setFlow(pd->getFlow());
                 p->setP(pd->getP());
                 p->setRc(pd->getRc());
+                int width=metrics.horizontalAdvance(QString("%1 [%2]").arg(p->getCost()).arg(p->getRc()));
+                p->setCWidth(width);
+                if(p->getCapacity()==POS_INFINITY){
+                    width= metrics.horizontalAdvance(QString("%1 (∞)").arg(p->getFlow()));
+                }else{
+                    width= metrics.horizontalAdvance(QString("%1 (%2)").arg(p->getFlow()).arg(p->getCapacity()));
+                }
+                p->setFWidth(width);
+
             }
 
 
@@ -383,5 +431,24 @@ void NSMWindow::loadOriGraphData(){
 
 
 }
+void NSMWindow::onBtnPrevClicked(){
+    int i=ui->cbStep->currentIndex();
+    if(i>0){
+        i--;
+    }
+    ui->cbStep->setCurrentIndex(i);
 
+}
+
+
+void NSMWindow::onBtnNextClicked(){
+    int i=ui->cbStep->currentIndex();
+    if(i<nsm->getGraph()->getGraphData()->count()-1){
+        i++;
+    }
+    ui->cbStep->setCurrentIndex(i);
+}
+void NSMWindow::onCbStepCurrentIndexChanged(int num){
+    nsm->setGraphData(num);
+}
 
