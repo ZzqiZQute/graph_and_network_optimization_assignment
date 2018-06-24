@@ -36,11 +36,9 @@ private:
     QWidget* mParent;
     Ui::NSMWindow *ui;
     NSMFrame* nsm;
-    NSMGraphData* oriGraphData;
     void init();
     void addVertex();
-    void saveOriGraphData();
-    void loadOriGraphData();
+
 };
 
 #endif // NSMWINDOW_H

@@ -33,14 +33,11 @@ QWidget *NSMWindow::parent() const
 NSMWindow::~NSMWindow()
 {
     delete ui;
-    if(oriGraphData!=NULL){
-        delete oriGraphData;
-    }
+
 
 }
 void NSMWindow::init(){
     nsm=ui->nsm;
-    oriGraphData=NULL;
     connect(ui->btnAddVertex,SIGNAL(clicked()),this,SLOT(onBtnAddVertexClicked()));
     connect(ui->btnRemoveAllVertex,SIGNAL(clicked()),this,SLOT(onBtnRemoveAllVertexClicked()));
     connect(ui->btnNext,SIGNAL(clicked()),this,SLOT(onBtnNextClicked()));
@@ -79,10 +76,10 @@ void NSMWindow::addVertex(){
         v->saveBCenter();
         nsm->moveVertexLabel(v);
         int width=QFontMetrics(QFont("微软雅黑",15)).horizontalAdvance(QString::number(dialog.getDemand()));
-        v->setBWidth(width+30);
+        v->setBWidth(width+LABELLRMARGIN);
         v->setB(dialog.getDemand());
         width=QFontMetrics(QFont("微软雅黑",15)).horizontalAdvance("∞");
-        v->setPiWidth(width+30);
+        v->setPiWidth(width+LABELLRMARGIN);
         v->setPi(POS_INFINITY);
         graph->addVertex(v);
     }
@@ -96,35 +93,42 @@ void NSMWindow::onBtnAddVertexClicked(){
 
 }
 void NSMWindow::onBtnCalcClicked(){
-    if(nsm->getEditable()){
-        saveOriGraphData();
+
+    int code=nsm->getGraph()->ctsma();
+    QList<NSMGraphData*>* dataList=nsm->getGraph()->getGraphData();
+    NSMVertex* dummy=nsm->getDummyVertex();
+    QPoint point=nsm->mouseToReal2(nsm->getPainterRect().width()/4,nsm->getPainterRect().height()/2);
+    dummy->setCenterX(point.x());
+    dummy->setCenterY(point.y());
+    dummy->saveCenter();
+    dummy->setLabelPos(0);
+    dummy->setB(0);
+    dummy->setPi(POS_INFINITY);
+    nsm->moveVertexLabel(dummy);
+    disconnect(ui->cbStep,SIGNAL(currentIndexChanged(int)),this,SLOT(onCbStepCurrentIndexChanged(int)));
+    ui->cbStep->clear();
+    connect(ui->cbStep,SIGNAL(currentIndexChanged(int)),this,SLOT(onCbStepCurrentIndexChanged(int)));
+    int p1=0;
+    int p2=0;
+    for(int i=0;i<dataList->count();i++){
+        NSMGraphData* data=dataList->at(i);
+        if(data->getPhase()==1){
+            p1++;
+            ui->cbStep->addItem(QString("Phase1:%1").arg(p1));
+        }else if(data->getPhase()==2){
+            p2++;
+            ui->cbStep->addItem(QString("Phase2:%1").arg(p2));
+        }else{
+
+        }
+
+        ui->cbStep->setCurrentIndex(ui->cbStep->count()-1);
+        nsm->setGraphData(ui->cbStep->count()-1);
+    }
+    if(ERROR_CODE==code){
+        QMessageBox::critical(this,"错误","未找到初始可行解，无法求得最小费用流",QMessageBox::Ok);
     }
     ui->rbEditMode->setChecked(false);
-    loadOriGraphData();
-    nsm->setCurrentGraphData(oriGraphData);
-    if(ERROR_CODE!=nsm->getGraph()->ctsma()){
-        QList<NSMGraphData*>* dataList=nsm->getGraph()->getGraphData();
-        disconnect(ui->cbStep,SIGNAL(currentIndexChanged(int)),this,SLOT(onCbStepCurrentIndexChanged(int)));
-        ui->cbStep->clear();
-        connect(ui->cbStep,SIGNAL(currentIndexChanged(int)),this,SLOT(onCbStepCurrentIndexChanged(int)));
-        int p1=0;
-        int p2=0;
-        for(int i=0;i<dataList->count();i++){
-            NSMGraphData* data=dataList->at(i);
-            if(data->getPhase()==1){
-                p1++;
-                ui->cbStep->addItem(QString("Phase1:%1").arg(p1));
-            }else if(data->getPhase()==2){
-                p2++;
-                ui->cbStep->addItem(QString("Phase2:%1").arg(p2));
-            }else{
-
-            }
-        }
-        ui->cbStep->setCurrentIndex(ui->cbStep->count()-1);
-    }else{
-
-    }
     nsm->update();
 
 }
@@ -140,7 +144,6 @@ void NSMWindow::onBtnRemoveAllVertexClicked(){
 }
 void NSMWindow::onRadioBtnEditModeToggled(bool b){
     if(b){
-        loadOriGraphData();
         nsm->clearCurrentGraphData();
         nsm->setEditable(true);
         nsm->clearState();
@@ -153,7 +156,9 @@ void NSMWindow::onRadioBtnEditModeToggled(bool b){
     }
     else
     {
-        ui->cbStep->setCurrentIndex(ui->cbStep->count()-1);
+        int index=ui->cbStep->currentIndex();
+        if(index!=-1)
+            nsm->setGraphData(index);
         nsm->setEditable(false);
         ui->btnAddVertex->setEnabled(false);
         ui->btnRemoveAllVertex->setEnabled(false);
@@ -356,77 +361,6 @@ void NSMWindow::onActionSave(){
             QMessageBox::information(this,"提示","保存成功",QMessageBox::Ok);
         }
 
-    }
-
-
-}
-void NSMWindow::saveOriGraphData(){
-    NSMGraph* graph=nsm->getGraph();
-    if(oriGraphData!=NULL){
-        delete oriGraphData;
-    }
-    oriGraphData=new NSMGraphData(0);
-    for(int i=1;i<=graph->getCount();i++){
-        NSMVertex* v=graph->getVertexAt(i);
-        NSMVertexData* vd=new NSMVertexData();
-        vd->setB(v->getB());
-        vd->setPi(v->getPi());
-        for(int j=0;j<v->getParams()->count();j++){
-            NSMVertexParam* p=v->getParams()->at(j);
-            NSMVertexParamData* pd=new NSMVertexParamData();
-            pd->setC(p->getC());
-            pd->setCapacity(p->getCapacity());
-            pd->setCost(p->getCost());
-            pd->setFlow(p->getFlow());
-            pd->setP(p->getP());
-            pd->setRc(p->getRc());
-            vd->getParams()->append(pd);
-
-        }
-        oriGraphData->getVertexDatas()->append(vd);
-
-    }
-
-
-}
-void NSMWindow::loadOriGraphData(){
-    QFontMetrics metrics(QFont("微软雅黑",15));
-    NSMGraph* graph=nsm->getGraph();
-    if(oriGraphData!=NULL){
-        for(int i=1;i<=graph->getCount();i++){
-            NSMVertex* v=graph->getVertexAt(i);
-            NSMVertexData* vd=oriGraphData->getVertexDatas()->at(i-1);
-            v->setB(vd->getB());
-            v->setBWidth(30+metrics.horizontalAdvance(QString::number(v->getB())));
-            v->setPi(vd->getPi());
-            if(v->getPi()==POS_INFINITY){
-                v->setPiWidth(30+metrics.horizontalAdvance("∞"));
-            }else{
-                v->setPiWidth(30+metrics.horizontalAdvance(QString::number(v->getPi())));
-            }
-            for(int j=0;j<v->getParams()->count();j++){
-                NSMVertexParam* p=v->getParams()->at(j);
-                NSMVertexParamData* pd=vd->getParams()->at(j);
-
-                p->setC(pd->getC());
-                p->setCapacity(pd->getCapacity());
-                p->setCost(pd->getCost());
-                p->setFlow(pd->getFlow());
-                p->setP(pd->getP());
-                p->setRc(pd->getRc());
-                int width=metrics.horizontalAdvance(QString("%1 [%2]").arg(p->getCost()).arg(p->getRc()));
-                p->setCWidth(width);
-                if(p->getCapacity()==POS_INFINITY){
-                    width= metrics.horizontalAdvance(QString("%1 (∞)").arg(p->getFlow()));
-                }else{
-                    width= metrics.horizontalAdvance(QString("%1 (%2)").arg(p->getFlow()).arg(p->getCapacity()));
-                }
-                p->setFWidth(width);
-
-            }
-
-
-        }
     }
 
 

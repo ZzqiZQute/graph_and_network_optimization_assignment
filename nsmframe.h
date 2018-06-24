@@ -33,6 +33,13 @@ public:
     void setGraphData(int num);
     void clearCurrentGraphData();
     void setCurrentGraphData(NSMGraphData *data);
+    QPoint mouseToReal(int x, int y);
+    QPoint mouseToReal2(int x, int y);
+    QPoint realToMouse(int x, int y);
+    NSMVertex *getDummyVertex() const;
+
+    QRect getPainterRect() const;
+
 protected:
     void paintEvent(QPaintEvent *event);
     void mousePressEvent(QMouseEvent *event);
@@ -75,22 +82,20 @@ private:
     bool createEdge;
     bool findEdgeTail;
     bool moveEdgeLabel;
+    bool moveDummyVertex;
     bool editable;
     QWidget* mParent;
     QRect painterRect;
     NSMGraphData* currentGraphData;
     void drawDemandsAndArcFlows(QPainter *painter);
     void drawCostAndDualVariables(QPainter *painter);
-    QPoint mouseToReal(int x, int y);
-    QPoint realToMouse(int x, int y);
     void init();
     void drawDemandsAndArcFlowsFrame(QPainter *painter);
     void drawCostAndDualVariablesFrame(QPainter *painter);
     void drawVertexs(QPainter *painter, Type type);
-    void drawVertexsSelf(QPainter *painter);
+    void drawVerticesSelf(QPainter *painter);
     void drawSelects(QPainter *painter);
     int checkLBtnDownVertex();
-    QPoint mouseToReal2(int x, int y);
     void drawStraightMaybeEdge(QPainter *painter, NSMVertex *v1, QPoint p);
     void drawEdges(QPainter *painter, Type type);
     void drawStraightEdge(QPainter *painter, NSMVertex *v1, NSMVertex *v2);
@@ -101,7 +106,8 @@ private:
     void drawFlowAndCapacity(QPainter *painter, NSMVertexParam *param);
     void drawCost(QPainter *painter, NSMVertexParam *param);
     void drawCurveEdge(QPainter *painter, NSMVertex *v1, NSMVertex *v2);
-
+    void drawCurveDummyEdge(QPainter *painter, NSMVertex *v1, NSMVertex *v2);
+    void drawStraightDummyEdge(QPainter *painter, NSMVertex *v1, NSMVertex *v2);
 };
 
 #endif // NSMFRAME_H

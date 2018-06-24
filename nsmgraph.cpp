@@ -343,6 +343,8 @@ void NSMGraph::addGraphData(int phase){
         gd->getVertexDatas()->append(vd);
 
     }
+
+
     for(int i=0;i<baseMatrix->getVectors()->count();i++){
         gd->getBaseMatrix()->addVector(baseMatrix->getVectors()->at(i));
     }

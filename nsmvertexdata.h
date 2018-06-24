@@ -21,6 +21,7 @@ private:
     QList<NSMVertexParamData*> *params;
     int b;
     int pi;
+
 };
 
 #endif // NSMVERTEXDATA_H
