@@ -43,6 +43,10 @@ int SetCapacityAndCostDialog::getCost() const
 void SetCapacityAndCostDialog::setCost(int value)
 {
     cost = value;
+    if(cost!=POS_INFINITY){
+        ui->tbCost->setText(QString::number(cost));
+        ui->tbCapacity->setFocus();
+    }
 }
 
 int SetCapacityAndCostDialog::getCapacity() const

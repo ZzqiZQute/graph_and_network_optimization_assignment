@@ -116,7 +116,7 @@ void NSMFrame::drawCostAndDualVariables(QPainter* painter){
 void NSMFrame::drawFlowAndCapacity(QPainter* painter,NSMVertexParam *param){
     if(param->getCapacity()==POS_INFINITY){
         painter->drawText(QRect(param->getFX()-param->getFWidth()/2,param->getFY()-VERTEX_SIZE/2,param->getFWidth(),VERTEX_SIZE)
-                          ,QString("%1 (∞)").arg(param->getFlow()),QTextOption(Qt::AlignCenter));
+                          ,QString("%1").arg(param->getFlow()),QTextOption(Qt::AlignCenter));
     }else{
         painter->drawText(QRect(param->getFX()-param->getFWidth()/2,param->getFY()-VERTEX_SIZE/2,param->getFWidth(),VERTEX_SIZE)
                           ,QString("%1 (%2)").arg(param->getFlow()).arg(param->getCapacity()),QTextOption(Qt::AlignCenter));
@@ -148,6 +148,7 @@ void NSMFrame::drawVertexs(QPainter* painter,Type type){
 }
 void NSMFrame::drawEdges(QPainter* painter,Type type){
 
+
     painter->setPen(QPen());
     for(int i=1;i<=graph->getCount();i++){
         NSMVertex* v=graph->getVertexAt(i);
@@ -156,9 +157,22 @@ void NSMFrame::drawEdges(QPainter* painter,Type type){
             if(param->getP()<=graph->getCount()){
                 NSMVertex* v1=graph->getVertexAt(param->getP());
                 NSMVertex* v2=v;
-
+                if(currentGraphData!=NULL){
+                    if(currentGraphData->getBaseMatrix()->isBaseVector(param->getP(),i))
+                        painter->setPen(QPen(QColor(255,128,0)));
+                    int v1=currentGraphData->getInVector()->getV1();
+                    int v2=currentGraphData->getInVector()->getV2();
+                    if((v1==param->getP()&&v2==i)||(v1==i&&v2==param->getP())){
+                        painter->setPen(QPen(Qt::green));
+                    }
+                    v1=currentGraphData->getOutVector()->getV1();
+                    v2=currentGraphData->getOutVector()->getV2();
+                    if((v1==param->getP()&&v2==i)||(v1==i&&v2==param->getP())){
+                        painter->setPen(QPen(Qt::red));
+                    }
+                }
                 if(param->getHover())
-                    painter->setPen(QColor(Qt::red));
+                    painter->setPen(QColor(Qt::darkYellow));
 
                 if(!param->getCurve()){
                     drawStraightEdge(painter,v1,v2);
@@ -166,19 +180,9 @@ void NSMFrame::drawEdges(QPainter* painter,Type type){
                     drawCurveEdge(painter,v1,v2);
                 }
             }
-            if(currentGraphData!=NULL&&currentGraphData->getPhase()==1){
-                if(param->getP()==graph->getCount()+1){
-                    NSMVertex* v1=dummyVertex;
-                    NSMVertex* v2=v;
-                    if(!param->getCurve()){
-                        drawStraightDummyEdge(painter,v1,v2);
-                    }else{
-                        drawCurveDummyEdge(painter,v1,v2);
-                    }
-                }
-            }
+
             if(type==DF){
-                drawFlowAndCapacity(painter,param);//FIXME dummy边检验数bug
+                drawFlowAndCapacity(painter,param);
             }else if(type==CV){
                 drawCost(painter,param);
             }
@@ -186,16 +190,64 @@ void NSMFrame::drawEdges(QPainter* painter,Type type){
 
     }
     if(currentGraphData!=NULL&&currentGraphData->getPhase()==1){
+
+        QList<NSMDummyEdge*> *edges=graph->getDummyEdge();
         NSMVertex* v2=dummyVertex;
-        for(int i=0;i<v2->getParams()->count();i++){
-            NSMVertexParam* param=v2->getParams()->at(i);
-            NSMVertex* v1=graph->getVertexAt(param->getP());
-            if(!param->getCurve()){
-                drawStraightDummyEdge(painter,v1,v2);
-            }else{
-                drawCurveDummyEdge(painter,v1,v2);
+
+        for(int i=0;i<edges->count();i++){
+            NSMDummyEdge* edge=edges->at(i);
+            NSMVertex* v1=graph->getVertexAt(edge->getP());
+            painter->setPen(QPen(Qt::blue));
+
+            if(edge->getDirIn()){
+                if(currentGraphData->getBaseMatrix()->isBaseVector(edge->getP(),graph->getCount()+1)){
+                    int b1=edge->getP();
+                    int b2=graph->getCount()+1;
+                    int a1=currentGraphData->getOutVector()->getV1();
+                    int a2=currentGraphData->getOutVector()->getV2();
+                    if((a1==b1&&a2==b2)||(a1==b2&&a2==b1)){
+                        drawStraightDummyEdge(painter,v1,v2,true,true);
+                    }else
+                        drawStraightDummyEdge(painter,v1,v2,true,false);
+                }
+                else  drawStraightDummyEdge(painter,v1,v2,false,false);
             }
+            else{
+                if(currentGraphData->getBaseMatrix()->isBaseVector(edge->getP(),graph->getCount()+1)){
+                    int b1=edge->getP();
+                    int b2=graph->getCount()+1;
+                    int a1=currentGraphData->getOutVector()->getV1();
+                    int a2=currentGraphData->getOutVector()->getV2();
+                    if((a1==b1&&a2==b2)||(a1==b2&&a2==b1)){
+                        drawStraightDummyEdge(painter,v2,v1,true,true);
+                    }else
+                        drawStraightDummyEdge(painter,v2,v1,true,false);
+                }
+                else drawStraightDummyEdge(painter,v2,v1,false,false);
+            }
+
+            painter->setPen(QPen(Qt::blue));
+            if(currentGraphData->getBaseMatrix()->isBaseVector(edge->getP(),graph->getCount()+1)){
+                painter->setPen(QPen(QColor(255,128,0)));
+                int b1=edge->getP();
+                int b2=graph->getCount()+1;
+                int a1=currentGraphData->getOutVector()->getV1();
+                int a2=currentGraphData->getOutVector()->getV2();
+                if((a1==b1&&a2==b2)||(a1==b2&&a2==b1)){
+                    painter->setPen(QPen(Qt::red));
+                }
+            }
+            if(type==DF){
+                painter->drawText(QRect(edge->getFX()-edge->getFWidth()/2,edge->getFY()-VERTEX_SIZE/2,edge->getFWidth(),VERTEX_SIZE)
+                                  ,QString("%1").arg(edge->getFlow()),QTextOption(Qt::AlignCenter));
+            }else if(type==CV){
+                painter->drawText(QRect(edge->getCX()-edge->getCWidth()/2,edge->getCY()-VERTEX_SIZE/2,edge->getCWidth(),VERTEX_SIZE)
+                                  ,QString("[%1]").arg(edge->getRc()),QTextOption(Qt::AlignCenter));
+            }
+            painter->setPen(QPen());
         }
+
+        painter->setPen(QPen());
     }
     if(createEdge){
         if(!findEdgeTail){
@@ -710,7 +762,7 @@ void NSMFrame::mouseMoveEvent(QMouseEvent *event)
         v->setBCenterY(v->getBOriCenterY()+offsety);
         v->setPiCenterX(v->getPiOriCenterX()+offsetx);
         v->setPiCenterY(v->getPiOriCenterY()+offsety);
-
+        moveDummyLabel();
     }
     for(int i=1;i<=graph->getCount();i++){
         NSMVertex* v=graph->getVertexAt(i);
@@ -797,11 +849,19 @@ void NSMFrame::mouseReleaseEvent(QMouseEvent *event)
                 if(findEdgeTail){
                     if(createEdgeVertexHead!=createEdgeVertexTail){
                         NSMVertex * v=graph->getVertexAt(createEdgeVertexTail);
+                        NSMVertex* v1=graph->getVertexAt(createEdgeVertexHead);
+                        int cc=POS_INFINITY;
+                        for(int i=0;i<v->getParams()->count();i++){
+                            NSMVertexParam* vp=v->getParams()->at(i);
+                            if(vp->getP()==createEdgeVertexHead){
+                                cc=vp->getCost();
+                            }
+                        }
                         SetCapacityAndCostDialog dialog(this);
+                        dialog.setCost(cc);
                         if(dialog.exec()==QDialog::Accepted){
                             int cost=dialog.getCost();
                             int capacity=dialog.getCapacity();
-                            NSMVertex* v1=graph->getVertexAt(createEdgeVertexHead);
                             QPoint edgeCenter=calcEdgeCenter(v1,v);
                             int deg=calcDeg(v1->getCenterX(),v1->getCenterY(),v->getCenterX(),v->getCenterY())-90;
                             QPoint disText=calcTail(edgeCenter.x(),edgeCenter.y(),deg,VERTEX_SIZE*3/4);
@@ -1190,7 +1250,7 @@ void NSMFrame::drawCurveEdge(QPainter* painter,NSMVertex* v1,NSMVertex* v2)
 
     }
 }
-void NSMFrame::drawStraightDummyEdge(QPainter* painter,NSMVertex* v1,NSMVertex* v2)
+void NSMFrame::drawStraightDummyEdge(QPainter* painter,NSMVertex* v1,NSMVertex* v2,bool base,bool out)
 {
     QPoint vCenter=QPoint(v1->getCenterX(),v1->getCenterY());
     int deg=calcDeg(v2->getCenterX(),v2->getCenterY(),v1->getCenterX(),v1->getCenterY());
@@ -1202,9 +1262,24 @@ void NSMFrame::drawStraightDummyEdge(QPainter* painter,NSMVertex* v1,NSMVertex* 
     if(length>c){
         startPoint.setX(c*(realPoint.x()-vCenter.x())/length+vCenter.x());
         startPoint.setY(c*(realPoint.y()-vCenter.y())/length+vCenter.y());
-        painter->setPen(Qt::DashLine);
+        if(base) {
+            if(out){
+                painter->setPen(QPen(QBrush(Qt::red),1,Qt::DashLine));
+            }else{
+                painter->setPen(QPen(QBrush(QColor(255,128,0)),1,Qt::DashLine));
+            }
+        }
+        else painter->setPen(QPen(QBrush(Qt::blue),1,Qt::DashLine));
         painter->drawLine(startPoint,realPoint);
-        painter->setPen(QPen());
+        if(base){
+            if(out){
+                painter->setPen(QPen(Qt::red));
+            }else{
+                painter->setPen(QPen(QColor(255,128,0)));
+            }
+        }
+
+        else painter->setPen(QPen(Qt::blue));
         double deg=calcDeg(realPoint.x(),realPoint.y(),startPoint.x(),startPoint.y());
         for(int j=-30;j<=30;j++)
         {
@@ -1213,8 +1288,9 @@ void NSMFrame::drawStraightDummyEdge(QPainter* painter,NSMVertex* v1,NSMVertex* 
         }
 
     }
+    painter->setPen(QPen());
 }
-void NSMFrame::drawCurveDummyEdge(QPainter* painter,NSMVertex* v1,NSMVertex* v2)
+void NSMFrame::drawCurveDummyEdge(QPainter* painter,NSMVertex* v1,NSMVertex* v2,bool base,bool out)
 {
     QPoint vCenter=QPoint(v1->getCenterX(),v1->getCenterY());
     int deg=calcDeg(v2->getCenterX(),v2->getCenterY(),v1->getCenterX(),v1->getCenterY());
@@ -1227,7 +1303,6 @@ void NSMFrame::drawCurveDummyEdge(QPainter* painter,NSMVertex* v1,NSMVertex* v2)
     if(length>c){
         startPoint.setX(c*(realPoint.x()-vCenter.x())/length+vCenter.x());
         startPoint.setY(c*(realPoint.y()-vCenter.y())/length+vCenter.y());
-
         double deg=calcDeg(startPoint.x(),startPoint.y(),realPoint.x(),realPoint.y());
         int degoffset=30;
         deg-=degoffset;
@@ -1235,9 +1310,24 @@ void NSMFrame::drawCurveDummyEdge(QPainter* painter,NSMVertex* v1,NSMVertex* v2)
         QPainterPath path(QPointF(startPoint.x(),startPoint.y()));
         path.quadTo(QPointF(middlePoint.x(),middlePoint.y()),QPointF(realPoint.x(),realPoint.y()));
         painter->setBrush(QBrush(Qt::transparent));
-        painter->setPen(Qt::DashLine);
+        if(base) {
+            if(out){
+                painter->setPen(QPen(QBrush(Qt::red),1,Qt::DashLine));
+            }else{
+                painter->setPen(QPen(QBrush(QColor(255,128,0)),1,Qt::DashLine));
+            }
+        }
+        else painter->setPen(QPen(QBrush(Qt::blue),1,Qt::DashLine));
         painter->drawPath(path);
-        painter->setPen(QPen());
+        if(base){
+            if(out){
+                painter->setPen(QPen(Qt::red));
+            }else{
+                painter->setPen(QPen(QColor(255,128,0)));
+            }
+        }
+
+        else painter->setPen(QPen(Qt::blue));
         deg=calcDeg(realPoint.x(),realPoint.y(),startPoint.x(),startPoint.y());
         deg+=degoffset;
         for(int j=-30;j<=30;j++)
@@ -1247,6 +1337,7 @@ void NSMFrame::drawCurveDummyEdge(QPainter* painter,NSMVertex* v1,NSMVertex* v2)
         }
 
     }
+    painter->setPen(QPen());
 }
 
 
@@ -1371,66 +1462,51 @@ void NSMFrame::setGraphData(int num){
     for(int i=1;i<=graph->getCount();i++){
         NSMVertex* v=graph->getVertexAt(i);
         NSMVertexData* vd=data->getVertexDatas()->at(i-1);
-        if(v->getParams()->count()<vd->getParams()->count()){
-            NSMVertexParam* vdnew=new NSMVertexParam();
-            v->getParams()->append(vdnew);
-        }
-        else if(v->getParams()->count()>vd->getParams()->count()){
-            v->getParams()->removeAt(v->getParams()->count()-1);
-        }
         v->setB(vd->getB());
         v->setBWidth(LABELLRMARGIN+metrics.horizontalAdvance(QString::number(v->getB())));
         v->setPi(vd->getPi());
-        if(v->getParams()->count()<vd->getParams()->count()){
-            int cnt=vd->getParams()->count()-v->getParams()->count();
-            for(int i=0;i<cnt;i++){
-                NSMVertexParam* vdnew=new NSMVertexParam();
-                v->getParams()->append(vdnew);
-            }
-        }
-        else if(v->getParams()->count()>vd->getParams()->count()){
-            int cnt=v->getParams()->count()-vd->getParams()->count();
-            for(int i=0;i<cnt;i++){
-                v->getParams()->erase(v->getParams()->end());
-            }
-        }
-        for(int j=0;j<vd->getParams()->count();j++){
-            NSMVertexParam* p=v->getParams()->at(j);
-            NSMVertexParamData* pd=vd->getParams()->at(j);
 
-            p->setC(pd->getC());
-            p->setCapacity(pd->getCapacity());
-            p->setCost(pd->getCost());
-            p->setFlow(pd->getFlow());
-            p->setP(pd->getP());
-            p->setRc(pd->getRc());
-            int width=metrics.horizontalAdvance(QString("%1 [%2]").arg(p->getCost()).arg(p->getRc()));
-            p->setCWidth(LABELLRMARGIN+width);
-            if(p->getCapacity()==POS_INFINITY){
-                width= metrics.horizontalAdvance(QString("%1 (∞)").arg(p->getFlow()));
-            }else{
-                width= metrics.horizontalAdvance(QString("%1 (%2)").arg(p->getFlow()).arg(p->getCapacity()));
+        for(int j=0;j<vd->getParams()->count();j++){
+
+            NSMVertexParamData* pd=vd->getParams()->at(j);
+            for(int k=0;k<v->getParams()->count();k++){
+                NSMVertexParam* p=v->getParams()->at(k);
+                if(pd->getP()==p->getP()){
+                    p->setC(pd->getC());
+                    p->setCapacity(pd->getCapacity());
+                    p->setCost(pd->getCost());
+                    p->setFlow(pd->getFlow());
+                    p->setP(pd->getP());
+                    p->setRc(pd->getRc());
+                    int width=metrics.horizontalAdvance(QString("%1 [%2]").arg(p->getCost()).arg(p->getRc()));
+                    p->setCWidth(LABELLRMARGIN+width);
+                    if(p->getCapacity()==POS_INFINITY){
+                        width= metrics.horizontalAdvance(QString("%1").arg(p->getFlow()));
+                    }else{
+                        width= metrics.horizontalAdvance(QString("%1 (%2)").arg(p->getFlow()).arg(p->getCapacity()));
+                    }
+                    p->setFWidth(LABELLRMARGIN+width);
+                    break;
+                }
+
             }
-            p->setFWidth(LABELLRMARGIN+width);
+            if(pd->getP()==graph->getCount()+1){
+                for(int l=0;l<graph->getDummyEdge()->count();l++){
+                    NSMDummyEdge* edge=graph->getDummyEdge()->at(l);
+                    if(edge->getP()==i){
+                        edge->setFlow(pd->getFlow());
+                        edge->setRc(pd->getRc());
+                        break;
+                    }
+                }
+            }
 
         }
     }
     if(data->getPhase()==1){
         NSMVertex* v=dummyVertex;
         NSMVertexData* vd=data->getVertexDatas()->at(data->getVertexDatas()->count()-1);
-        if(v->getParams()->count()<vd->getParams()->count()){
-            int cnt=vd->getParams()->count()-v->getParams()->count();
-            for(int i=0;i<cnt;i++){
-                NSMVertexParam* vdnew=new NSMVertexParam();
-                v->getParams()->append(vdnew);
-            }
-        }
-        else if(v->getParams()->count()>vd->getParams()->count()){
-            int cnt=v->getParams()->count()-vd->getParams()->count();
-            for(int i=0;i<cnt;i++){
-                v->getParams()->erase(v->getParams()->end());
-            }
-        }
+
         v->setB(vd->getB());
         v->setBWidth(LABELLRMARGIN+metrics.horizontalAdvance(QString::number(v->getB())));
         v->setPi(vd->getPi());
@@ -1440,25 +1516,10 @@ void NSMFrame::setGraphData(int num){
             v->setPiWidth(LABELLRMARGIN+metrics.horizontalAdvance(QString::number(v->getPi())));
         }
         for(int j=0;j<vd->getParams()->count();j++){
-
-            NSMVertexParam* p=v->getParams()->at(j);
             NSMVertexParamData* pd=vd->getParams()->at(j);
-
-            p->setC(pd->getC());
-            p->setCapacity(pd->getCapacity());
-            p->setCost(pd->getCost());
+            NSMDummyEdge* p=graph->getDummyEdge()->at(pd->getP()-1);
             p->setFlow(pd->getFlow());
-            p->setP(pd->getP());
             p->setRc(pd->getRc());
-            int width=metrics.horizontalAdvance(QString("%1 [%2]").arg(p->getCost()).arg(p->getRc()));
-            p->setCWidth(LABELLRMARGIN+width);
-            if(p->getCapacity()==POS_INFINITY){
-                width= metrics.horizontalAdvance(QString("%1 (∞)").arg(p->getFlow()));
-            }else{
-                width= metrics.horizontalAdvance(QString("%1 (%2)").arg(p->getFlow()).arg(p->getCapacity()));
-            }
-            p->setFWidth(LABELLRMARGIN+width);
-
         }
     }
     update();
@@ -1471,4 +1532,18 @@ void NSMFrame::clearCurrentGraphData()
 void NSMFrame::setCurrentGraphData(NSMGraphData* data)
 {
     currentGraphData=data;
+}
+void NSMFrame::moveDummyLabel(){
+    NSMVertex *v=dummyVertex;
+    for(int i=0;i<getGraph()->getDummyEdge()->count();i++){
+        NSMDummyEdge* edge=getGraph()->getDummyEdge()->at(i);
+        NSMVertex* v1=graph->getVertexAt(edge->getP());
+        QPoint edgeCenter=calcEdgeCenter(v1,v);
+        edge->setCX(edgeCenter.x());
+        edge->setCY(edgeCenter.y());
+        edge->setFX(edgeCenter.x());
+        edge->setFY(edgeCenter.y());
+
+    }
+
 }

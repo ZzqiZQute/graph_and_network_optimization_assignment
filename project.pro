@@ -47,7 +47,8 @@ SOURCES += \
     setdemanddialog.cpp \
     nsmvertexdata.cpp \
     nsmvertexparamdata.cpp \
-    nsmgraphdata.cpp
+    nsmgraphdata.cpp \
+    nsmdummyedge.cpp
 
 HEADERS += \
     common.h \
@@ -72,7 +73,8 @@ HEADERS += \
     setdemanddialog.h \
     nsmvertexdata.h \
     nsmvertexparamdata.h \
-    nsmgraphdata.h
+    nsmgraphdata.h \
+    nsmdummyedge.h
 
 FORMS += \
     launchdialog.ui \

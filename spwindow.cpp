@@ -255,6 +255,7 @@ void SPWindow::onRadioBtnEditModeToggled(bool b){
         shortestpath->setEditable(true);
         ui->btnAddVertex->setEnabled(true);
         ui->btnRemoveAllVertex->setEnabled(true);
+        ui->rbEditMode->setEnabled(false);
     }
     else
     {
@@ -269,6 +270,7 @@ void SPWindow::onRadioBtnEditModeToggled(bool b){
 void SPWindow::onBtnCalcClicked()
 {
     ui->rbEditMode->setChecked(false);
+    ui->rbEditMode->setEnabled(true);
     int i=ui->cbMethod->currentIndex();
     if(i==0){
         shortestpath->setMethod(SPFrame::Bellman);

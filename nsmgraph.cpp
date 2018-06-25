@@ -6,6 +6,8 @@ NSMGraph::NSMGraph()
     baseMatrix=new BaseMatrix();
     vertexs->push_back(new NSMVertex());
     graphData=new QList<NSMGraphData*>();
+    dummyEdgeCnt=0;
+    dummyEdge=new QList<NSMDummyEdge*>();
     count=0;
     dummy=NULL;
 }
@@ -15,6 +17,8 @@ NSMGraph::~NSMGraph()
     vertexs->clear();
     baseMatrix->clearVectors();
     graphData->clear();
+    dummyEdge->clear();
+    delete dummyEdge;
     delete graphData;
     delete baseMatrix;
     delete vertexs;
@@ -74,6 +78,8 @@ int NSMGraph::getCount() const
 
 int NSMGraph::ctsma()
 {
+    setDummyEdgeCnt(getCount());
+    getDummyEdge()->clear();
     graphData->clear();
     dummy=new NSMVertex();
     baseMatrix->clearVectors();
@@ -82,17 +88,26 @@ int NSMGraph::ctsma()
         for(int j=0;j<v->getParams()->count();j++){
             v->getParams()->at(j)->setC(v->getParams()->at(j)->getCost());
             v->getParams()->at(j)->setCost(0);
+
         }
         if(v->getB()<0){
             NSMVertexParam* vp=new NSMVertexParam(i);
             vp->setFlow(-v->getB());
             vp->setCost(1);
             dummy->addVertexParams(vp);
+            NSMDummyEdge* edge=new NSMDummyEdge(i,true);
+            edge->setFlow(-v->getB());
+            edge->setRc(0);
+            dummyEdge->append(edge);
         }else{
             NSMVertexParam* vp=new NSMVertexParam(count+1);
             vp->setFlow(v->getB());
             vp->setCost(1);
             v->addVertexParams(vp);
+            NSMDummyEdge* edge=new NSMDummyEdge(i,false);
+            edge->setFlow(v->getB());
+            edge->setRc(0);
+            dummyEdge->append(edge);
         }
     }
     addVertex(dummy);
@@ -107,7 +122,7 @@ int NSMGraph::ctsma()
 
 
     //Phase1
-    changeBaseVector(1);
+    if(UNSUPPORTED_ERROR==changeBaseVector(1))return UNSUPPORTED_ERROR;
     int bcnt=0;
     for(int i=0;i<baseMatrix->getVectors()->count();i++){
         BaseVector* v=baseMatrix->getVectors()->at(i);
@@ -133,8 +148,8 @@ int NSMGraph::ctsma()
                 vp->setCost(vp->getC());
             }
         }
-        changeBaseVector(2);
-        addGraphData(2);
+        if(UNSUPPORTED_ERROR==changeBaseVector(2))return UNSUPPORTED_ERROR;
+
 
     }
 
@@ -194,34 +209,49 @@ void NSMGraph::calcPi(){
     }
 
 }
-void NSMGraph::changeBaseVector(int phase){
+int NSMGraph::changeBaseVector(int phase){
 
     bool loop=true;
+    addGraphData(phase,BaseVector(-1,-1),BaseVector(-1,-1));
     while(loop){
-        addGraphData(phase);
+
         loop=false;
         calcPi();
         BaseVector bv;
         BaseVector bv2;
+
         int maxt=POS_INFINITY;
         int maxchange=POS_INFINITY;
         for(int i=1;i<=count;i++){
             NSMVertex* v=vertexs->at(i);
             for(int j=0;j<v->getParams()->count();j++){
                 NSMVertexParam* vp=v->getParams()->at(j);
+                NSMVertex* v2=vertexs->at(vp->getP());
+                int t=vp->getCost()-(v->getPi()-v2->getPi());//c-(PIj-PIi)
+                vp->setRc(t);
                 if(!baseMatrix->isBaseVector(i,vp->getP())){
-                    NSMVertex* v2=vertexs->at(vp->getP());
-                    int t=vp->getCost()-(v->getPi()-v2->getPi());//c-(PIj-PIi)
-                    vp->setRc(t);
-                    if(t<0&&t<maxt){
-                        loop=true;
-                        bv.set(vp->getP(),i);
-                        maxt=t;
+                    if(vp->getFlow()<vp->getCapacity()){
+                        if(t<0&&t<maxt){
+                            loop=true;
+                            bv.set(vp->getP(),i);
+                            maxt=t;
+                        }
                     }
                 }
             }
         }
-        if(!loop)break;
+        if(!loop){
+            addGraphData(phase,BaseVector(-2,-2),BaseVector(-2,-2));
+            break;
+        }
+        NSMVertex* vv2=getVertexAt(bv.getV2());
+        for(int i=0;i<vv2->getParams()->count();i++){
+            NSMVertexParam* vvp=vv2->getParams()->at(i);
+            if(vvp->getP()==bv.getV1()){
+                maxchange=vvp->getCapacity()-vvp->getFlow();
+            }
+        }
+        bv2.set(-3,-3);
         QList<int> list=baseMatrix->getCircuit(bv.getV1(),bv.getV2());
         for(int i=0;i<list.count()-1;i++){
             NSMVertex* v1=vertexs->at(list.at(i));
@@ -254,6 +284,7 @@ void NSMGraph::changeBaseVector(int phase){
 
         }
 
+
         for(int i=0;i<list.count()-1;i++){
             NSMVertex* v1=vertexs->at(list.at(i));
             NSMVertex* v2=vertexs->at(list.at(i+1));
@@ -281,18 +312,59 @@ void NSMGraph::changeBaseVector(int phase){
                 break;
             }
         }
-
-        baseMatrix->removeVector(bv2.getV1(),bv2.getV2());
-        baseMatrix->addVector(new BaseVector(bv.getV1(),bv.getV2()));
-
+        addGraphData(phase,bv,bv2);
+        if(bv2.getV1()!=-3){
+            baseMatrix->removeVector(bv2.getV1(),bv2.getV2());
+            baseMatrix->addVector(new BaseVector(bv.getV1(),bv.getV2()));
+        }else{
+            return UNSUPPORTED_ERROR;
+        }
 
     }
 
+    return 0;
+}
+
+QList<NSMDummyEdge *> *NSMGraph::getDummyEdge() const
+{
+    return dummyEdge;
+}
+
+int NSMGraph::getDummyEdgeCnt() const
+{
+    return dummyEdgeCnt;
+}
+
+void NSMGraph::setDummyEdgeCnt(int value)
+{
+    dummyEdgeCnt = value;
 }
 
 QList<NSMGraphData *> *NSMGraph::getGraphData() const
 {
     return graphData;
+}
+
+void NSMGraph::clearFlow()
+{
+    for(int i=1;i<=count;i++){
+        NSMVertex* v=getVertexAt(i);
+        for(int j=0;j<v->getParams()->count();j++){
+            v->getParams()->at(j)->setFlow(0);
+        }
+
+    }
+}
+
+void NSMGraph::setCost()
+{
+    for(int i=1;i<=count;i++){
+        NSMVertex* v=vertexs->at(i);
+        for(int j=0;j<v->getParams()->count();j++){
+            NSMVertexParam* vp=v->getParams()->at(j);
+            vp->setCost(vp->getOriCost());
+        }
+    }
 }
 
 BaseMatrix *NSMGraph::getBaseMatrix() const
@@ -321,7 +393,7 @@ int NSMGraph::getLastY()
 {
     return vertexs->at(count)->getCenterY();
 }
-void NSMGraph::addGraphData(int phase){
+void NSMGraph::addGraphData(int phase,BaseVector in,BaseVector out){
     NSMGraphData* gd=new NSMGraphData(phase);
     for(int i=1;i<=count;i++){
         NSMVertex* v=getVertexAt(i);
@@ -348,5 +420,7 @@ void NSMGraph::addGraphData(int phase){
     for(int i=0;i<baseMatrix->getVectors()->count();i++){
         gd->getBaseMatrix()->addVector(baseMatrix->getVectors()->at(i));
     }
+    gd->getInVector()->set(in.getV1(),in.getV2());
+    gd->getOutVector()->set(out.getV1(),out.getV2());
     graphData->append(gd);
 }

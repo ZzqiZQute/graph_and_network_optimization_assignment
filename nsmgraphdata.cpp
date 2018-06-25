@@ -6,6 +6,8 @@ NSMGraphData::NSMGraphData(int phase)
     this->phase=phase;
     vertexDatas=new QList<NSMVertexData*>();
     baseMatrix=new BaseMatrix();
+    inVector=new BaseVector();
+    outVector=new BaseVector();
 }
 
 NSMGraphData::~NSMGraphData()
@@ -13,6 +15,8 @@ NSMGraphData::~NSMGraphData()
     delete baseMatrix;
     vertexDatas->clear();
     delete vertexDatas;
+    delete inVector;
+    delete outVector;
 }
 
 int NSMGraphData::getPhase() const
@@ -39,3 +43,14 @@ void NSMGraphData::setBaseMatrix(BaseMatrix *value)
 {
     baseMatrix = value;
 }
+
+BaseVector *NSMGraphData::getInVector() const
+{
+    return inVector;
+}
+
+BaseVector *NSMGraphData::getOutVector() const
+{
+    return outVector;
+}
+

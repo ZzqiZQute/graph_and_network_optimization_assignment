@@ -93,42 +93,64 @@ void NSMWindow::onBtnAddVertexClicked(){
 
 }
 void NSMWindow::onBtnCalcClicked(){
-
-    int code=nsm->getGraph()->ctsma();
-    QList<NSMGraphData*>* dataList=nsm->getGraph()->getGraphData();
-    NSMVertex* dummy=nsm->getDummyVertex();
-    QPoint point=nsm->mouseToReal2(nsm->getPainterRect().width()/4,nsm->getPainterRect().height()/2);
-    dummy->setCenterX(point.x());
-    dummy->setCenterY(point.y());
-    dummy->saveCenter();
-    dummy->setLabelPos(0);
-    dummy->setB(0);
-    dummy->setPi(POS_INFINITY);
-    nsm->moveVertexLabel(dummy);
-    disconnect(ui->cbStep,SIGNAL(currentIndexChanged(int)),this,SLOT(onCbStepCurrentIndexChanged(int)));
-    ui->cbStep->clear();
-    connect(ui->cbStep,SIGNAL(currentIndexChanged(int)),this,SLOT(onCbStepCurrentIndexChanged(int)));
-    int p1=0;
-    int p2=0;
-    for(int i=0;i<dataList->count();i++){
-        NSMGraphData* data=dataList->at(i);
-        if(data->getPhase()==1){
-            p1++;
-            ui->cbStep->addItem(QString("Phase1:%1").arg(p1));
-        }else if(data->getPhase()==2){
-            p2++;
-            ui->cbStep->addItem(QString("Phase2:%1").arg(p2));
-        }else{
-
+    nsm->getGraph()->clearFlow();
+    nsm->getGraph()->setCost();
+    if(nsm->getGraph()->getCount()<2){
+        QMessageBox::critical(this,"错误","至少要有两个节点！",QMessageBox::Ok);
+        ui->rbEditMode->setEnabled(false);
+    }else{
+        int code=nsm->getGraph()->ctsma();
+        if(code==UNSUPPORTED_ERROR){
+            QMessageBox::critical(this,"错误","这里不会做了。。",QMessageBox::Ok);
+            return;
         }
+        QList<NSMGraphData*>* dataList=nsm->getGraph()->getGraphData();
+        NSMVertex* dummy=nsm->getDummyVertex();
+        QPoint point=nsm->mouseToReal2(nsm->getPainterRect().width()/4,nsm->getPainterRect().height()/2);
+        dummy->setCenterX(point.x());
+        dummy->setCenterY(point.y());
+        dummy->saveCenter();
+        dummy->setLabelPos(0);
+        dummy->setB(0);
+        dummy->setPi(POS_INFINITY);
+        nsm->moveVertexLabel(dummy);
+        for(int i=0;i<nsm->getGraph()->getDummyEdge()->count();i++){
+            NSMDummyEdge* edge=nsm->getGraph()->getDummyEdge()->at(i);
+            NSMVertex* v=nsm->getGraph()->getVertexAt(edge->getP());
+            QPoint edgeCenter=nsm->calcEdgeCenter(dummy,v);
 
-        ui->cbStep->setCurrentIndex(ui->cbStep->count()-1);
-        nsm->setGraphData(ui->cbStep->count()-1);
+            edge->setFX(edgeCenter.x());
+            edge->setFY(edgeCenter.y());
+            edge->setCX(edgeCenter.x());
+            edge->setCY(edgeCenter.y());
+        }
+        disconnect(ui->cbStep,SIGNAL(currentIndexChanged(int)),this,SLOT(onCbStepCurrentIndexChanged(int)));
+        ui->cbStep->clear();
+        connect(ui->cbStep,SIGNAL(currentIndexChanged(int)),this,SLOT(onCbStepCurrentIndexChanged(int)));
+        int p1=0;
+        int p2=0;
+        for(int i=0;i<dataList->count();i++){
+            NSMGraphData* data=dataList->at(i);
+            if(data->getPhase()==1){
+                p1++;
+                ui->cbStep->addItem(QString("Phase1:%1").arg(p1));
+            }else if(data->getPhase()==2){
+                p2++;
+                ui->cbStep->addItem(QString("Phase2:%1").arg(p2));
+            }else{
+
+            }
+
+            ui->cbStep->setCurrentIndex(ui->cbStep->count()-1);
+            nsm->setGraphData(ui->cbStep->count()-1);
+        }
+        if(ERROR_CODE==code){
+            QMessageBox::critical(this,"错误","未找到初始可行解，无法求得最小费用流",QMessageBox::Ok);
+        }
+        ui->rbEditMode->setEnabled(true);
+        ui->rbEditMode->setChecked(false);
     }
-    if(ERROR_CODE==code){
-        QMessageBox::critical(this,"错误","未找到初始可行解，无法求得最小费用流",QMessageBox::Ok);
-    }
-    ui->rbEditMode->setChecked(false);
+
     nsm->update();
 
 }
@@ -144,10 +166,13 @@ void NSMWindow::onBtnRemoveAllVertexClicked(){
 }
 void NSMWindow::onRadioBtnEditModeToggled(bool b){
     if(b){
+        ui->rbEditMode->setEnabled(false);
         nsm->clearCurrentGraphData();
         nsm->setEditable(true);
         nsm->clearState();
         nsm->getGraph()->clearVerticesStates();
+        nsm->getGraph()->clearFlow();
+        nsm->getGraph()->setCost();
         ui->btnAddVertex->setEnabled(true);
         ui->btnRemoveAllVertex->setEnabled(true);
         ui->btnPrev->setEnabled(false);
@@ -156,15 +181,18 @@ void NSMWindow::onRadioBtnEditModeToggled(bool b){
     }
     else
     {
+
         int index=ui->cbStep->currentIndex();
         if(index!=-1)
             nsm->setGraphData(index);
+        nsm->moveDummyLabel();
         nsm->setEditable(false);
         ui->btnAddVertex->setEnabled(false);
         ui->btnRemoveAllVertex->setEnabled(false);
         ui->btnPrev->setEnabled(true);
         ui->btnNext->setEnabled(true);
         ui->cbStep->setEnabled(true);
+
     }
     nsm->setFocus();
     nsm->update();
@@ -223,6 +251,8 @@ void NSMWindow::onActionOpen(){
                     NSMVertexParam* vp=new NSMVertexParam();
                     file.read((char*)&tempint,sizeof(int));
                     vp->setCost(tempint);
+                    file.read((char*)&tempint,sizeof(int));
+                    vp->setOriCost(tempint);
                     file.read((char*)&tempint,sizeof(int));
                     vp->setFlow(tempint);
                     file.read((char*)&tempint,sizeof(int));
@@ -325,6 +355,8 @@ void NSMWindow::onActionSave(){
                 for(int j=0;j<v->getParams()->count();j++){
                     NSMVertexParam* vp=v->getParams()->at(j);
                     tempint=vp->getCost();
+                    file.write((char*)&tempint,sizeof(int));
+                    tempint=vp->getOriCost();
                     file.write((char*)&tempint,sizeof(int));
                     tempint=vp->getFlow();
                     file.write((char*)&tempint,sizeof(int));

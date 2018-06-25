@@ -6,6 +6,7 @@ NSMVertexParam::NSMVertexParam()
     capacity=POS_INFINITY;
     flow=0;
     cost=0;
+    oriCost=0;
     rc=0;
     metrics=new QFontMetrics(QFont("微软雅黑",15));
 
@@ -21,6 +22,7 @@ NSMVertexParam::NSMVertexParam(int p, int c, int capacity)
     this->p=p;
     this->cost=c;
     this->capacity=capacity;
+    oriCost=cost;
     flow=0;
     rc=0;
     metrics=new QFontMetrics(QFont("微软雅黑",15));
@@ -79,7 +81,7 @@ void NSMVertexParam::setFlow(int value)
 {
     flow = value;
     if(getCapacity()==POS_INFINITY){
-        fWidth= metrics->horizontalAdvance(QString("%1 (∞)").arg(getFlow()));
+        fWidth= metrics->horizontalAdvance(QString("%1").arg(getFlow()));
     }else{
         fWidth= metrics->horizontalAdvance(QString("%1 (%2)").arg(getFlow()).arg(getCapacity()));
     }
@@ -104,7 +106,7 @@ void NSMVertexParam::setCapacity(int value)
 {
     capacity = value;
     if(getCapacity()==POS_INFINITY){
-        fWidth= metrics->horizontalAdvance(QString("%1 (∞)").arg(getFlow()));
+        fWidth= metrics->horizontalAdvance(QString("%1").arg(getFlow()));
     }else{
         fWidth= metrics->horizontalAdvance(QString("%1 (%2)").arg(getFlow()).arg(getCapacity()));
     }
@@ -301,5 +303,15 @@ int NSMVertexParam::getRc() const
 void NSMVertexParam::setRc(int value)
 {
     rc = value;
+}
+
+int NSMVertexParam::getOriCost() const
+{
+    return oriCost;
+}
+
+void NSMVertexParam::setOriCost(int value)
+{
+    oriCost = value;
 }
 

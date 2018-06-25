@@ -89,12 +89,16 @@ public:
     int getRc() const;
     void setRc(int value);
 
+    int getOriCost() const;
+    void setOriCost(int value);
+
 private:
     int p;
     int capacity;
     int c;
     int rc;
     int cost;
+    int oriCost;
     int flow;
     int fX;
     int fY;

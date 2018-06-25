@@ -2,6 +2,7 @@
 #define COMMON_H
 #define POS_INFINITY 1073741823 //max pos integer /2
 #define ERROR_CODE -1073741824
+#define UNSUPPORTED_ERROR -1073741823
 #define VERTEX_SIZE 50
 #define PI 3.1415926535897932
 #define FLOYDMAXDISPLAY 15
@@ -21,6 +22,7 @@
 #include "nsmvertexdata.h"
 #include "nsmvertexparamdata.h"
 #include "nsmgraphdata.h"
+#include "nsmdummyedge.h"
 double calcDeg(int x1,int y1,int x2,int y2);
 QPoint calcTail(int x,int y,double deg,double len);
 double calcDis(double x1, double y1, double x2, double y2);

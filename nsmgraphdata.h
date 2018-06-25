@@ -3,6 +3,7 @@
 #include <QList>
 class NSMVertexData;
 class BaseMatrix;
+class BaseVector;
 class NSMGraphData
 {
 public:
@@ -16,9 +17,15 @@ public:
     BaseMatrix *getBaseMatrix() const;
     void setBaseMatrix(BaseMatrix *value);
 
+    BaseVector *getInVector() const;
+
+    BaseVector *getOutVector() const;
+
 private:
     QList<NSMVertexData*> *vertexDatas;
     BaseMatrix* baseMatrix;
+    BaseVector* inVector;
+    BaseVector* outVector;
     int phase;
 };
 

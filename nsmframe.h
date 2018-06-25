@@ -37,9 +37,9 @@ public:
     QPoint mouseToReal2(int x, int y);
     QPoint realToMouse(int x, int y);
     NSMVertex *getDummyVertex() const;
-
+    QPoint calcEdgeCenter(NSMVertex *v1, NSMVertex *v2);
     QRect getPainterRect() const;
-
+    void moveDummyLabel();
 protected:
     void paintEvent(QPaintEvent *event);
     void mousePressEvent(QMouseEvent *event);
@@ -101,13 +101,12 @@ private:
     void drawStraightEdge(QPainter *painter, NSMVertex *v1, NSMVertex *v2);
     void drawDemand(QPainter *painter);
     void drawDualVariable(QPainter *painter);
-    QPoint calcEdgeCenter(NSMVertex *v1, NSMVertex *v2);
     void setDegAndDisByVertexMove(NSMVertex *v1, NSMVertex *v2, NSMVertexParam *vp);
     void drawFlowAndCapacity(QPainter *painter, NSMVertexParam *param);
     void drawCost(QPainter *painter, NSMVertexParam *param);
     void drawCurveEdge(QPainter *painter, NSMVertex *v1, NSMVertex *v2);
-    void drawCurveDummyEdge(QPainter *painter, NSMVertex *v1, NSMVertex *v2);
-    void drawStraightDummyEdge(QPainter *painter, NSMVertex *v1, NSMVertex *v2);
+    void drawCurveDummyEdge(QPainter *painter, NSMVertex *v1, NSMVertex *v2, bool base, bool out);
+    void drawStraightDummyEdge(QPainter *painter, NSMVertex *v1, NSMVertex *v2, bool base, bool out);
 };
 
 #endif // NSMFRAME_H
